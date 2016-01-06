@@ -3,11 +3,11 @@ import os
 import sys
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "frontend.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "frontend.settings.dev")
 
     from django.core.management import execute_from_command_line
 
-    if sys.argv[1] == "demonstration":
+    if sys.argv[1] == "migrate-and-run":
         execute_from_command_line([sys.argv[0], "makemigrations", "frontend"])
         execute_from_command_line([sys.argv[0], "syncdb", "--noinput"])
         execute_from_command_line([sys.argv[0], "migrate", "frontend"])

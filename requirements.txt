@@ -1,1 +1,10 @@
-celery
+Django>=1.7
+celery>=2.5.2
+django-celery
+unittest2>=0.4.0
+coverage>=3.0
+nose
+nose-cover3
+mock
+django-nose
+python-memcached
