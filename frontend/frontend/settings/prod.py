@@ -10,10 +10,10 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import djcelery # Django-Celery integration
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+# Django-Celery integration
+import djcelery
 djcelery.setup_loader()
 
 BROKER_URL = "amqp://frontend:frontend@192.168.1.10:5672//"
@@ -36,29 +36,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
     'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap_themes',
     'djcelery',
-    'apps.common',
-    'apps.scheme',
-    'apps.profiles',
-    'apps.wizard',
 )
-
-AUTH_USER_MODEL = 'common.GenericUser'
-AUTH_ADMIN_MODEL = 'scheme.Administrator'
-USER_ADMIN_FORMS = 'common.forms'
-
-AUTHENTICATION_BACKENDS = (
-    'frontend.backends.GenericUserBackend',
-    'frontend.backends.SuperUserCreationBackend',
-)
-#    'django.contrib.auth.backends.ModelBackend',
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,12 +65,12 @@ WSGI_APPLICATION = 'frontend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'scapl.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': ''},
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'scapl',
+        'USER': 'scapl',
+        'PASSWORD': 'secret',
+        'HOST': '192.168.1.20',
+        'PORT': '3306'},
     'celery': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'celery.sqlite3'),
@@ -114,37 +99,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
-# For handling automatic admin creation
-ADMIN_EMAIL = 'admin@localhost'
-ADMIN_PASSWORD = u'bcrypt_sha256$$2a$12$Gt54zH8Vta8mft0m4QRuzO0o6aqGlt298/NF6q3qF41HBGH/9ypBe'  # admin
-
-
-# For managing passowrd hashing algorithm
-PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.BCryptPasswordHasher',
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
-    'django.contrib.auth.hashers.MD5PasswordHasher',
-    'django.contrib.auth.hashers.CryptPasswordHasher',
-]
-
-# Password validation
-# AUTH_PASSWORD_VALIDATORS = [
-#     {
-#         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-#     },
-#     {
-#         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-#         'OPTIONS': {'min_length': 8,}
-#     },
-#     {
-#         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-#     },
-#     {
-#         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-#     },
-# ]

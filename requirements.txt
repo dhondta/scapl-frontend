@@ -1,4 +1,5 @@
 Django>=1.7
+django-bootstrap-themes
 celery>=2.5.2
 django-celery
 unittest2>=0.4.0
@@ -8,3 +9,4 @@ nose-cover3
 mock
 django-nose
 python-memcached
+bcrypt
