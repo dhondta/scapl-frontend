@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import djcelery # Django-Celery integration
+import djcelery  # Django-Celery integration
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -34,14 +34,16 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = (
+    'django_admin_bootstrapped',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+#    'ordered_model',
+    'adminsortable2',
     'bootstrap_themes',
     'djcelery',
     'apps.common',
@@ -50,10 +52,12 @@ INSTALLED_APPS = (
     'apps.wizard',
 )
 
-AUTH_USER_MODEL = 'common.GenericUser'
+# Particular application customized authentication settings
+COMMON_APP = 'common'
+AUTH_USER_MODEL = COMMON_APP + '.GenericUser'
 AUTH_ADMIN_MODEL = 'scheme.Administrator'
-USER_ADMIN_FORMS = 'common.forms'
 
+# Backends for using the customized user model and for automatically creating a superuser
 AUTHENTICATION_BACKENDS = (
     'frontend.backends.GenericUserBackend',
     'frontend.backends.SuperUserCreationBackend',
@@ -148,3 +152,23 @@ PASSWORD_HASHERS = [
 #         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
 #     },
 # ]
+
+# customized context processing
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.static",
+)
+
+# set to False because of incompatibility with adminsortable
+CSRF_COOKIE_HTTPONLY = False
+
+# Specific SCAPL config
+DI_ID_DIGITS = 5
+DL_ID_DIGITS = 3
+DS_ID_DIGITS = 2

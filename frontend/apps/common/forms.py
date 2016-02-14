@@ -1,14 +1,11 @@
 # -*- coding: UTF-8 -*-
 from django import forms
-from django.apps import apps
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from .models import GenericUser
 
-user_app, user_model = settings.AUTH_USER_MODEL.split('.')
 
-
-class AdminsitratorAddForm(forms.ModelForm):
-    """ A form that creates a user, with privileges, from the given email and password """
+class GenericUserUpdateForm(forms.ModelForm):
+    """ A form handling user update with customized error messages and password confirmation """
     error_messages = {
         'duplicate_email': _("This email address already exists."),
         'password_mismatch': _("Both password fields didn't match."),
@@ -18,16 +15,8 @@ class AdminsitratorAddForm(forms.ModelForm):
                                 help_text=_("Enter the same password as above, for verification."))
 
     class Meta:
-        model = apps.get_app_config(user_app).get_model(user_model)
+        model = GenericUser
         fields = ('email', )
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        try:
-            self.model._default_manager.get(email=email)
-        except self.model.DoesNotExist:
-            return email
-        raise forms.ValidationError(self.error_messages['duplicate_email'])
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
@@ -38,7 +27,7 @@ class AdminsitratorAddForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        user = super(AdminsitratorAddForm, self).save(commit=False)
+        user = super(GenericUserUpdateForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         user.is_staff = True
         if commit:
@@ -46,6 +35,13 @@ class AdminsitratorAddForm(forms.ModelForm):
         return user
 
 
-class AdminsitratorUpdateForm(AdminsitratorAddForm):
-    """ A form to update user's data, based on the add form """
-    pass
+class GenericUserForm(GenericUserUpdateForm):
+    """ A form handling user creation with customized error messages, email validation and password confirmation """
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        try:
+            GenericUser._default_manager.get(email=email)
+        except GenericUser.DoesNotExist:
+            return email
+        raise forms.ValidationError(self.error_messages['duplicate_email'])

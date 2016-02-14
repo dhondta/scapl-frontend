@@ -1,8 +1,14 @@
 # -*- coding: UTF-8 -*-
+from django.conf import settings
 from django.contrib import admin
-from .models import Administrator, Entity, DataItem, ASDataItem, SEDataItem, DataList, DataSequence
-from .forms import AdminsitratorAddForm, AdminsitratorUpdateForm
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
+from importlib import import_module
+from adminsortable2.admin import SortableInlineAdminMixin
+from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataList, DataSequence, ItemListAssociations, ListSequenceAssociations
+
+cadmin = import_module("apps.{}.admin".format(settings.COMMON_APP))
+forms = import_module("apps.{}.forms".format(settings.COMMON_APP))
 
 
 def shorten(text):
@@ -11,49 +17,49 @@ def shorten(text):
     except AttributeError:
         return u'{}...'.format(text.content[0:27]) if len(text.content) > 30 else text.content
 
-"""
-    email = models.EmailField(max_length=254, unique=True, db_index=True)
-    groups = models.ForeignKey(Group, default=None)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    title = models.ForeignKey(Title, default=None, blank=True, null=True, related_name="users")
-    rank = models.ForeignKey(Rank, default=None, blank=True, null=True, related_name="users")
-    service = models.ForeignKey(Service, default=None, blank=True, null=True, related_name="users")
-    phone1 = models.CharField(max_length=30, default=None, blank=True, null=True)
-    phone2 = models.CharField(max_length=30, default=None, blank=True, null=True)
-    comments = models.TextField(max_length=1000, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-"""
+
+def make_item_orphan(modeladmin, request, queryset):
+    for obj in queryset:
+        ItemListAssociations.objects.filter(item_id=obj.id).delete()
+make_item_orphan.short_description = _("Unlink selected Data Items")
 
 
-class AdministratorAdmin(admin.ModelAdmin):
-    form = AdminsitratorUpdateForm
-    add_form = AdminsitratorAddForm
-    list_display = ('email', 'is_email_verified', 'service', 'is_staff', )
-    list_filter = ('is_active', 'is_email_verified', )
-    search_fields = ('first_name', 'last_name', 'email', )
-    ordering = ('email', )
+def make_list_orphan(modeladmin, request, queryset):
+    for obj in queryset:
+        ListSequenceAssociations.objects.filter(list_id=obj.id).delete()
+make_list_orphan.short_description = _("Unlink selected Data Lists")
+
+
+class AdministratorAdmin(cadmin.GenericUserAdmin):
+    list_display = ('email_emphasize_su', 'service', 'is_active', )
+    filter_horizontal = ('user_permissions', )
     fieldsets = (
-        (None, {'fields': ('email', 'password', )}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'title', 'rank', 'service', 'phone1', 'phone2', )}),
-        (_('Permissions'), {'fields': ('is_active', 'is_email_verified', 'is_staff', 'groups', 'user_permissions', )}),
-        (_('Status'), {'fields': ('last_login', 'date_joined', )}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')}
-        ),
+        (None, {'fields': ('email', ('password1', 'password2', ), )}),
+        (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ), 'service', ('phone1', 'phone2', ), )}),
+        (_('Permissions'), {'fields': (('is_active', 'is_staff', ), 'user_permissions', )}),
+        (_('Status'), {'fields': (('last_login', 'date_joined', ), )}),
     )
 
     class Meta:
         model = Administrator
 
+    def email_emphasize_su(self, administrator):
+        return format_html((u'<span style="color:red">{}</span>' if administrator.is_superuser else u'{}') \
+                           .format(str(administrator)))
+
+
+class ItemListAssociationsInline(SortableInlineAdminMixin, admin.StackedInline):
+    model = ItemListAssociations
+    extra = 1
+
+
+class ListSequenceAssociationsInline(SortableInlineAdminMixin, admin.StackedInline):
+    model = ListSequenceAssociations
+    extra = 1
+
 
 class EntityAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description_overview', 'author', 'date_modified', )
+    list_display = ('id_code', 'name', 'description_overview', 'author', 'date_modified', )
     list_filter = ('name', )
     search_fields = ('id', 'name', 'description', )
 
@@ -65,34 +71,32 @@ class EntityAdmin(admin.ModelAdmin):
             obj.author = request.user
         obj.save()
 
-    def description_overview(self, description):
-        return shorten(description)
+    def id_code(self, entity):
+        return str(entity)
+
+    def description_overview(self, entity):
+        return shorten(entity)
 
 
 class DataItemAdmin(EntityAdmin):
+    actions = (make_item_orphan, )
     fieldsets = (
         ('Identification', {
-            'classes': ['collapse', ],
-            'fields': ('name', 'list', )
+            'classes': ['wide', ],
+            'fields': ('name', 'description', )
         }),
-        ('Metadata', {
-            'fields': ('description', )
-        })
     )
 
 
 class ASDataItemAdmin(DataItemAdmin):
     fieldsets = (
         ('Identification', {
-            'classes': ['collapse', ],
-            'fields': ('name', 'list', )
-        }),
-        ('Metadata', {
-            'fields': ('description', )
+            'classes': ['wide', ],
+            'fields': ('name', 'description', )
         }),
         ('Action', {
             'fields': ('call', )
-        })
+        }),
     )
     # TODO: add 'call' validation
 
@@ -100,45 +104,41 @@ class ASDataItemAdmin(DataItemAdmin):
 class SEDataItemAdmin(DataItemAdmin):
     fieldsets = (
         ('Identification', {
-            'classes': ['collapse', ],
-            'fields': ('name', 'list', )
-        }),
-        ('Metadata', {
-            'fields': ('description', )
+            'classes': ['wide', ],
+            'fields': ('name', 'description', )
         }),
         ('Action', {
             'fields': ('api', 'keywords', 'max_suggestions', )
-        })
+        }),
     )
     # TODO: add 'api' and 'keywords' validation
 
 
 class DataListAdmin(EntityAdmin):
+    inlines = (ItemListAssociationsInline, )
     fieldsets = (
         ('Identification', {
-            'classes': ['collapse', ],
-            'fields': ('name', 'sequence', )
+            'classes': ['wide', ],
+            'fields': ('name', 'description', )
         }),
-        ('Metadata', {
-            'fields': ('description', )
-        })
     )
 
 
 class DataSequenceAdmin(EntityAdmin):
+    inlines = (ListSequenceAssociationsInline, )
     fieldsets = (
         ('Identification', {
-            'classes': ['collapse', ],
-            'fields': ('name', )
+            'classes': ['wide', ],
+            'fields': ('name', 'description', )
         }),
         ('Metadata', {
-            'fields': ('description', )
+            'fields': ('max_users', )
         })
     )
 
 
 admin.site.register(Administrator, AdministratorAdmin)
-admin.site.register(DataItem, DataItemAdmin)
+admin.site.register(ManualDataItem, DataItemAdmin)
 admin.site.register(ASDataItem, ASDataItemAdmin)
 admin.site.register(SEDataItem, SEDataItemAdmin)
 admin.site.register(DataList, DataListAdmin)

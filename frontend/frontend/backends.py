@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import check_password
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.timezone import now
 
 user_app, user_model = settings.AUTH_USER_MODEL.split('.')
 admin_app, admin_model = settings.AUTH_ADMIN_MODEL.split('.')
@@ -41,7 +42,7 @@ class GenericUserBackend(GenericBackend):
 
 
 class SuperUserCreationBackend(GenericBackend):
-    """ Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD and create the admin if it doesn't exist. """
+    """ Authenticate against the settings ADMIN_EMAIL and ADMIN_PASSWORD and create the admin if it doesn't exist. """
 
     @property
     def admin_model(self):
@@ -62,6 +63,7 @@ class SuperUserCreationBackend(GenericBackend):
                 admin.is_staff = True
                 admin.is_superuser = True
                 admin.is_email_verified = True
+                admin.last_login = now()
                 admin.save()
             return admin
         return None

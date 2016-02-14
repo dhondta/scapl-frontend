@@ -61,3 +61,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# DJango DB and migrations
+frontend/apps/common/migrations/
+frontend/apps/profiles/migrations/
+frontend/apps/scheme/migrations/
+frontend/apps/wizard/migrations/
+frontend/scapl.sqlite3
+

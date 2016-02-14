@@ -1,5 +1,7 @@
 Django>=1.7
+django_admin_bootstrapped
 django-bootstrap-themes
+django-admin-sortable2
 celery>=2.5.2
 django-celery
 unittest2>=0.4.0
