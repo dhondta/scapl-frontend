@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+{% block datesforms %} {% load bootstrap_tags %} {% endblock %}
+{% block title %}My Care4Care Mailbox{% endblock %}
+{% block titlebar %}Mailbox{% endblock %}
+{% block content %}
+	<div class="container">
+		<div class="row">
+	    <div class="col-sm-2 col-md-2">
+	          
+	            <hr />
+	            <ul class="nav nav-pills nav-stacked">
+	                <li class="active"><a href="#"><span class="badge pull-right">{{ messagelastto|length }}</span> Inbox </a>
+	                </li>
+	                
+	            </ul>
+	        </div>
+	     </div>
+	     <hr />
+	    <div class="row">
+	        
+	        
+	        <div class="col-sm-9 col-md-10">
+	            <!-- Nav tabs -->
+	            <ul class="nav nav-tabs">
+	                <li class="active"><a href="#inbox" data-toggle="tab"><span class="glyphicon glyphicon-inbox">
+	                </span>Inbox</a></li>
+	                <li><a href="#sendmail" data-toggle="tab">Sent Mail</a></li>
+	                <li ><a href="#newmail" data-toggle="tab"><span class="glyphicon glyphicon-envelope">
+	                </span>New Mail</a></li>	               	
+	            </ul>
+	            <!-- Tab panes -->
+	            <div class="tab-content">
+	                <div class="tab-pane fade in active" id="inbox">
+	                    <div class="list-group">
+	                      {% for msg in messagelastto %}
+                        	<a href="{% url 'view_mailbox' msg_id=msg.id %}" class="list-group-item">
+                        		                         		 
+                                
+                                <span class="name" style="min-width: 120px; display: inline-block;">{{ msg.user_from.id.first_name }}&nbsp;{{ msg.user_from.id.last_name }}</span> 
+                                <span class="">{{ msg.obj_message |truncatechars:20 }}</span>
+                                <span class="text-muted" style="font-size: 11px;">-{{ msg.message | striptags | truncatechars:60 }}</span> 
+                                <span class="badge">{{ msg.insert_datetime |date:"d/m/Y" }}</span>
+                                <span class="badge">{{ msg.insert_datetime |time:'H:i' }}</span> 
+                            </a>
+                          {% endfor %}
+                            
+	                    </div>
+	                </div>
+	                <div class="tab-pane fade in" id="sendmail">
+	                    <div class="list-group">
+	                    {% for  msg in messagelastfrom %}
+	                        <a href="{% url  'view_mailbox' msg_id=msg.id %}" class="list-group-item">
+	                                                       
+	                            <span class="name" style="min-width: 120px; display: inline-block;">{{ msg.user_to.id.first_name }}&nbsp;{{ msg.user_to.id.last_name }}</span>
+								<span class="">{{ msg.obj_message |truncatechars:20}}</span>
+                                <span class="text-muted" style="font-size: 11px;">-{{ msg.message | striptags |truncatechars:60 }}</span>
+	                            <span class="badge">{{ msg.insert_datetime |date:"d/m/Y" }}</span>
+	                            <span class="badge">{{ msg.insert_datetime |time:'H:i' }}</span>
+	                       {% endfor %}     
+                            </a>
+	                    </div>
+	                </div>
+	                <div class="tab-pane fade in" id="newmail">
+	                	<div class="panel-orange">
+	                	
+			                	<form class="form-horizontal" id="mail_form" role="form" method="post" action="{% url 'view_mailbox' %}">
+		    			{% csrf_token %}
+		
+		        	 	{{mail_form.media}}
+		
+		        	 	
+			    		{{mail_form.user_to.errors}}
+			    		<div class="row">
+			    		<div class="col-lg-2">{{mail_form.user_to.label_tag}}</div><div class="col-lg-2"> {{ mail_form.user_to }}</div>
+			    		</div>
+			    		<br/>
+			    		<div class="row">
+			    		{{mail_form.obj_message.errors}}
+			    		<div class="col-lg-2">{{mail_form.obj_message.label_tag}}</div>
+			    		<div class="col-lg-2">{{mail_form.obj_message}}</div>
+			    		</div>
+			    		<br/>
+			    		{{mail_form.message.errors}}
+			    		{{mail_form.message.label_tag}}
+			    		{{mail_form.message}}
+			    	<button type="submit" class="btn btn-primary">Send mail</button>
+						</form>
+	                	
+	                    </div>
+	                </div>
+	                
+	                
+	                
+	            </div>
+	            <div class="panel panel-orange">
+	            	
+	            	<div class="panel-heading">
+						<h3 class="panel-title"> Subject:&nbsp;{{ msg.obj_message }} &nbsp;{{ msg.user_from.id.username }} &nbsp;{{ msg.user_from.id.first_name }} &nbsp;{{ msg.user_from.id.last_name }}</h3>
+						<span class="badge">{{ msg.insert_datetime |date:"d/m/Y" }}</span>
+                        <span class="badge">{{ msg.insert_datetime |time:'H:i' }}</span> 
+					</div>
+					{{ msg.message |safe }}
+	            </div>
+	         	
+	        </div>
+
+
+	    </div>
+
+
+	
+
+{% endblock %}

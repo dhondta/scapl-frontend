@@ -47,6 +47,7 @@ class DataSequence(Entity):
     user = models.ManyToManyField(GenericUser, related_name="sequences")
 
     class Meta:
+        ordering = ('id', )
         verbose_name = _("Data sequence")
         verbose_name_plural = _("Data sequences")
 
@@ -61,6 +62,7 @@ class DataList(Entity):
     sequences = models.ManyToManyField(DataSequence, through='ListSequenceAssociations', related_name="lists")
 
     class Meta:
+        ordering = ('id', )
         verbose_name = _("Data list")
         verbose_name_plural = _("Data lists")
 
@@ -73,6 +75,9 @@ class DataItem(Entity):
     id = models.IntegerField(primary_key=True)
     author = models.ForeignKey(GenericUser, null=True, blank=True, related_name="created_items")
     lists = models.ManyToManyField(DataList, through='ItemListAssociations', related_name="items")
+
+    class Meta:
+        ordering = ('id', )
 
     def __str__(self):
         return u'DI{}'.format(str(self.id).zfill(settings.DI_ID_DIGITS))
@@ -127,7 +132,7 @@ class ItemListAssociations(models.Model):
 
     class Meta:
         ordering = ('item_order', )
-        verbose_name = _("Item/List associations")
+        verbose_name = _("Item/List association")
         verbose_name_plural = _("Item/List associations")
 
     def __str__(self):
@@ -141,7 +146,7 @@ class ListSequenceAssociations(models.Model):
 
     class Meta:
         ordering = ('list_order', )
-        verbose_name = _("List/Sequence associations")
+        verbose_name = _("List/Sequence association")
         verbose_name_plural = _("List/Sequence associations")
 
     def __str__(self):

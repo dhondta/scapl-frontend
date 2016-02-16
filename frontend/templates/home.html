@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block toolbar %}
+ 	<li class="divider"></li>  	
+	<li><a style="color: white" href="{% url 'create_offer' %}">Create an offer</a></li>
+	<li><a style="color: white" href="{% url 'create_demand' %}">Create a demand</a></li>
+	<li class="divider"></li>
+{% endblock %}
+{% block titlebar %}MyCare4Care{% endblock %}
+{% block content %}
+    {% if registered %}
+    <div id="welcome">
+        <h1>Welcome, {{ user.first_name }} !</h1>
+    </div>
+    {% endif %}
+
+    {% if not user_group == 'User' %}
+	<div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-rose">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-envelope fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{ last_messages_count }}</div>
+                            <div>New Mails !</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-right"><a href="{% url 'view_mailbox' %}">View Details</a></span>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+         <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-clock-o fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{ events_today }}</div>
+                            <div>Events today !</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left"><a href="{% url 'view_agenda' %}">View Details</a></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        </div>
+    {% endif %}
+{% endblock %}

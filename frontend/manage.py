@@ -20,3 +20,16 @@ if __name__ == "__main__":
         execute_from_command_line(sys.argv)
     else:
         execute_from_command_line(sys.argv)
+
+
+"""
+django-extensions:
+
+ :export_mails: e.g. with '--format=google google.csv', generates a list of emails from all users
+ :graph_models: with '-a -o myapp_models.png', generates a graphviz graph of app models
+ :runserver_plus: enhanced runserver
+ :shell_plus: enhanced shell
+ :show_urls: produces a tab-separated list of (url_pattern, view_function, name) tuples
+ :validate_templates: checks templates for rendering errors
+
+"""

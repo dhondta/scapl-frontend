@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+{% block datesforms %}{{ job_form.media }} {% endblock %}
+{% block title %}Job{% endblock %}
+{% block titlebar %}Care4Care Demand{% endblock %}
+{% block content %}
+{% load bootstrap_tags %}
+
+	<div class="panel-blue">
+        <div class="panel-heading">
+            <h3 class="panel-title"> Job Detail</h3>
+        </div>
+
+        <br />
+    <strong>Demander : {{ demander }}</strong>
+    <br />
+    <strong>Offerer : {{ offerer }}</strong>
+        <br />
+    <form method="post" action="{% url 'pending_job' %}">
+        {% csrf_token %}
+        {{ jobForm|as_bootstrap }}
+        {% if user.pk == pk and open %}
+            <button type="submit" name="accept_job" >Accept job</button>
+        {% endif %}
+    </form>
+
+    </div>
+
+{% endblock %}

@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = (
+    'bootstrap3',
     'django_admin_bootstrapped',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -42,27 +43,30 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-#    'ordered_model',
+    'django_extensions',
+    'smuggler',
     'adminsortable2',
     'bootstrap_themes',
-    'djcelery',
-    'apps.common',
-    'apps.scheme',
-    'apps.profiles',
-    'apps.wizard',
+# TODO: Enable 'storages' for production version
+#    'storages',
+    'frontend.apps.CeleryAppConfig',
+    'frontend.apps.CommonAppConfig',
+    'frontend.apps.ProfilesAppConfig',
+    'frontend.apps.SchemeAppConfig',
+    'frontend.apps.WizardAppConfig',
 )
 
 # Particular application customized authentication settings
 COMMON_APP = 'common'
 AUTH_USER_MODEL = COMMON_APP + '.GenericUser'
 AUTH_ADMIN_MODEL = 'scheme.Administrator'
+SCHEME_SOURCE = 'apps.scheme.views.get_scheme'
 
 # Backends for using the customized user model and for automatically creating a superuser
 AUTHENTICATION_BACKENDS = (
     'frontend.backends.GenericUserBackend',
     'frontend.backends.SuperUserCreationBackend',
 )
-#    'django.contrib.auth.backends.ModelBackend',
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -117,6 +121,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_URL = '/static/'
 
 
@@ -136,6 +141,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.CryptPasswordHasher',
 ]
 
+# TODO: Enable for production version
 # Password validation
 # AUTH_PASSWORD_VALIDATORS = [
 #     {
@@ -165,10 +171,29 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
 )
 
-# set to False because of incompatibility with adminsortable
-CSRF_COOKIE_HTTPONLY = False
+# Set to False because of incompatibility with adminsortable (normally, no longer required with adminsortable2
+#CSRF_COOKIE_HTTPONLY = False
 
 # Specific SCAPL config
 DI_ID_DIGITS = 5
 DL_ID_DIGITS = 3
 DS_ID_DIGITS = 2
+
+# TODO: Enable FTP for production version
+# File storage (for APL packages)
+MEDIA_ROOT = MEDIA_URL = '/packages/'
+# DEFAULT_FILE_STORAGE = 'storages.backends.ftp.FTPStorage'
+
+# TODO: Enable Memcache for production version
+# Cache management
+# https://docs.djangoproject.com/en/1.9/topics/cache/#memcached
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+#         'LOCATION': '/tmp/memcached.sock',
+#     }
+# }
+
+# Smuggler configuration
+SMUGGLER_FIXTURE_DIR = '/data/'
+#SMUGGLER_EXCLUDE_LIST = []

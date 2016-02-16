@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Registration{% endblock %}
+{% block toolbar %}{% endblock %}   
+{% block menu %}{% endblock %}   
+{% block user_summary %}{% endblock %}
+{% block titlebar %}Registration{% endblock %}
+{% block content %}
+{% load bootstrap_tags %}
+ 
+
+<div style="width: 50%;" class="container">
+
+  <div class="panel panel-blue">
+        <div class="panel-heading"><center><h3>Sign up to become a member of the Care4Care project</h3></center></div>
+    </div>
+
+  {% if registered %}
+    <strong>Thank you for registering! </strong>
+    <a href="/">Return to the index page.</a><br />
+  {% else %}
+
+  <h4><strong>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }} </strong></h4>
+  {% for field in form %}
+    {{ field.error }}
+  {% endfor %}
+
+  <form id="user_form" role="form" method="post" action="{% url 'sign_up' %}"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <center>
+        <table><tr><td>
+            {{ wizard.management_form }}
+            {% if wizard.steps.step1 == 1 %}
+              {{ become_user.text|safe }}
+              {{ wizard.form|as_bootstrap }}
+            {% elif wizard.steps.step1 == 2 %}
+              {{ quick_procedure.text|safe }}
+              {{ wizard.form|as_bootstrap }}
+            {% else %}
+              <input type="checkbox" name="become_member" id="id_become_member" value="true"/>
+              <label for="id_become_member">Check this box if you want to become a member</label>
+              {{ join_a_branch.text|safe }}
+              {{ wizard.form|as_bootstrap }}
+            {% endif %}
+        </td></tr></table>
+        {% if wizard.steps.step1 == 1 %}
+          <button style="display: none;" class="btn btn-info" type="submit" name="wizard_prev" value="{{ wizard.steps.prev }}"><i class="fa fa-chevron-left fa-2x"></i></button>
+        {% else %}
+          <button class="btn btn-info" type="submit" name="wizard_prev" value="{{ wizard.steps.prev }}"><i class="fa fa-chevron-left fa-2x"></i></button>
+        {% endif %}
+            &nbsp;&nbsp;&nbsp;
+        {% if wizard.steps.step1 == 3 %}
+          <button class="btn btn-info" type="submit" name="submit" value="Submit"><i class="fa fa-check fa-2x"></i></button>
+        {% else %}
+          <button class="btn btn-info" type="submit" name="wizard_next" value="{{ wizard.steps.next }}"><i class="fa fa-chevron-right fa-2x"></i></button>
+        {% endif %} </center>
+    </form>
+</div>
+
+{% endif %}
+{% endblock %}

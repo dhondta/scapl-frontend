@@ -1,0 +1,13 @@
+{% if user.is_staff and user.is_authenticated %}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-gear fa-lg"></i> <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+        <li><a href="/admin/"><i class="fa fa-fw fa-th-list"></i> Administration</a></li>
+        <li class="divider"></li>
+        <li><a href="{% url 'edit_parameter' %}?type=page"><i class="fa fa-fw fa-file-text-o"></i> Edit pages</a></li>
+        <li><a href="{% url 'edit_parameter' %}?type=content"><i class="fa fa-fw fa-file-text-o"></i> Edit contents</a></li>
+        <li><a href="{% url 'edit_parameter' %}?type=help"><i class="fa fa-fw fa-file-text-o"></i> Edit help texts</a></li>
+        <li style="width: 180px;"><a href="{% url 'edit_parameter' %}?type=procedure"><i class="fa fa-fw fa-file-text-o"></i> Edit procedures</a></li>
+    </ul>
+</li>
+{% endif %}

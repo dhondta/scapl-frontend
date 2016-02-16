@@ -11,11 +11,11 @@ cadmin = import_module("apps.{}.admin".format(settings.COMMON_APP))
 forms = import_module("apps.{}.forms".format(settings.COMMON_APP))
 
 
-def shorten(text):
+def shorten(text, length=50):
     try:
-        return u'{}...'.format(text.description[0:27]) if len(text.description) > 30 else text.description
+        return u'{}...'.format(text.description[0:27]) if len(text.description) > length else text.description
     except AttributeError:
-        return u'{}...'.format(text.content[0:27]) if len(text.content) > 30 else text.content
+        return u'{}...'.format(text.content[0:27]) if len(text.content) > length else text.content
 
 
 def make_item_orphan(modeladmin, request, queryset):

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+{% block title %}My {% if favourites %}Favourite and Ignored Members{% else %}Personal Network{% endif %}{% endblock %}
+{% block toolbar %}{% include "obj/bar_top_user.html" %}{% endblock %}
+{% block titlebar %}My Care4Care {% if favourites %}Favourite and Ignored Members{% else %}Personal Network{% endif %}{% endblock %}
+{% block content %}
+    {% if favourites %}
+    <div class="panel panel-green">
+	  <!-- Default panel contents -->
+	  <div class="panel-heading">Favourite members</div>
+
+	  <!-- PROFILES TABLE  -->
+	  <table class="table">
+     <thead>
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Membership</th>
+            <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for p in favourites %}
+            <tr>
+              <td> {{ p.favourite.id.first_name }}</td>
+              <td> {{ p.favourite.id.last_name }} </td>
+              <td> {{ p.favourite.status }} </td>
+              <td> {{ phones }} </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+	  </table>
+	</div>
+    {% endif %}
+
+    {% if ignored %}
+    <div class="panel panel-red">
+	  <!-- Default panel contents -->
+	  <div class="panel-heading">Ignored members</div>
+
+	  <!-- PROFILES TABLE  -->
+	  <table class="table">
+     <thead>
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Membership</th>
+            <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for p in ignored %}
+            <tr>
+              <td> {{ p.favourite.id.first_name }}</td>
+              <td> {{ p.favourite.id.last_name }} </td>
+              <td> {{ p.favourite.status }} </td>
+              <td> {{ phones }} </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+	  </table>
+	</div>
+    {% endif %}
+
+    {% if personal_network %}
+	<div class="panel panel-blue">
+	  <!-- Default panel contents -->
+	  <div class="panel-heading">Personal network members</div>
+	  <!-- OFFERS TABLE -->
+	  <table class="table">
+	    <thead>
+          <tr>
+            <th>Username</th>
+            <th>Emmergency contact</th>
+            <th>Phone</th>
+            <th>Comment</th>
+            <th>Agenda</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for p in personal_network %}
+              <tr>
+                <td>{{ pn.member.id.username }}</td>
+                <td>{% if pn.emergency_contact == True %}<i class="fa fa-check fa-fw"></i>{% endif %}</td>
+                <td>{{ pn.member.phone1 }}</td>
+                <td>{{ pn.comment }}</td>
+                <td><i class="fa fa-calendar fa-fw"></i> </td>
+                <td><a href="{% url 'delete_pn' pk=pn.id %}"><i class="fa fa-times fa-fw"></i></a></td>
+              </tr>
+            {% endfor %}
+        </tbody>
+	  </table>
+	</div>
+    {% endif %}
+{% endblock %}

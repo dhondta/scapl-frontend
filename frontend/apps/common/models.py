@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from bootstrap_themes import list_themes
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.mail import send_mail
 from django.db import models
@@ -156,6 +157,7 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True, editable=False)
+    theme = models.CharField(max_length=128, default='default', choices=list_themes())
 
     objects = GenericUserManager()
 

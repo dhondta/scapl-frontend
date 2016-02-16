@@ -1,0 +1,27 @@
+{% load static %}
+{% if user.is_authenticated %}
+    <table width="100%">
+        <tr>
+            <td rowspan="2">
+                <!-- Profile picture -->
+                <a href="{% url 'edit_own_profile' %}">
+                    {% if user.profile.picture %}
+                        <img class="profile-object-img" src='{{ user.profile.picture.url }}' alt="Picture can't be displayed">
+                    {% else %}
+                        <img class="profile-object-img" src="{% static 'img/profile_pic_default.gif' %}" alt="Picture can't be displayed">
+                    {% endif %}
+                </a>
+            </td>
+            <td><span style="position: relative; top: -10px;">
+                <h4><b>Time credits</b> : <br /> {{ n_hours }} hours {{ n_minutes }} min</h4>
+            </span></td>
+        </tr>
+        <tr>
+            <td>
+            <!-- Profile summary  -->
+                <span style="color: orange; position: relative; top: -10px;">&nbsp;&nbsp;{{ n_offers }} pending offers</span> <br />
+                <span style="color: lightblue; position: relative; top: -10px;">&nbsp;&nbsp;{{ n_demands }} pending demands</span>
+            </td>
+        </tr>
+    </table>
+{% endif %}

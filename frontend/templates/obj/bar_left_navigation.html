@@ -1,0 +1,12 @@
+<li><a style="color :white" href="{% url 'view_home' %}"><i class="fa fa-home fa-fw fa-lg"></i> Home</a></li>
+<li><a style="color :white" href="{% url 'view_own_profile' %}"><i class="fa fa-fw fa-user fa-lg"></i> Profile</a></li>
+<li><a style="color :white" href="{% url 'view_profiles_list' %}?filter=pn"><i class="fa fa-fw fa-users fa-lg"></i> Personnal Network</a></li>
+{% if not user_group == 'User' %}
+<li><a style="color :white" href="{% url 'view_profiles_list' %}?filter=fav"><i class="fa fa-fw fa-star fa-lg"></i> Favourites</a></li>
+{% if not user_group == 'Non Member' %}
+<li><a style="color :white" href="{% url 'use_credits' %}"><i class="fa fa-fw fa-dollar fa-lg"></i> Account</a></li>
+<li><a style="color :white" href="{% url 'view_jobs_list' %}"><i class="fa fa-fw fa-wrench fa-lg"></i> Jobs</a></li>
+{% endif %}
+<li><a style="color :white" href="{% url 'view_mailbox' %}"><i class="fa fa-fw fa-envelope fa-lg"></i> Mailbox</a></li>
+<li><a style="color :white" href="{% url 'view_agenda' %}"><i class="fa fa-fw fa-calendar fa-lg"></i> Agenda</a></li>
+{% endif %}

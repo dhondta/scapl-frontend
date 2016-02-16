@@ -1,10 +1,15 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+
+
+admin.site.site_title = 'SCAPL Frontend'
+admin.site.site_header = _('SCAPL Administration')
+admin.site.index_title = 'SCAPL-FE Internals Management'
+
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'frontend.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
+    url(r'^admin/', include('smuggler.urls')),  # before admin url patterns!
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^wizard/', include('apps.wizard.urls')),
 )
