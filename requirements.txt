@@ -1,6 +1,7 @@
 Django>=1.7
 django_admin_bootstrapped
 django-bootstrap-themes
+django-bootstrap3
 django-admin-sortable2
 django-storages
 django-smuggler
@@ -14,4 +15,6 @@ nose-cover3
 mock
 django-nose
 python-memcached
+pyparsing
+pydot2
 bcrypt

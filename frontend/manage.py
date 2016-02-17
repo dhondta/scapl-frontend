@@ -18,6 +18,8 @@ if __name__ == "__main__":
     elif sys.argv[1] == "runserver":
         # execute_from_command_line([sys.argv[0], "loaddata", "./data/initial.json"])
         execute_from_command_line(sys.argv)
+    elif sys.argv[1] == "draw_models":
+        execute_from_command_line([sys.argv[0], "graph_models", "-a", "-g", "-o", "scapl-frontend-models.png"])
     else:
         execute_from_command_line(sys.argv)
 
