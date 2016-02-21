@@ -13,7 +13,7 @@ if __name__ == "__main__":
         sys.argv[1] = "runserver"
         execute_from_command_line(sys.argv)
     elif sys.argv[1] == "migrate":
-        execute_from_command_line([sys.argv[0], "syncdb", "--noinput"])
+        execute_from_command_line([sys.argv[0], "migrate", "--run-syncdb"])
         execute_from_command_line(sys.argv)
     elif sys.argv[1] == "runserver":
         # execute_from_command_line([sys.argv[0], "loaddata", "./data/initial.json"])
