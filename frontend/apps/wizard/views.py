@@ -11,7 +11,7 @@ get_scheme = getattr(__import__(scheme_app, fromlist=[scheme_views]), scheme_fun
 
 
 def start_wizard(request, apl_id=None, seq_id=None):
-    if not seq_id:
+    if seq_id is None:
         return
     request.scheme = get_scheme(seq_id)
     print(request.scheme)

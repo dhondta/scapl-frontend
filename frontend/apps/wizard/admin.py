@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django.contrib import admin
+from .models import APLTask, APLTaskContributors, APLTaskItem
 
 
-# for apl tasks administration...
+admin.site.register(APLTask)
+admin.site.register(APLTaskContributors)
