@@ -1,0 +1,127 @@
+{% load staticfiles %}
+<div class="row"
+     style="background-image: url({% static 'assets/images/background.png' %}); ">
+
+
+    <!-- Profile Info and Notifications -->
+    <div class="col-md-6 col-sm-8 clearfix">
+        <ul class="user-info pull-left pull-none-xsm">
+
+
+            <ul class="user-info pull-left pull-right-xs pull-none-xsm">
+
+                <!-- Profile Info -->
+                <li class="profile-info dropdown pull-right">
+                    <!-- add class "pull-right" if you want to place this from right -->
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{% static 'assets/images/thumb-1.png' %}" alt="" class="img-circle"/>
+
+                        <span>Welcome,</span>
+                        <strong>{{UserName}}</strong>
+                    </a>
+
+
+                    <ul class="dropdown-menu">
+
+                        <!-- Reverse Caret -->
+                        <li class="caret"></li>
+
+                        <!-- Profile sub-links -->
+                        <li>
+                            <a href="#">
+                                Edit Profile
+                                <i class="entypo-user"></i>
+
+                            </a>
+                        </li>
+
+
+                        <li>
+                            <a href="#">
+                                Logout
+                                <i class="entypo-logout"></i>
+
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+
+            </ul>
+        </ul>
+
+    </div>
+
+
+    <!-- Raw Links -->
+    <div class="col-md-6 col-sm-4 clearfix hidden-xs">
+
+        <ul class="list-inline links-list pull-right">
+
+            <!-- Task Notifications -->
+            <li class="notifications dropdown">
+
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+                   data-close-others="true">
+                    Pending Task
+                    <i class="entypo-list"></i>
+                    <!-- <span class="badge badge-warning">1</span>-->
+                </a>
+
+
+                <ul class="dropdown-menu pull-left">
+                    <li class="top">
+                        {% comment TODO: display the number of pending tasks 'You have 2 pending tasks %}
+                        <p></p>
+                        {% endcomment %}
+                    </li>
+
+                    <li>
+                        <ul class="dropdown-menu-list scroller">
+                            <!-- example of task declaration
+                                           <li>
+                                               <a href="#">
+
+                       <span class="task">
+                           <span class="desc">Procurement</span>
+                           <span class="percent">27%</span>
+                       </span>
+
+                       <span class="progress">
+                           <span style="width: 27%;" class="progress-bar progress-bar-success">
+                               <span class="sr-only">27% Complete</span>
+                           </span>
+                       </span>
+                                               </a>
+                                           </li>
+                                           <li>
+                                               <a href="#">
+                       <span class="task">
+                           <span class="desc">App Development</span>
+                           <span class="percent">83%</span>
+                       </span>
+
+                       <span class="progress progress-striped">
+                           <span style="width: 83%;" class="progress-bar progress-bar-danger">
+                               <span class="sr-only">83% Complete</span>
+                           </span>
+                       </span>
+                                               </a>
+                                           </li>
+       -->
+                        </ul>
+                    </li>
+
+                    <li class="external">
+                        <a href="#">See all tasks</a>
+                    </li>
+                </ul>
+
+            </li>
+
+
+        </ul>
+
+    </div>
+
+</div>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+{% load  bootstrap_themes cache compress i18n navbar %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    {% bootstrap_styles theme='{{ user.theme }}' type='css' %}
+    {% bootstrap_styles theme='{{ user.theme }}' type='min.css' %}
+    {% bootstrap_script use_min=True %}
+    <link rel="stylesheet" href="{% static 'css/user.css' %}">
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
+	<link rel="icon" type="image/png" href="{% static 'icons/scapl.ico' %}" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="{% static 'js/html5shiv.js' %}"></script>
+    <script src="{% static 'js/respond.min.js' %}"></script>
+    <![endif]-->
+    <!-- jQuery Version 2.X compressed -->
+    <script src="{% static 'js/jquery-2.2.0.min.js' %}"></script>
+    <title>{% block title %}{% trans 'SCAPL Frontend' %}{% endblock %}</title>
+</head>
+
+<body>
+   {% if user.is_authenticated %}
+    <div id="wrapper">
+    {% else %}
+    <div id="wrapper1">
+    {% endif %}
+        <!-- Navigation -->
+        <nav class="navbar-fixed-top navbar-inverse " role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <!-- Logo Care4Care-->
+
+
+            </div>
+            <div class="collapse navbar-collapse">
+	        	<ul class="nav navbar-nav left-nav">
+                    {% block toolbar %}
+                        {% if user.is_authenticated or registered %}
+                            {% include "obj/bar_top_user.html" %}
+                        {% endif %}
+                    {% endblock %}
+	       		 </ul>
+	            <!-- Top Menu Items -->
+	            <ul class="nav navbar-right top-nav">
+              	{% if user.is_authenticated or registered %}
+                    {% include "obj/shortcut_mail.html" %}
+                    {% include "obj/menu_top_admin.html" %}
+                    {% include "obj/menu_top_user.html" %}
+                {% else %}
+                    {% include "obj/shortcut_signin.html" %}
+                    <li>
+                        <a  style="color: white" href="{% url 'sign_up' %}">Sign up</a>
+                    </li>
+                {% endif %}
+           		</ul>
+            		<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            		<div class="collapse navbar-collapse navbar-ex1-collapse" id="navigation">
+                		<ul class="nav navbar-nav side-nav">
+		                    <!-- <li class="active"> -->
+                              <li><a style="padding: 0px 0px 0px 0px;" href="{% url 'view_index' %}">
+                                <img src="{% static 'img/bannerlogo.jpg' %}"/></a></li>
+		                  	{% block menu %}{% include "obj/bar_left_navigation.html" %}{% endblock %}
+                            <li>{% include 'obj/bar_left_infos.html' %}</li>
+                		</ul>
+            		</div>
+                  	<!-- /.navbar-collapse -->
+            </div>
+        </nav>
+            <div id="page-wrapper">
+                <div class="container-fluid" >
+                    <!-- Page Heading -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <table class="title-bar"><tr>
+                                <td width="25%" valign="bottom"><h1 class="page-header"><small>{% block titlebar %}{% endblock %}</small></h1></td>
+                                <td width="50%" valign="center">
+                                    <center>
+                                        <h2><small>&nbsp;{% if msg_text %}<font color="{{ msg_color }}">
+                                            {% if msg_is_html %}{{ msg_text|safe }}{% else %}{{ msg_text }}{% endif %}</font>{% endif %}</small></h2>
+                                        {% if tip and tip.strip %}<center><h4><b><u>Tip</u> :</b> <i>{{ tip }}</i></h4></center>{% endif %}
+                                    </center>
+                                <td width="25%" valign="bottom">{% include "obj/pagelet_profile.html" %}</td>
+                            </tr></table>
+                        </div>
+                    </div>
+                     <!-- /.row -->
+                    {% block content %}
+                    {% endblock %}
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /#page-wrapper -->
+            <footer class="row">
+            {% block footer %}
+            {% endblock %}
+            </footer>
+        </div>
+        <!-- /#wrapper -->
+        </div>
+    </body>
+</html>

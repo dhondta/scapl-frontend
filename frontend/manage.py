@@ -23,7 +23,6 @@ if __name__ == "__main__":
     else:
         execute_from_command_line(sys.argv)
 
-
 """
 django-extensions:
 

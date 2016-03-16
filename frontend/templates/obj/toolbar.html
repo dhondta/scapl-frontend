@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<div class="row">
+
+    <!-- Language Selector -->
+    <div class="dropdown language-selector">
+
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-close-others="true">
+            <img src="{% static 'assets/images/flag-uk.png' %}"/>
+        </a>
+
+        <ul class="dropdown-menu pull-right">
+            <li>
+                <a href="#">
+                    <img src="{% static 'assets/images/flag-ne.png' %}"/>
+                    <span>Nederlands</span>
+                </a>
+            </li>
+            <li class="active">
+                <a href="#">
+                    <img src="{% static 'assets/images/flag-uk.png' %}"/>
+                    <span>English</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <img src="{% static 'assets/images/flag-fr.png' %}"/>
+                    <span>Français</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+</div>

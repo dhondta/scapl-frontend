@@ -30,7 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 INSTALLED_APPS = (
     'bootstrap3',
@@ -45,8 +44,8 @@ INSTALLED_APPS = (
     'smuggler',
     'adminsortable2',
     'bootstrap_themes',
-# TODO: Enable 'storages' for production version
-#    'storages',
+    # TODO: Enable 'storages' for production version
+    #    'storages',
     'frontend.apps.CeleryAppConfig',
     'frontend.apps.CommonAppConfig',
     'frontend.apps.ProfilesAppConfig',
@@ -79,7 +78,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'frontend.urls'
 
 WSGI_APPLICATION = 'frontend.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -115,18 +113,37 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-STATIC_URL = '/static/'
+"""copy the static files to the public accessible folder using manage.py
 
+# --link    Create a symbolic link to each file instead of copying.
+# --noinput Do NOT prompt the user for input of any kind.
+#
+python manage.py collectstatic -link --noinput
+"""
+# web accessible folder
+STATICFILES_DIRS = (
+    os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, 'static/').replace('\\', '/'),
+    # location of application, should not be public web accessible
+)
+# URL prefix for static files.
+# STATIC_URL = os.path.join(os.path.dirname(__file__),os.pardir,os.pardir,os.pardir, 'static/').replace('\\', '/')
+STATIC_URL = '/static/'
+# web accessible folder
+STATIC_ROOT = '/var/www/scapl-frontend/static/'
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    # 'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 
 # For handling automatic admin creation
 ADMIN_EMAIL = 'admin@localhost'
 ADMIN_PASSWORD = u'bcrypt_sha256$$2a$12$Gt54zH8Vta8mft0m4QRuzO0o6aqGlt298/NF6q3qF41HBGH/9ypBe'  # admin
-
 
 # For managing passowrd hashing algorithm
 PASSWORD_HASHERS = [
@@ -137,6 +154,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
     'django.contrib.auth.hashers.CryptPasswordHasher',
+
 ]
 
 # TODO: Enable for production version
@@ -157,10 +175,14 @@ PASSWORD_HASHERS = [
 #     },
 # ]
 
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # customized context processing
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'templates').replace('\\', '/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -172,13 +194,14 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.static',
             ],
         },
     },
 ]
 
 # Set to False because of incompatibility with adminsortable (normally, no longer required with adminsortable2
-#CSRF_COOKIE_HTTPONLY = False
+# CSRF_COOKIE_HTTPONLY = False
 
 # Specific SCAPL config
 DI_ID_DIGITS = 5
@@ -202,4 +225,11 @@ MEDIA_ROOT = MEDIA_URL = '/packages/'
 
 # Smuggler configuration
 SMUGGLER_FIXTURE_DIR = '/data/'
-#SMUGGLER_EXCLUDE_LIST = []
+# SMUGGLER_EXCLUDE_LIST = []
+
+getText = lambda x: x
+LANGUAGES = (
+    ('en', getText('EN')),
+    ('fr', getText('FR')),
+    ('nl', getText('NL')),
+)

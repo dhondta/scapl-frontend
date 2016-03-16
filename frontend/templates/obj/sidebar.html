@@ -1,0 +1,87 @@
+{% load staticfiles %}
+<div class="sidebar-menu">
+    <header style="" class="logo-env">
+        <!-- logo -->
+        <div style="" class="logo">
+            <a href="index.html">
+                <img src="{% static 'assets/images/Slogo.png' %}" alt="" width="120">
+            </a>
+        </div>
+
+        <!-- logo collapse icon -->
+
+        <div style="" class="sidebar-collapse">
+            <a href="#" class="sidebar-collapse-icon with-animation">
+                <!-- add class "with-animation" if you want sidebar to have animation during expanding/collapsing transition -->
+                <i class="entypo-menu"></i>
+            </a>
+        </div>
+
+
+        <!-- open/close menu icon (do not remove if you want to enable menu on mobile devices) -->
+        <div class="sidebar-mobile-menu visible-xs">
+            <a href="#" class="with-animation"><!-- add class "with-animation" to support animation -->
+                <i class="entypo-menu"></i>
+            </a>
+        </div>
+
+    </header>
+
+
+    <ul style="" id="main-menu" class="">
+        <!-- add class "multiple-expanded" to allow multiple submenus to open -->
+        <!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+        <!-- Search Bar -->
+        <li class="root-level" id="search">
+            <form method="get" action="">
+                <input style="" name="q" class="search-input" placeholder="Search..." type="text">
+                <button style="" type="submit">
+                    <i class="entypo-search"></i>
+                </button>
+            </form>
+        </li>
+        <li class="root-level has-sub">
+            <a href="Profile.html">
+                <i class="entypo-user"></i>
+                <span style="">Profile</span>
+            </a>
+            <ul style="" class="">
+                <li class="active">
+                    <a href="index.html">
+                        <span style="">Edit profile</span>
+                    </a>
+                </li>
+
+
+            </ul>
+        </li>
+        <li class="">
+            <a href="reports.html">
+                <i class="entypo-doc-text"></i>
+                <span style="">Reports</span>
+            </a>
+        </li>
+        <li class="root-level has-sub">
+            <a href="tasks.html" target="_blank">
+                <i class="entypo-flow-tree"></i>
+                <span style="">Tasks</span>
+                <!--<span style="" class="badge badge-secondary badge-roundless">New</span>-->
+            </a>
+            <ul style="">
+                <li>
+                    <a href="wizard.html">
+                        <span style="">New wizard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="tasks.html">
+                        <span style="">All tasks</span>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+    </ul>
+
+</div>
