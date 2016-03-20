@@ -61,6 +61,7 @@ class SuperUserCreationBackend(GenericBackend):
                 admin = self.admin_model.objects.get(email=email)
             except self.admin_model.DoesNotExist:
                 admin = self.admin_model(email=email, password=settings.ADMIN_PASSWORD)
+                admin.type = 2
                 admin.is_active = True
                 admin.is_staff = True
                 admin.is_superuser = True

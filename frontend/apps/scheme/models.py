@@ -4,27 +4,41 @@ from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from importlib import import_module
 
 user_app, user_model = settings.AUTH_USER_MODEL.split('.')
-GenericUser = apps.get_app_config(user_app).get_model(user_model)
+ScaplUser = apps.get_app_config(user_app).get_model(user_model)
+cmodels = import_module("apps.{}.models".format(settings.COMMON_APP))
+
+profile_app, profile_model = settings.AUTH_ROLE_MODEL.split('.')
+ScaplRole = apps.get_app_config(profile_app).get_model(profile_model)
+
+# for name, obj in inspect.getmembers(settings.PROFILE_APP):
+#     if inspect.isclass(obj) and name.endswith("User"):
+#         exec("{} = {}".format(name, obj))
+
 
 """ (see SCAPL's SDD section 4.2 Data Dictionary for more details about the data scheme and models' meaning) """
 
 
-class Administrator(GenericUser):
+class AdministratorManager(cmodels.GenericUserManager):
+    def get_queryset(self):
+        return super(AdministratorManager, self).get_queryset().filter(type=2)
+
+
+class Administrator(ScaplUser):
     """ This model defines an administrator for the wizard application """
-    is_staff = True
+    objects = AdministratorManager()
 
     class Meta:
-#        permissions = (('scheme_edition', _('Can edit wizard\'s scheme')), )
+        proxy = True
         verbose_name = _("Administrator")
         verbose_name_plural = _("Administrators")
 
-    # TODO: to be deleted
-    # def create_superuser(self, email, date_of_birth, password):
-    #     user = self.create_user(email=email, date_of_birth=date_of_birth, password=password, is_staff=True)
-    #     user.save(using=self._db)
-    #     return user
+    def save(self, *args, **kwargs):
+        self.type = 2
+        self.is_staff = True
+        return super(Administrator, self).save(*args, **kwargs)
 
 
 class Entity(models.Model):
@@ -42,9 +56,9 @@ class Entity(models.Model):
 class DataSequence(Entity):
     """ This model defines the structure of a data sequence """
     id = models.IntegerField(primary_key=True)
-    author = models.ForeignKey(GenericUser, null=True, blank=True, related_name="created_sequences")
-    max_users = models.IntegerField(default=5)
-    user = models.ManyToManyField(GenericUser, related_name="sequences")
+    author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_sequences")
+    roles = models.ManyToManyField(ScaplRole, through='SequenceRoleAssociations', related_name="sequences")
+    # max_users = models.IntegerField(default=5)
 
     class Meta:
         ordering = ('id', )
@@ -58,7 +72,7 @@ class DataSequence(Entity):
 class DataList(Entity):
     """ This model defines the structure of a data list """
     id = models.IntegerField(primary_key=True)
-    author = models.ForeignKey(GenericUser, null=True, blank=True, related_name="created_lists")
+    author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_lists")
     sequences = models.ManyToManyField(DataSequence, through='ListSequenceAssociations', related_name="lists")
 
     class Meta:
@@ -73,7 +87,7 @@ class DataList(Entity):
 class DataItem(Entity):
     """ This model defines the generic structure of a data item """
     id = models.IntegerField(primary_key=True)
-    author = models.ForeignKey(GenericUser, null=True, blank=True, related_name="created_items")
+    author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_items")
     lists = models.ManyToManyField(DataList, through='ItemListAssociations', related_name="items")
 
     class Meta:
@@ -151,3 +165,15 @@ class ListSequenceAssociations(models.Model):
 
     def __str__(self):
         return self.list.description
+
+
+class SequenceRoleAssociations(models.Model):
+    sequence = models.ForeignKey(DataSequence, on_delete=models.CASCADE)
+    role = models.ForeignKey(ScaplRole, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = _("Sequence/role association")
+        verbose_name_plural = _("Sequence/role associations")
+
+    def __str__(self):
+        return self.sequence.description

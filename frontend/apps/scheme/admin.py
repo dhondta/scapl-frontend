@@ -5,7 +5,8 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from importlib import import_module
 from adminsortable2.admin import SortableInlineAdminMixin
-from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataList, DataSequence, ItemListAssociations, ListSequenceAssociations
+from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataList, DataSequence, \
+    ItemListAssociations, ListSequenceAssociations, SequenceRoleAssociations
 
 cadmin = import_module("apps.{}.admin".format(settings.COMMON_APP))
 forms = import_module("apps.{}.forms".format(settings.COMMON_APP))
@@ -30,6 +31,7 @@ def make_list_orphan(modeladmin, request, queryset):
 make_list_orphan.short_description = _("Unlink selected Data Lists")
 
 
+@admin.register(Administrator)
 class AdministratorAdmin(cadmin.GenericUserAdmin):
     list_display = ('email_emphasize_su', 'service', 'is_active', )
     filter_horizontal = ('user_permissions', )
@@ -39,6 +41,7 @@ class AdministratorAdmin(cadmin.GenericUserAdmin):
         (_('Permissions'), {'fields': (('is_active', 'is_staff', ), 'user_permissions', )}),
         (_('Status'), {'fields': (('last_login', 'date_joined', ), )}),
     )
+    add_fieldsets = fieldsets
 
     class Meta:
         model = Administrator
@@ -58,10 +61,21 @@ class ListSequenceAssociationsInline(SortableInlineAdminMixin, admin.StackedInli
     extra = 1
 
 
+class SequenceRoleAssociationsInline(admin.StackedInline):
+    model = SequenceRoleAssociations
+    extra = 1
+
+
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('id_code', 'name', 'description_overview', 'author', 'date_modified', )
     list_filter = ('name', )
     search_fields = ('id', 'name', 'description', )
+    fieldsets = (
+        (_('Identification'), {
+            'classes': ['wide', ],
+            'fields': ('name', 'description', )
+        }),
+    )
 
     class Meta:
         model = Entity
@@ -78,68 +92,42 @@ class EntityAdmin(admin.ModelAdmin):
         return shorten(entity)
 
 
+@admin.register(ManualDataItem)
 class DataItemAdmin(EntityAdmin):
     actions = (make_item_orphan, )
-    fieldsets = (
-        ('Identification', {
-            'classes': ['wide', ],
-            'fields': ('name', 'description', )
-        }),
-    )
 
 
+@admin.register(ASDataItem)
 class ASDataItemAdmin(DataItemAdmin):
-    fieldsets = (
-        ('Identification', {
-            'classes': ['wide', ],
-            'fields': ('name', 'description', )
-        }),
-        ('Action', {
+    fieldsets = EntityAdmin.fieldsets + (
+        (_('Action'), {
             'fields': ('call', )
         }),
     )
+    # fieldsets = (
+    #     EntityAdmin.fieldsets[0],
+    #     (_('Action'), {
+    #         'fields': ('call', )
+    #     }),
+    # )
     # TODO: add 'call' validation
 
 
+@admin.register(SEDataItem)
 class SEDataItemAdmin(DataItemAdmin):
-    fieldsets = (
-        ('Identification', {
-            'classes': ['wide', ],
-            'fields': ('name', 'description', )
-        }),
-        ('Action', {
+    fieldsets = EntityAdmin.fieldsets + (
+        (_('Action'), {
             'fields': ('api', 'keywords', 'max_suggestions', )
         }),
     )
     # TODO: add 'api' and 'keywords' validation
 
 
+@admin.register(DataList)
 class DataListAdmin(EntityAdmin):
     inlines = (ItemListAssociationsInline, )
-    fieldsets = (
-        ('Identification', {
-            'classes': ['wide', ],
-            'fields': ('name', 'description', )
-        }),
-    )
 
 
+@admin.register(DataSequence)
 class DataSequenceAdmin(EntityAdmin):
-    inlines = (ListSequenceAssociationsInline, )
-    fieldsets = (
-        ('Identification', {
-            'classes': ['wide', ],
-            'fields': ('name', 'description', )
-        }),
-        ('Metadata', {
-            'fields': ('max_users', )
-        })
-    )
-
-
-admin.site.register(Administrator, AdministratorAdmin)
-admin.site.register(ManualDataItem, DataItemAdmin)
-admin.site.register(ASDataItem, ASDataItemAdmin)
-admin.site.register(SEDataItem, SEDataItemAdmin)
-admin.site.register(DataList, DataListAdmin)
-admin.site.register(DataSequence, DataSequenceAdmin)
+    inlines = (ListSequenceAssociationsInline, SequenceRoleAssociationsInline, )

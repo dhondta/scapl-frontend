@@ -55,9 +55,13 @@ INSTALLED_APPS = (
 
 # Particular application customized authentication settings
 COMMON_APP = 'common'
-AUTH_USER_MODEL = COMMON_APP + '.GenericUser'
-AUTH_ADMIN_MODEL = 'scheme.Administrator'
-SCHEME_SOURCE = 'apps.scheme.views.get_scheme'
+PROFILE_APP = 'profiles'
+SCHEME_APP = 'scheme'
+AUTH_ABSTRACT_USER_MODEL = '%s.GenericUser' % COMMON_APP
+AUTH_USER_MODEL = '%s.ScaplUser' % PROFILE_APP
+AUTH_ROLE_MODEL = '%s.ScaplRole' % PROFILE_APP
+AUTH_ADMIN_MODEL = '%s.Administrator' % SCHEME_APP
+SCHEME_SOURCE = 'apps.%s.views.get_scheme' % SCHEME_APP
 
 # Backends for using the customized user model and for automatically creating a superuser
 AUTHENTICATION_BACKENDS = (
@@ -138,7 +142,7 @@ STATIC_ROOT = '/var/www/scapl-frontend/static/'
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    # 'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 # For handling automatic admin creation
@@ -207,6 +211,7 @@ TEMPLATES = [
 DI_ID_DIGITS = 5
 DL_ID_DIGITS = 3
 DS_ID_DIGITS = 2
+RL_ID_DIGITS = 2
 
 # TODO: Enable FTP for production version
 # File storage (for APL packages)

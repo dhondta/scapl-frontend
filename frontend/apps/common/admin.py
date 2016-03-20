@@ -20,13 +20,7 @@ class GenericUserAdmin(admin.ModelAdmin):
         (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ), 'service', ('phone1', 'phone2', ), )}),
         (_('Status'), {'fields': (('last_login', 'date_joined', ), )}),
     )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', ('password1', 'password2', ), ),
-            'exclude': ('first_name', 'last_name', )
-        }),
-    )
+    add_fieldsets = fieldsets
 
     class Meta:
         model = GenericUser
