@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+{% load staticfiles %}
+
+{% block title %}Registration{% endblock %}
+{% block extra_script %}
+<script src="{% static 'assets/js/neon-register.js' %}"></script>
+<script src="{% static 'assets/js/jquery.inputmask.bundle.min.js' %}"></script>
+{% endblock %}
+<!--formRegistration-->
+{% block form %}
+{% include "obj/register-form.html" %}
+{% endblock %}
