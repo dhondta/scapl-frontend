@@ -80,16 +80,16 @@ class EntityAdmin(admin.ModelAdmin):
     class Meta:
         model = Entity
 
-    def save_model(self, request, obj, form, change):
-        if getattr(obj, 'author', None) is None:
-            obj.author = request.user
-        obj.save()
-
     def id_code(self, entity):
         return str(entity)
 
     def description_overview(self, entity):
         return shorten(entity)
+
+    def save_model(self, request, obj, form, change):
+        if getattr(form.instance, 'author', None) is None:
+            form.instance.author = request.user
+        form.instance.save()
 
 
 @admin.register(ManualDataItem)
@@ -126,8 +126,12 @@ class SEDataItemAdmin(DataItemAdmin):
 @admin.register(DataList)
 class DataListAdmin(EntityAdmin):
     inlines = (ItemListAssociationsInline, )
+    # FIXME: List save returns error "save() prohibited to prevent data loss due to unsaved related object 'list'." if items are provided with the stackedinlines.
+    #  see save_model() and save_formset() for a fix
 
 
 @admin.register(DataSequence)
 class DataSequenceAdmin(EntityAdmin):
     inlines = (ListSequenceAssociationsInline, SequenceRoleAssociationsInline, )
+    # FIXME: List save returns error "save() prohibited to prevent data loss due to unsaved related object 'sequence'." if items are provided with the stackedinlines.
+    #  see save_model() and save_formset() for a fix
