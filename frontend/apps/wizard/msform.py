@@ -11,11 +11,16 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.formtools.utils import security_hash
+try:
+    from django.contrib.formtools.utils import security_hash
+except ImportError:
+    from django.contrib.formtools.utils import form_hmac as security_hash
+
 
 class MultiFormWizard(object):
     # The HTML (and POST data) field name for the "step" variable.
     step_field_name = "wizard_step"
+
     def __init__(self, **kwargs):
         """
         Changed __init__ method to suit our needs
@@ -59,11 +64,9 @@ class MultiFormWizard(object):
         self.template = kwargs.get('template')
         self.extra_context = kwargs.get('extra_context', {})
 
-
     def _build_initials(self):
         """
-        Builds the list with initial data to prevent IndexErrors in
-        self.set_initial
+        Builds the list with initial data to prevent IndexErrors in self.set_initial.
         """
         for step, forms in enumerate(self.forms):
             try:
@@ -71,13 +74,12 @@ class MultiFormWizard(object):
             except IndexError:
                 self.initial.append(dict())
 
-
     def set_inital(self, step, form_name, initial):
         self.initial[step][form_name] = initial
 
     def get_initials(self, step, form_name):
         """
-        Return the initial data for a form
+        Returns the initial data for a form.
         """
         return self.initial[step].get(form_name)
 
@@ -99,7 +101,7 @@ class MultiFormWizard(object):
 
     def get_forms(self, step, data = None, files = None):
         """
-        Returns the forms for the given step
+        Returns the forms for the given step.
         """
         forms = dict()
         args = (data, files)
@@ -123,14 +125,15 @@ class MultiFormWizard(object):
         return forms
 
     def num_steps(self):
-        "Helper method that returns the number of steps."
+        """
+        Helper method that returns the number of steps.
+        """
         return len(self.forms)
 
     def __call__(self, request, *args, **kwargs):
-        if kwargs.has_key('extra_context'):
+        if 'extra_context' in kwargs.keys():
             self.extra_context.update(kwargs.get('extra_context'))
         current_step = self.determine_step(request, *args, **kwargs)
-
 
         self.parse_params(request, *args, **kwargs)
 
@@ -142,7 +145,7 @@ class MultiFormWizard(object):
         # TODO: Move "hash_%d" to a method to make it configurable
         for step in range(current_step):
             forms = self.get_forms(step, request.POST)
-            for name, form in forms.iteritems():
+            for name, form in forms.items():
                 form.full_clean()
                 if request.POST.get('hash_%d_%s' % (step, name), '') != self.security_hash(request, form):
                     return self.render_hash_failure(request, step)
@@ -155,7 +158,7 @@ class MultiFormWizard(object):
 
         invalid = False
 
-        for name, form in forms.iteritems():
+        for name, form in forms.items():
             if not form.is_valid():
                 invalid = True
 
@@ -184,8 +187,10 @@ class MultiFormWizard(object):
 
         return self.render(forms, request, current_step)
 
-    def render(self, bound_forms, request, step, context = {}):
-        "Renders the given Form object, returning an HttpResponse."
+    def render(self, bound_forms, request, step, context={}):
+        """
+        Renders the given Form object, returning an HttpResponse.
+        """
         old_data = request.POST
         prev_fields = []
         if old_data:
@@ -193,7 +198,7 @@ class MultiFormWizard(object):
             # Collect all data from previous steps and render it as HTML hidden fields.
             for i in range(step):
                 old_forms = self.get_forms(i, old_data)
-                for name, form in old_forms.iteritems():
+                for name, form in old_forms.items():
                     hash_name = u'hash_%d_%s' % (i, name)
                     prev_fields.extend(
                         [field.as_hidden() for field in form]
@@ -284,7 +289,7 @@ class MultiFormWizard(object):
         use the template system's select_template() hook.
         """
         if not self.template:
-            raise ValueError, 'Please provide a template'
+            raise(ValueError('Please provide a template'))
         return self.template
 
     def render_template(self, request, forms, previous_fields, step, context = {}):
