@@ -3,12 +3,12 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from .models import GenericUser, Title, Rank, Country, Locality, Address, OrganizationalUnit, Department, Service
-from .forms import GenericUserUpdateForm, GenericUserForm
+from .forms import GenericUserUpdateForm, GenericUserCreationForm
 
 
 class GenericUserAdmin(admin.ModelAdmin):
     form = GenericUserUpdateForm
-    add_form = GenericUserForm
+    add_form = GenericUserCreationForm
     change_user_password_template = None
     list_display = ('email_extended', 'is_active', 'service', 'is_staff', )
     list_filter = ('is_active', )

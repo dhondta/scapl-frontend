@@ -2,7 +2,32 @@ from collections import OrderedDict
 from .models import DataItem, DataList, DataSequence, ItemListAssociations, ListSequenceAssociations
 
 
+def get_item(item_id=1):
+    pass
+
+
 def get_scheme(sequence_id=1):
+    """
+    This function retrieves a data sequence based on its ID.
+
+    The resulting structure is a dictionary formatted like follows:
+
+    {
+        DS_object: OrderedDict(
+            DL006_object: [
+                DI00005_object,
+                DI00002_object,
+                ...
+            ],
+            DL017_object: [
+                DI00011_object,
+                ...
+            ],
+            ...
+        )
+    }
+
+    """
     scheme = {}
     ds = DataSequence.objects.get(id=sequence_id)
     scheme[ds] = OrderedDict()

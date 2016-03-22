@@ -1,4 +1,12 @@
-{% load staticfiles %}
+{% load staticfiles i18n %}
+
+{% trans "Search" as label_search %}
+{% trans "Profile" as label_profile %}
+{% trans "Reports" as label_reports %}
+{% trans "Tasks" as label_tasks %}
+{% trans "New wizard" as label_newwizard %}
+{% trans "All tasks" as label_alltasks %}
+
 <div class="sidebar-menu">
     <header style="" class="logo-env">
         <!-- logo -->
@@ -34,53 +42,39 @@
         <!-- Search Bar -->
         <li class="root-level" id="search">
             <form method="get" action="">
-                <input style="" name="q" class="search-input" placeholder="Search..." type="text">
+                <input style="" name="q" class="search-input" placeholder="{{ label_search }}" type="text">
                 <button style="" type="submit">
                     <i class="entypo-search"></i>
                 </button>
             </form>
         </li>
-        <li class="root-level has-sub">
-            <a href="Profile.html">
-                <i class="entypo-user"></i>
-                <span style="">Profile</span>
+        <li class="">
+            <a href="{% url 'profile' %}">
+                <i class="entypo-doc-text"></i>
+                <span style="">{{ label_profile }}</span>
             </a>
-            <ul style="" class="">
-                <li class="active">
-                    <a href="/profile/">
-                        <span style="">Show profile</span>
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="index.html">
-                        <span style="">Edit profile</span>
-                    </a>
-                </li>
-
-
-            </ul>
         </li>
         <li class="">
-            <a href="reports.html">
+            <a href="{% url 'reports' %}">
                 <i class="entypo-doc-text"></i>
-                <span style="">Reports</span>
+                <span style="">{{ label_reports }}</span>
             </a>
         </li>
         <li class="root-level has-sub">
             <a href="tasks.html" target="_blank">
                 <i class="entypo-flow-tree"></i>
-                <span style="">Tasks</span>
+                <span style="">{{ label_tasks }}</span>
                 <!--<span style="" class="badge badge-secondary badge-roundless">New</span>-->
             </a>
             <ul style="">
                 <li>
                     <a href="wizard.html">
-                        <span style="">New wizard</span>
+                        <span style="">{{ label_newwizard }}</span>
                     </a>
                 </li>
                 <li>
                     <a href="tasks.html">
-                        <span style="">All tasks</span>
+                        <span style="">{{ label_alltasks }}</span>
                     </a>
                 </li>
 

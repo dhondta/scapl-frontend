@@ -5,6 +5,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from importlib import import_module
+from model_utils.managers import InheritanceManager
+
 
 user_app, user_model = settings.AUTH_USER_MODEL.split('.')
 ScaplUser = apps.get_app_config(user_app).get_model(user_model)
@@ -49,8 +51,8 @@ class Entity(models.Model):
     date_modified = models.DateTimeField(verbose_name=_(u'Last modification date'), auto_now_add=False, auto_now=True, editable=False)
 
     class Meta:
-        unique_together = ('name', 'description', )
         abstract = True
+        unique_together = ('name', 'description', )
 
 
 class DataSequence(Entity):
@@ -71,7 +73,7 @@ class DataSequence(Entity):
 
 class DataList(Entity):
     """ This model defines the structure of a data list """
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_lists")
     sequences = models.ManyToManyField(DataSequence, through='ListSequenceAssociations', related_name="lists")
 
@@ -86,9 +88,10 @@ class DataList(Entity):
 
 class DataItem(Entity):
     """ This model defines the generic structure of a data item """
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_items")
     lists = models.ManyToManyField(DataList, through='ItemListAssociations', related_name="items")
+    objects = InheritanceManager()
 
     class Meta:
         ordering = ('id', )
@@ -99,6 +102,7 @@ class DataItem(Entity):
 
 class ManualDataItem(DataItem):
     """ This model defines a manual data item (not triggering any task) """
+
     class Meta:
         verbose_name = _("Data item (Manual)")
         verbose_name_plural = _("Data items (Manual)")
@@ -136,7 +140,7 @@ class SEDataItem(DataItem):
         return json.loads(self.keywords)
 
     def __repr__(self):
-        return u'{} {} {}'.format(self.api, self.keywords, self.max_suggestions)
+        return u'{} ({} suggestions)'.format(self.api, self.keywords, self.max_suggestions)
 
 
 class ItemListAssociations(models.Model):

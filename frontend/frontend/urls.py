@@ -7,9 +7,8 @@ admin.site.site_header = _('SCAPL Administration')
 admin.site.index_title = _('SCAPL-FE Internals Management')
 
 urlpatterns = [
-    url(r'^', include('apps.common.urls')),
     url(r'^admin/', include('smuggler.urls')),  # before admin url patterns!
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^home/', include('apps.common.urls')),
+    url(r'^', include('apps.profiles.urls')),
     url(r'^wizard/', include('apps.wizard.urls')),
 ]

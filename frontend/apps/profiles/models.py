@@ -39,7 +39,7 @@ class SecurityUserManager(cmodels.GenericUserManager):
 
 
 class ScaplUser(GenericUser):
-    type = models.IntegerField(choices=((0, _("Normal user"), ), (1, _("Security user"), )))
+    type = models.IntegerField(choices=((0, _("Normal user"), ), (1, _("Security user"), )), default=0)
     role = models.ForeignKey(ScaplRole, related_name="scapl_users", blank=True, null=True)
 
 
@@ -54,7 +54,6 @@ class NormalUser(ScaplUser):
 
     def save(self, *args, **kwargs):
         self.type = 0
-        self.is_active = True
         return super(NormalUser, self).save(*args, **kwargs)
 
 

@@ -58,6 +58,7 @@ class APLTaskContributors(models.Model):
 class APLTaskItem(models.Model):
     apl = models.ForeignKey(APLTask, on_delete=models.CASCADE)
     item = models.IntegerField(blank=False, null=False, editable=False)
+    value = models.TextField()
     date_filled = models.DateTimeField(auto_now_add=True, editable=False)
     date_updated = models.DateTimeField(auto_now=True, editable=False)
 

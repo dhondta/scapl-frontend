@@ -154,10 +154,10 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
     phone1 = models.CharField(max_length=30, default=None, blank=True, null=True)
     phone2 = models.CharField(max_length=30, default=None, blank=True, null=True)
     comments = models.TextField(max_length=1000, blank=True, null=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True, editable=False)
-    theme = models.CharField(max_length=128, default='default', choices=list_themes())
+    theme = models.CharField(max_length=128, default=list_themes()[0], choices=list_themes())
 
     objects = GenericUserManager()
 
@@ -168,14 +168,21 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
         name = self.get_extended_name()
         return u'{} ({})'.format(self.email, name).strip(" ()" if name == '' else "")
 
+    def clean_first_name(self, first_name):
+        return first_name.capitalize()
+
+    def clean_last_name(self, last_name):
+        return last_name.capitalize()
+
     def get_full_name(self):
-        return u'{} {}'.format(self.first_name if self.first_name else '', self.last_name if self.last_name else '').strip(" ")
+        return u'{} {}'.format(self.first_name or '', self.last_name or '').strip(" ")
 
     def get_short_name(self):
-        return u'{}. {}'.format(self.first_name[0] if self.first_name else '', self.last_name if self.last_name else '').strip(" .")
+        short_name = u'{}. {}'.format(self.first_name[0] if self.first_name else '', self.last_name or '').strip(" .")
+        return self.first_name if len(short_name) == 1 else (short_name if short_name != '' else 'nobody')
 
     def get_extended_name(self):
-        return u'{} {} {}'.format(self.rank if self.rank else '', self.get_short_name(), self.title if self.title else '').strip(" ,")
+        return u'{} {} {}'.format(self.rank or '', self.get_short_name() or '', self.title or '').strip(" ")
 
     def email_user(self, subject, message, from_email=None):
         send_mail(subject, message, from_email, [self.email])

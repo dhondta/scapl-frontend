@@ -20,30 +20,18 @@ var neonRegister = neonRegister || {};
 		
 		neonRegister.$container.validate({
 			rules: {
-				first_name: {
-					required: true
-				},
-
-				last_name: {
-					required: true
-				},
-				
 				email: {
 					required: true,
 					email: true
 				},
 				
-				username: {
-					required: true	
-				},
-				
-				password: {
+				password1: {
 					required: true
 				},
 
 				password2: {
 					required: true,
-				    equalTo: "#password"
+				    equalTo: "#password1"
 				},
 
  			},
@@ -65,72 +53,72 @@ var neonRegister = neonRegister || {};
 				$(element).closest('.input-group').removeClass('validate-has-error');
 			},
 			
-			submitHandler: function(ev)
-			{
-				$(".login-page").addClass('logging-in');
-				
-				// We consider its 30% completed form inputs are filled
-				neonRegister.setPercentage(30, function()
-				{
-					// Lets move to 98%, meanwhile ajax data are sending and processing
-					neonRegister.setPercentage(98, function()
-					{
-						// Send data to the server
-						$.ajax({
-							url: baseurl + 'data/sample-register-form.php',
-							method: 'POST',
-							dataType: 'json',
-							data: {
-								name: 		$("input#name").val(),
-								phone: 		$("input#phone").val(),
-								birthdate: 	$("input#birthdate").val(),
-								username: 	$("input#username").val(),
-								email: 		$("input#email").val(),
-								password:	$("input#password").val()
-							},
-							error: function()
-							{
-								alert("An error occoured!");
-							},
-							success: function(response)
-							{
-								// From response you can fetch the data object retured
-								var name = response.submitted_data.name,
-									phone = response.submitted_data.phone,
-									birthdate = response.submitted_data.birthdate,
-									username = response.submitted_data.username,
-									email = response.submitted_data.email,
-									password = response.submitted_data.password;
-								
-								
-								// Form is fully completed, we update the percentage
-								neonRegister.setPercentage(100);
-								
-								
-								// We will give some time for the animation to finish, then execute the following procedures	
-								setTimeout(function()
-								{
-									// Hide the description title
-									$(".login-page .login-header .description").slideUp();
-									
-									// Hide the register form (steps)
-									neonRegister.$steps.slideUp('normal', function()
-									{
-										// Remove loging-in state
-										$(".login-page").removeClass('logging-in');
-										
-										// Now we show the success message
-										$(".form-register-success").slideDown('normal');
-										
-										// You can use the data returned from response variable
-									});
-									
-								}, 1000);
-							}
-						});
-					});
-				});
-			}
+//			submitHandler: function(ev)
+//			{
+//				$(".login-page").addClass('logging-in');
+//
+//				// We consider its 30% completed form inputs are filled
+//				neonRegister.setPercentage(30, function()
+//				{
+//					// Lets move to 98%, meanwhile ajax data are sending and processing
+//					neonRegister.setPercentage(98, function()
+//					{
+//						// Send data to the server
+//						$.ajax({
+//							url: baseurl + 'data/sample-register-form.php',
+//							method: 'POST',
+//							dataType: 'json',
+//							data: {
+//								name: 		$("input#name").val(),
+//								phone: 		$("input#phone").val(),
+//								birthdate: 	$("input#birthdate").val(),
+//								username: 	$("input#username").val(),
+//								email: 		$("input#email").val(),
+//								password:	$("input#password").val()
+//							},
+//							error: function()
+//							{
+//								alert("An error occoured!");
+//							},
+//							success: function(response)
+//							{
+//								// From response you can fetch the data object retured
+//								var name = response.submitted_data.name,
+//									phone = response.submitted_data.phone,
+//									birthdate = response.submitted_data.birthdate,
+//									username = response.submitted_data.username,
+//									email = response.submitted_data.email,
+//									password = response.submitted_data.password;
+//
+//
+//								// Form is fully completed, we update the percentage
+//								neonRegister.setPercentage(100);
+//
+//
+//								// We will give some time for the animation to finish, then execute the following procedures
+//								setTimeout(function()
+//								{
+//									// Hide the description title
+//									$(".login-page .login-header .description").slideUp();
+//
+//									// Hide the register form (steps)
+//									neonRegister.$steps.slideUp('normal', function()
+//									{
+//										// Remove loging-in state
+//										$(".login-page").removeClass('logging-in');
+//
+//										// Now we show the success message
+//										$(".form-register-success").slideDown('normal');
+//
+//										// You can use the data returned from response variable
+//									});
+//
+//								}, 1000);
+//							}
+//						});
+//					});
+//				});
+//			}
 		});
 	
 		// Steps Handler

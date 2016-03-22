@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from importlib import import_module
 from adminsortable2.admin import SortableInlineAdminMixin
-from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataList, DataSequence, \
+from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataItem, DataList, DataSequence, \
     ItemListAssociations, ListSequenceAssociations, SequenceRoleAssociations
 
 cadmin = import_module("apps.{}.admin".format(settings.COMMON_APP))
@@ -93,28 +93,24 @@ class EntityAdmin(admin.ModelAdmin):
 
 
 @admin.register(ManualDataItem)
-class DataItemAdmin(EntityAdmin):
+class ManualDataItemAdmin(EntityAdmin):
     actions = (make_item_orphan, )
 
 
 @admin.register(ASDataItem)
-class ASDataItemAdmin(DataItemAdmin):
+class ASDataItemAdmin(EntityAdmin):
+    actions = (make_item_orphan, )
     fieldsets = EntityAdmin.fieldsets + (
         (_('Action'), {
             'fields': ('call', )
         }),
     )
-    # fieldsets = (
-    #     EntityAdmin.fieldsets[0],
-    #     (_('Action'), {
-    #         'fields': ('call', )
-    #     }),
-    # )
     # TODO: add 'call' validation
 
 
 @admin.register(SEDataItem)
-class SEDataItemAdmin(DataItemAdmin):
+class SEDataItemAdmin(EntityAdmin):
+    actions = (make_item_orphan, )
     fieldsets = EntityAdmin.fieldsets + (
         (_('Action'), {
             'fields': ('api', 'keywords', 'max_suggestions', )

@@ -1,4 +1,14 @@
-{% load staticfiles %}
+{% load staticfiles i18n %}
+
+{% trans "Dutch" as label_dutch %}
+{% trans "English" as label_english %}
+{% trans "French" as label_french %}
+{% trans "Welcome" as label_welcome %}
+{% trans "Edit profile" as label_editprofile %}
+{% trans "Sign out" as label_signout %}
+{% trans "Pending tasks" as label_pendingtasks %}
+{% trans "See all tasks" as label_seealltasks %}
+
 <div class="row">
 
     <!-- Language Selector -->
@@ -12,19 +22,19 @@
             <li>
                 <a href="#">
                     <img src="{% static 'assets/images/flag-ne.png' %}"/>
-                    <span>Nederlands</span>
+                    <span>{{ label_dutch }}</span>
                 </a>
             </li>
             <li class="active">
                 <a href="#">
                     <img src="{% static 'assets/images/flag-uk.png' %}"/>
-                    <span>English</span>
+                    <span>{{ label_english }}</span>
                 </a>
             </li>
             <li>
                 <a href="#">
                     <img src="{% static 'assets/images/flag-fr.png' %}"/>
-                    <span>Français</span>
+                    <span>{{ label_french }}</span>
                 </a>
             </li>
 
@@ -49,8 +59,7 @@
                     <a href="{% url 'profile' %}" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="{% static 'assets/images/thumb-1.png' %}" alt="" class="img-circle"/>
 
-                        <span>Welcome,</span>
-                        <strong>{{UserName}}</strong>
+                        <span>{{ label_welcome }}, <strong>{{ request.user.get_short_name }}</strong></span>
                     </a>
 
 
@@ -61,8 +70,8 @@
 
                         <!-- Profile sub-links -->
                         <li>
-                            <a href="#">
-                                Edit Profile
+                            <a href="{% url 'profile' %}">
+                                {{ label_editprofile }}
                                 <i class="entypo-user"></i>
 
                             </a>
@@ -70,8 +79,8 @@
 
 
                         <li>
-                            <a href="#">
-                                Logout
+                            <a href="{% url 'signout' %}">
+                                {{ label_signout }}
                                 <i class="entypo-logout"></i>
 
                             </a>
@@ -96,7 +105,7 @@
 
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
                    data-close-others="true">
-                    Pending Task
+                    {{ label_pendingtasks }}
                     <i class="entypo-list"></i>
                     <!-- <span class="badge badge-warning">1</span>-->
                 </a>
@@ -146,7 +155,7 @@
                     </li>
 
                     <li class="external">
-                        <a href="#">See all tasks</a>
+                        <a href="#">{{ label_seealltasks }}</a>
                     </li>
                 </ul>
 

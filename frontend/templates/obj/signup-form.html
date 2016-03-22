@@ -1,0 +1,194 @@
+{% load staticfiles i18n %}
+
+{% trans "Create your account" as msg_create %}
+{% trans "Registration" as msg_registration %}
+{% trans "You have been successfully registered" as msg_success %}
+{% trans "We have emailed you the confirmation link for your account" as msg_mail %}
+{% trans "Credentials" as header_credentials %}
+{% trans "Personal data (Optional)" as header_persdata %}
+{% trans "Previous Step" as button_prev %}
+{% trans "Next Step" as button_next %}
+{% trans "Complete Registration" as button_complete %}
+{% trans "Return to Login Page" as link_login %}
+{% trans "Privacy Policy" as link_privpolicy %}
+
+<div class="login-container">
+
+    <div class="login-header login-caret">
+
+        <div class="login-content">
+
+
+            <a href="/" class="logo">
+                <img src="{% static 'assets/images/Slogo.png' %}" width="150" height="100" alt=""/>
+            </a>
+
+            <p class="description">{{ msg_create }}</p>
+
+            <!-- progress bar indicator -->
+            <div class="login-progressbar-indicator">
+                <h3>0%</h3>
+                <span>{{ msg_registration }}...</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="login-progressbar">
+        <div></div>
+    </div>
+
+    <div class="login-form">
+
+        <div class="login-content">
+
+            <form method="post" role="form" id="form_register">
+
+                {% csrf_token %}
+
+                <div class="form-register-success">
+                    <i class="entypo-check"></i>
+                    <h3>{{ msg_success }}</h3>
+                    <p>{{ msg_mail }}</p>
+                </div>
+
+                <div class="form-steps">
+
+                    <div class="step current" id="step-1">
+
+                        <h3>{{ header_credentials }}</h3>
+
+                        {% if form.email.errors %}
+                            <div class="form-login-error" style="display: block;">
+                            {% for error in form.email.errors %}
+                                <h3>{{ error }}</h3>
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <div class="input-group{% if form.email.errors %} {{ 'validate-has-error' }}{% endif %}">
+                                <div class="input-group-addon"><i class="entypo-mail"></i></div>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group{% if form.new_password1.errors %} {{ 'validate-has-error' }}{% endif %}">
+                                <div class="input-group-addon"><i class="entypo-lock"></i></div>
+                                {{ form.new_password1 }}
+                                {{ form.new_password2 }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="button" data-step="step-2" class="btn btn-primary btn-block btn-login">
+                                {{ button_next }}
+                                <i class="entypo-right-open-mini"></i>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            {% blocktrans with v1=1 v2=2 %}Step {{ v1 }} of {{ v2 }}{% endblocktrans %}
+                        </div>
+
+                    </div>
+
+                    <div class="step" id="step-2">
+
+                        <h3>{{ header_persdata }}</h3>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="entypo-user"></i></div>
+                                {{ form.first_name }}
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="entypo-phone"></i></div>
+                                {{ form.phone1 }}
+                                {{ form.phone2 }}
+                            </div>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="entypo-calendar"></i>
+                                </div>
+
+                                <input type="text" class="form-control" name="birthdate" id="birthdate"
+                                       placeholder="Date of Birth (DD/MM/YYYY)" data-mask="date" autocomplete="off"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="entypo-user-add"></i>
+                                </div>
+
+                                <input type="text" class="form-control" name="username" id="username"
+                                       placeholder="Username" data-mask="[a-zA-Z0-1\.]+" data-is-regex="true"
+                                       autocomplete="off"/>
+                            </div>
+                        </div>
+                        -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"></div>
+                                {{ form.title }}
+                                <!--<input type="text" class="form-control" name="title" id="title"
+                                       placeholder="Title" autocomplete="off"/>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"></div>
+                                {{ form.rank }}
+                                <!--<input type="text" class="form-control" name="rank" id="rank"
+                                       placeholder="Rank" autocomplete="off"/>-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"></div>
+                                {{ form.service }}
+                                <!--<input type="text" class="form-control" name="service" id="service"
+                                       placeholder="Service" autocomplete="off"/>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="button" data-step="step-1" class="btn btn-primary btn-block btn-login">
+                                {{ button_prev }}
+                                <i class="entypo-left-open-mini"></i>
+                            </button>
+                            <button type="submit" class="btn btn-success btn-block btn-login">
+                                {{ button_complete }}
+                                <i class="entypo-right-open-mini"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            {% blocktrans with v1=2 v2=2 %}Step {{ v1 }} of {{ v2 }}{% endblocktrans %}
+                        </div>
+
+                    </div>
+
+                </div>
+            </form>
+
+
+            <div class="login-bottom-links">
+                <a href="/" class="link"><i class="entypo-lock"></i>{{ link_login }}</a>
+                <br/>
+                <a href="#">{{ link_privpolicy }}</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

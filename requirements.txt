@@ -3,6 +3,7 @@ django_admin_bootstrapped
 django-bootstrap-themes
 django-bootstrap3
 django-admin-sortable2
+django-model-utils
 django-storages
 django-smuggler
 django-extensions

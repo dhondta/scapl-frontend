@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% load i18n  %}
+
+{% trans "Profile" as title %}
+
+{% block title %}SCAPL - {{ title }}{% endblock %}
+{% block content %}
+{% include "obj/edit-form.html" %}
+{% endblock %}

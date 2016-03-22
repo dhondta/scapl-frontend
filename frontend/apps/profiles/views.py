@@ -1,6 +1,45 @@
+# -*- coding: UTF-8 -*-
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.contrib.auth import get_user_model
+from django.conf import settings
+from importlib import import_module
+from .forms import ScaplUserCreationForm, ScaplUserUpdateForm
 
-User = get_user_model()
+cviews = import_module("apps.{}.views".format(settings.COMMON_APP))
 
-# Create your views here.
+
+@login_required(login_url='/')
+def home(request):
+    return render(request, 'profiles/home.html')
+
+
+@login_required(login_url='/')
+def profile(request):
+    if request.method == 'POST':
+        form = ScaplUserUpdateForm(data=request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.instance)
+        print(form.errors)
+    else:
+        form = ScaplUserUpdateForm(instance=request.user)
+    return render(request, 'profiles/edit.html', {'form': form})
+
+
+@login_required(login_url='/')
+def reports(request):
+    return render(request, 'profiles/reports.html')
+
+
+def password(request):
+    return render(request, 'profiles/forgot-password.html')
+
+
+signin = cviews.signin('common/index.html')
+
+
+signout = cviews.signout()
+
+
+signup = cviews.signup(ScaplUserCreationForm, 'profiles/signup.html')
