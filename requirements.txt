@@ -1,12 +1,13 @@
 Django>=1.8
 django_admin_bootstrapped
+django-admin-sortable2
 django-bootstrap-themes
 django-bootstrap3
-django-admin-sortable2
+django-extensions
+django-formtools
 django-model-utils
 django-storages
 django-smuggler
-django-extensions
 celery>=2.5.2
 django-celery
 unittest2>=0.4.0
