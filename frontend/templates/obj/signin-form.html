@@ -34,7 +34,7 @@
 
         <div class="login-content">
 
-            {% if message %}<div class="form-login-error" style="display: block;"><h3>{{ message }}</h3></div>{% endif %}
+            {% if request.message %}<div class="form-login-error" style="display: block;"><h3>{{ request.message }}</h3></div>{% endif %}
 
             <form method="post" role="form" id="form1" class="validate">
 

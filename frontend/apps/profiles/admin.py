@@ -11,13 +11,13 @@ sadmin = import_module("apps.{}.admin".format(settings.SCHEME_APP))
 
 def scapl_user_admin(model=None):
     class ScaplUserAdmin(cadmin.GenericUserAdmin):
-        list_display = cadmin.GenericUserAdmin.list_display + ('role',)
-        list_filter = cadmin.GenericUserAdmin.list_filter + ('role',)
+        list_display = ('email_extended', 'is_active', 'service', 'role', )
+        list_filter = cadmin.GenericUserAdmin.list_filter + ('role', )
         fieldsets = (
-            (None, {'fields': ('email', ('password1', 'password2', ), )}),
+            (None, {'fields': (('email', ), )}),
             (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ),
                                              ('service', 'role', ), ('phone1', 'phone2', ), )}),
-            (_('Status'), {'fields': (('last_login', 'date_joined', ), )}),
+            (_('Status'), {'fields': ('is_active', ('last_login', 'date_joined', ), )}),
         )
         add_fieldsets = fieldsets
 

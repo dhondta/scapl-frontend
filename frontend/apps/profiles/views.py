@@ -9,25 +9,24 @@ from .forms import ScaplUserCreationForm, ScaplUserUpdateForm
 cviews = import_module("apps.{}.views".format(settings.COMMON_APP))
 
 
-@login_required(login_url='/')
+@login_required
 def home(request):
     return render(request, 'profiles/home.html')
 
 
-@login_required(login_url='/')
+@login_required
 def profile(request):
     if request.method == 'POST':
         form = ScaplUserUpdateForm(data=request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, form.instance)
-        print(form.errors)
     else:
         form = ScaplUserUpdateForm(instance=request.user)
     return render(request, 'profiles/edit.html', {'form': form})
 
 
-@login_required(login_url='/')
+@login_required
 def reports(request):
     return render(request, 'profiles/reports.html')
 

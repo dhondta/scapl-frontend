@@ -55,6 +55,7 @@ coverage.xml
 # Django stuff:
 *.log
 *.sqlite
+*.sqlite3
 
 # Sphinx documentation
 docs/_build/
@@ -62,10 +63,8 @@ docs/_build/
 # PyBuilder
 target/
 
-# DJango DB and migrations
+# DJango migrations
 frontend/apps/common/migrations/
 frontend/apps/profiles/migrations/
 frontend/apps/scheme/migrations/
 frontend/apps/wizard/migrations/
-frontend/scapl.sqlite3
-

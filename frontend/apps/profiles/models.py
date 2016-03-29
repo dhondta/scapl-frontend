@@ -12,7 +12,6 @@ cmodels = import_module("apps.{}.models".format(settings.COMMON_APP))
 
 class ScaplRole(models.Model):
     """ This model defines possible roles for users in relationship with the DataSequence model """
-    id = models.IntegerField(primary_key=True)
     author = models.ForeignKey(GenericUser, null=True, blank=True, related_name="created_roles")
     name = models.CharField(max_length=120)
     description = models.TextField(null=True)

@@ -6,20 +6,20 @@ from .forms import GenericUserCreationForm
 
 def signin(template='index.html'):
     def signin_template(request):
-        message = None
+        next = request.GET.get('next')
         if request.user.is_authenticated():
-            return redirect('home')
+            return redirect(next or 'home')
         if request.method == 'POST':
             user = authenticate(email=request.POST['email'], password=request.POST['password'])
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect('home')
+                    return redirect(next or 'home')
                 else:
-                    message = "Disabled account"
+                    request.message = "Disabled account"
             else:
-                message = "Bad credentials"
-        return render(request, template, locals())
+                request.message = "Bad credentials"
+        return render(request, template)
     return signin_template
 
 
@@ -35,12 +35,9 @@ def signup(form_class=GenericUserCreationForm, template='signup.html', home_view
     def signup_template(request):
         if request.user.is_authenticated():
             return redirect(home_view)
-        if request.method == 'POST':
-            form = form_class(data=request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('home')
-        else:
-            form = form_class()
+        form = form_class(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
         return render(request, template, {'form': form})
     return signup_template

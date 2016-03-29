@@ -2,10 +2,6 @@ from collections import OrderedDict
 from .models import DataItem, DataList, DataSequence, ItemListAssociations, ListSequenceAssociations
 
 
-def get_item(item_id=1):
-    pass
-
-
 def get_scheme(sequence_id=1):
     """
     This function retrieves a data sequence based on its ID.

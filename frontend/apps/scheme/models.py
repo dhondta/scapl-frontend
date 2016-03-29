@@ -57,9 +57,8 @@ class Entity(models.Model):
 
 class DataSequence(Entity):
     """ This model defines the structure of a data sequence """
-    id = models.IntegerField(primary_key=True)
     author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_sequences")
-    roles = models.ManyToManyField(ScaplRole, through='SequenceRoleAssociations', related_name="sequences")
+    roles = models.ManyToManyField(ScaplRole, through='SequenceRoleAssociations', related_name="related_sequences")
     # max_users = models.IntegerField(default=5)
 
     class Meta:
@@ -67,13 +66,15 @@ class DataSequence(Entity):
         verbose_name = _("Data sequence")
         verbose_name_plural = _("Data sequences")
 
-    def __str__(self):
+    def __repr__(self):
         return u'DS{}'.format(str(self.id).zfill(settings.DS_ID_DIGITS))
+
+    def __str__(self):
+        return self.name
 
 
 class DataList(Entity):
     """ This model defines the structure of a data list """
-    id = models.AutoField(primary_key=True)
     author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_lists")
     sequences = models.ManyToManyField(DataSequence, through='ListSequenceAssociations', related_name="lists")
 
@@ -82,13 +83,15 @@ class DataList(Entity):
         verbose_name = _("Data list")
         verbose_name_plural = _("Data lists")
 
-    def __str__(self):
+    def __repr__(self):
         return u'DL{}'.format(str(self.id).zfill(settings.DL_ID_DIGITS))
+
+    def __str__(self):
+        return self.name
 
 
 class DataItem(Entity):
     """ This model defines the generic structure of a data item """
-    id = models.AutoField(primary_key=True)
     author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_items")
     lists = models.ManyToManyField(DataList, through='ItemListAssociations', related_name="items")
     objects = InheritanceManager()
@@ -96,8 +99,11 @@ class DataItem(Entity):
     class Meta:
         ordering = ('id', )
 
-    def __str__(self):
+    def __repr__(self):
         return u'DI{}'.format(str(self.id).zfill(settings.DI_ID_DIGITS))
+
+    def __str__(self):
+        return self.name
 
 
 class ManualDataItem(DataItem):
@@ -107,9 +113,6 @@ class ManualDataItem(DataItem):
         verbose_name = _("Data item (Manual)")
         verbose_name_plural = _("Data items (Manual)")
 
-    def __repr__(self):
-        return u'manual'
-
 
 class ASDataItem(DataItem):
     """ This model defines the structure of a data item particularized to the Automation System """
@@ -118,9 +121,6 @@ class ASDataItem(DataItem):
     class Meta:
         verbose_name = _("Data item (Automation System)")
         verbose_name_plural = _("Data items (Automation System)")
-
-    def __repr__(self):
-        return u'{}'.format(self.call)
 
 
 class SEDataItem(DataItem):
@@ -138,9 +138,6 @@ class SEDataItem(DataItem):
 
     def getkeywords(self):
         return json.loads(self.keywords)
-
-    def __repr__(self):
-        return u'{} ({} suggestions)'.format(self.api, self.keywords, self.max_suggestions)
 
 
 class ItemListAssociations(models.Model):

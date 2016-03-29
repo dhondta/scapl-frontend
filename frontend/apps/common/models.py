@@ -157,7 +157,7 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True, editable=False)
-    theme = models.CharField(max_length=128, default=list_themes()[0], choices=list_themes())
+    theme = models.CharField(max_length=128, default="default", choices=list_themes())
 
     objects = GenericUserManager()
 
@@ -170,6 +170,9 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
 
     def clean_first_name(self, first_name):
         return first_name.capitalize()
+
+    def email_user(self, subject, message, from_email=None):
+        send_mail(subject, message, from_email, [self.email])
 
     def clean_last_name(self, last_name):
         return last_name.capitalize()
@@ -184,5 +187,5 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
     def get_extended_name(self):
         return u'{} {} {}'.format(self.rank or '', self.get_short_name() or '', self.title or '').strip(" ")
 
-    def email_user(self, subject, message, from_email=None):
-        send_mail(subject, message, from_email, [self.email])
+    def natural_key(self):
+        return (self.pk, )

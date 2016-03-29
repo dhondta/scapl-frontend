@@ -32,12 +32,14 @@ CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# TODO: Dev key ; change it for production version
 SECRET_KEY = 'vm-ucdk*adk1$47^ri1!&8sp)ms%u^$26v)zhq6l$r@s_&ur%8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+SITE_ID=1
 
 # Application definition
 INSTALLED_APPS = (
@@ -47,9 +49,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django_libs',
+    'forms_ajaxified',
     'smuggler',
     'adminsortable2',
     'bootstrap_themes',
@@ -64,15 +69,8 @@ INSTALLED_APPS = (
     #'queued_search',
 )
 
-# Particular application customized authentication settings
-COMMON_APP = 'common'
-PROFILE_APP = 'profiles'
-SCHEME_APP = 'scheme'
-AUTH_ABSTRACT_USER_MODEL = '%s.GenericUser' % COMMON_APP
-AUTH_USER_MODEL = '%s.ScaplUser' % PROFILE_APP
-AUTH_ROLE_MODEL = '%s.ScaplRole' % PROFILE_APP
-AUTH_ADMIN_MODEL = '%s.Administrator' % SCHEME_APP
-SCHEME_SOURCE = 'apps.%s.views.get_scheme' % SCHEME_APP
+# Login URL settings
+LOGIN_URL = LOGIN_REDIRECT_URL = '/'
 
 # Backends for using the customized user model and for automatically creating a superuser
 AUTHENTICATION_BACKENDS = (
@@ -130,8 +128,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
-
-"""copy the static files to the public accessible folder using manage.py
+"""
+Copy the static files to the public accessible folder using manage.py
 
 # --link    Create a symbolic link to each file instead of copying.
 # --noinput Do NOT prompt the user for input of any kind.
@@ -148,7 +146,6 @@ STATICFILES_DIRS = (
 STATIC_URL = '/static/'
 # web accessible folder
 STATIC_ROOT = '/var/www/scapl-frontend/static/'
-
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -169,7 +166,6 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
     'django.contrib.auth.hashers.CryptPasswordHasher',
-
 ]
 
 # TODO: Enable for production version
@@ -209,8 +205,6 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.core.context_processors.static',
-                'django.core.context_processors.request',
             ],
             'libraries': {
                 'common_tags': 'apps.common.tags',
@@ -244,8 +238,13 @@ MEDIA_ROOT = MEDIA_URL = '/packages/'
 # }
 
 # Smuggler configuration
-SMUGGLER_FIXTURE_DIR = '/data/'
-# SMUGGLER_EXCLUDE_LIST = []
+SMUGGLER_FIXTURE_DIR = './data/'
+SMUGGLER_EXCLUDE_LIST = [
+    'contenttypes.contenttype',
+    'auth.permission',
+    'admin.logentry',
+    'sessions.session'
+]
 
 getText = lambda x: x
 LANGUAGES = (
@@ -253,3 +252,13 @@ LANGUAGES = (
     ('fr', getText('FR')),
     ('nl', getText('NL')),
 )
+
+# Particular application customized authentication settings
+COMMON_APP = 'common'
+PROFILE_APP = 'profiles'
+SCHEME_APP = 'scheme'
+AUTH_ABSTRACT_USER_MODEL = '%s.GenericUser' % COMMON_APP
+AUTH_USER_MODEL = '%s.ScaplUser' % PROFILE_APP
+AUTH_ROLE_MODEL = '%s.ScaplRole' % PROFILE_APP
+AUTH_ADMIN_MODEL = '%s.Administrator' % SCHEME_APP
+SCHEME_SOURCE = 'apps.%s' % SCHEME_APP

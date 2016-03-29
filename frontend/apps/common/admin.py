@@ -3,21 +3,22 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from .models import GenericUser, Title, Rank, Country, Locality, Address, OrganizationalUnit, Department, Service
-from .forms import GenericUserUpdateForm, GenericUserCreationForm
+from .forms import GenericUserAdminForm, GenericUserCreationForm
 
 
 class GenericUserAdmin(admin.ModelAdmin):
-    form = GenericUserUpdateForm
+    form = GenericUserAdminForm
     add_form = GenericUserCreationForm
     change_user_password_template = None
-    list_display = ('email_extended', 'is_active', 'service', 'is_staff', )
+    list_display = ('email_extended', 'service', 'is_active', 'is_staff', )
     list_filter = ('is_active', )
     readonly_fields = ('last_login', 'date_joined', )
     search_fields = ('first_name', 'last_name', 'email', )
     ordering = ('email', )
     fieldsets = (
         (None, {'fields': ('email', ('password1', 'password2', ), )}),
-        (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ), 'service', ('phone1', 'phone2', ), )}),
+        (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ),
+                                         'service', ('phone1', 'phone2', ), )}),
         (_('Status'), {'fields': (('last_login', 'date_joined', ), )}),
     )
     add_fieldsets = fieldsets

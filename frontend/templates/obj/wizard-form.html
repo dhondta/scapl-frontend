@@ -1,0 +1,59 @@
+{% load staticfiles i18n %}
+
+<form novalidate="novalidate" id="rootwizard" method="post" action="#" class="form-wizard" data-class="form_ajaxified">
+
+	<div style="margin-left: 10%; margin-right: 10%;" class="steps-progress">
+		<div style="width: 0px;" class="progress-indicator"></div>
+	</div>
+
+	<ul>
+        {% for step in wizard.steps %}
+		<li
+			{% if forloop.first %} class="active"{% endif %}>
+			<a href="#tab{{ forloop.counter }}" data-toggle="tab"><span>{{ forloop.counter }}</span>{{ step.title }}</a>
+		</li>
+        {% endfor %}
+	</ul>
+
+	<div class="tab-content">
+
+        {% for step in wizard.steps %}
+		<div class="tab-pane{% if forloop.first %} active{% endif %}" id="tab{{ forloop.counter }}">
+            {% for item in step.items %}
+			<div class="row">
+				<div class="col-md-6">
+					<form method="post" action="javascript:;" id="{{ item.id }}">
+						<script>
+							$('#{{ item.id }}').submit(function(){
+							});
+						</script>
+						<div class="form-group">
+							{% csrf_token %}
+							<label class="control-label" for="{{ item.id }}">{{ item.label }}</label>
+							{{ item.form.value }}
+						</div>
+					</form>
+				</div>
+			</div>
+            {% endfor %}
+		</div>
+        {% endfor %}
+
+        <ul class="pager wizard">
+			<li class="previous first">
+				<a href="#">First</a>
+			</li>
+			<li class="previous">
+				<a href="#"><i class="entypo-left-open"></i> Previous</a>
+			</li>
+
+			<li class="next last">
+				<a href="#">Last</a>
+			</li>
+			<li class="next">
+				<a href="#">Next <i class="entypo-right-open"></i></a>
+			</li>
+		</ul>
+	</div>
+
+</form>

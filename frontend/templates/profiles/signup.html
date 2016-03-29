@@ -2,14 +2,10 @@
 
 {% load staticfiles i18n  %}
 
-{% trans "Registration" as title %}
-
-{% block title %}SCAPL - {{ title }}{% endblock %}
+{% block title %}SCAPL - {% trans "Registration" %}{% endblock %}
 {% block extra_script %}
 <script src="{% static 'assets/js/neon-register.js' %}"></script>
 <script src="{% static 'assets/js/jquery.inputmask.bundle.min.js' %}"></script>
 {% endblock %}
 <!--formRegistration-->
-{% block form %}
-{% include "obj/signup-form.html" %}
-{% endblock %}
+{% block form %}{% include "obj/signup-form.html" %}{% endblock %}

@@ -17,7 +17,7 @@
 
 
     <!-- For login -->
-    <title>{% block title %}{% trans 'Login' %}{% endblock %}</title>
+    <title>{% block title %}SCAPL - {% trans 'Sign in' %}{% endblock %}</title>
 
 </head>
 <body class="page-body login-page login-form-fall">
@@ -32,14 +32,10 @@ var baseurl = '';
 -->
 
 <!--formLogin-->
-{% block form %}
-{% include "obj/signin-form.html" %}
-{% endblock %}
+{% block form %}{% include "obj/signin-form.html" %}{% endblock %}
 
 <!-- Footer -->
-{% block footer %}
-{% include "obj/footer.html" %}
-{% endblock %}
+{% block footer %}{% include "obj/footer.html" %}{% endblock %}
 
 </body>
 </html>

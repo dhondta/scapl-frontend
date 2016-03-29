@@ -4,6 +4,7 @@ django-admin-sortable2
 django-bootstrap-themes
 django-bootstrap3
 django-extensions
+django-forms-ajaxified
 django-formtools
 django-model-utils
 django-storages
@@ -20,3 +21,4 @@ python-memcached
 pyparsing
 pydot2
 bcrypt
+py-web-search

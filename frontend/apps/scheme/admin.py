@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
+from django_mptt_admin.admin import DjangoMpttAdmin
 from importlib import import_module
 from adminsortable2.admin import SortableInlineAdminMixin
 from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataItem, DataList, DataSequence, \
@@ -81,7 +82,7 @@ class EntityAdmin(admin.ModelAdmin):
         model = Entity
 
     def id_code(self, entity):
-        return str(entity)
+        return repr(entity)
 
     def description_overview(self, entity):
         return shorten(entity)
