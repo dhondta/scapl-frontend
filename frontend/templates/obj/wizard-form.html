@@ -23,14 +23,29 @@
 			<div class="row">
 				<div class="col-md-6">
 					<form method="post" action="javascript:;" id="{{ item.id }}">
+						{% csrf_token %}
 						<script>
-							$('#{{ item.id }}').submit(function(){
+							$(document).ready(function() {
+								$("#{{ item.id }}-save").click(function() {
+									$.ajax({
+										type: "POST",
+										url: "/wizard/save/",
+										data: {
+											csrfmiddlewaretoken: '{{ csrf_token }}',
+											apl: {{ request.session.apl }},
+											item: {{ item.id }},
+											value: $('#{{ item.id }}').val(),
+										},
+										success: function(response){}
+									});
+									return false;
+								});
 							});
 						</script>
 						<div class="form-group">
-							{% csrf_token %}
 							<label class="control-label" for="{{ item.id }}">{{ item.label }}</label>
 							{{ item.form.value }}
+							<a id="{{ item.id }}-save">Save</a>
 						</div>
 					</form>
 				</div>

@@ -5,17 +5,12 @@
 {% block title %}SCAPL - {% trans "Wizard" %}{% endblock %}
 {% block additional_scripts %}
 <script src="{% static 'assets/js/jquery.bootstrap.wizard.min.js' %}"></script>
-<script>
-    $(document).ready(function() {
-        $('[data-class="form_ajaxified"]').formsAjaxified();
-    });
-</script>
-<style>
+<!--<style>
     input.success, textarea.success, select.success {
         @color-rgba: rgba(red(@brand-success), green(@brand-success), blue(@brand-success), .6);
         border-color: @color-rgba;
         .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @{color-rgba}");
     }
-</style>
+</style>-->
 {% endblock %}
 {% block content %}{% include "obj/wizard-form.html" %}{% endblock %}

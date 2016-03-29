@@ -63,8 +63,11 @@ docs/_build/
 # PyBuilder
 target/
 
-# DJango migrations
+# Django migrations
 frontend/apps/common/migrations/
 frontend/apps/profiles/migrations/
 frontend/apps/scheme/migrations/
 frontend/apps/wizard/migrations/
+
+# Django production settings
+frontend/frontend/settings/prod.py

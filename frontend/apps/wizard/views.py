@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
 from .forms import APLTaskInitStepForm, APLTaskSequenceSelectionForm
-from .models import APLTask
+from .models import APLTask, APLTaskItem
 from .utils import make_form
 
 
@@ -45,4 +46,20 @@ def start_wizard(request):
     if seq_id is None:
         return select_sequence(request)
 #    del request.session['apl'], request.session['sequence']
+    print({'wizard': make_form(apl_id, seq_id)})
     return render(request, 'wizard/wizard.html', {'wizard': make_form(apl_id, seq_id)})
+
+
+@login_required
+def save_data_item(request):
+    if request.method == 'POST':
+        apl_id, item_id, user_id = int(request.POST['apl']), int(request.POST['item']), request.user.id
+        apl = APLTask.objects.get(id=apl_id)
+        if apl.author.id == user_id or user_id in [x.id for x in apl.contributors.all()]:
+            try:
+                di = APLTaskItem.objects.get(apl=apl, item_id=item_id)
+            except APLTaskItem.DoesNotExist:
+                di = APLTaskItem(apl=apl, item_id=item_id)
+            di.value = request.POST['value']
+            di.save()
+    return HttpResponse('')

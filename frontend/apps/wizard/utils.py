@@ -14,9 +14,12 @@ def make_form(apl_id, seq_id):
     for dl, lst in seq.items():
         step = {'title': dl.name, 'help': dl.description, 'items': []}
         for di in lst:
-            item_id = str(di)
-            saved_value = saved_di.filter(item__exact=di.id)
-            form = APLTaskItemForm(initial=saved_value)
+            item_id = di.id
+            try:
+                form = APLTaskItemForm(instance=saved_di.filter(item_id=di.id)[0])
+            # occurs when 'filter' method returns an empty queryset ('[0]' then causes this error)
+            except IndexError:
+                form = APLTaskItemForm()
             form.fields['value'].widget.attrs['id'] = item_id
             item = {'label': di.name, 'help': di.description, 'id': item_id, 'form': form}
             step['items'].append(item)
