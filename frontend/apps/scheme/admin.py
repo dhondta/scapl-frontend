@@ -1,16 +1,14 @@
 # -*- coding: UTF-8 -*-
-from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
-from django_mptt_admin.admin import DjangoMpttAdmin
 from importlib import import_module
 from adminsortable2.admin import SortableInlineAdminMixin
-from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataItem, DataList, DataSequence, \
+from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataItem, DataList, DataSequence, \
     ItemListAssociations, ListSequenceAssociations, SequenceRoleAssociations
 
-cadmin = import_module("apps.{}.admin".format(settings.COMMON_APP))
-forms = import_module("apps.{}.forms".format(settings.COMMON_APP))
+cadmin = import_module("apps.common.admin")
+forms = import_module("apps.common.forms")
 
 
 def shorten(text, length=50):

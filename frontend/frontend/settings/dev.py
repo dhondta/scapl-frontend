@@ -254,11 +254,7 @@ LANGUAGES = (
 )
 
 # Particular application customized authentication settings
-COMMON_APP = 'common'
-PROFILE_APP = 'profiles'
-SCHEME_APP = 'scheme'
-AUTH_ABSTRACT_USER_MODEL = '%s.GenericUser' % COMMON_APP
-AUTH_USER_MODEL = '%s.ScaplUser' % PROFILE_APP
-AUTH_ROLE_MODEL = '%s.ScaplRole' % PROFILE_APP
-AUTH_ADMIN_MODEL = '%s.Administrator' % SCHEME_APP
-SCHEME_SOURCE = 'apps.%s' % SCHEME_APP
+AUTH_ABSTRACT_USER_MODEL = 'common.GenericUser'
+AUTH_USER_MODEL = 'profiles.ScaplUser'
+AUTH_ROLE_MODEL = 'profiles.ScaplRole'
+AUTH_ADMIN_MODEL = 'scheme.Administrator'

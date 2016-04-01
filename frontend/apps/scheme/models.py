@@ -10,7 +10,7 @@ from model_utils.managers import InheritanceManager
 
 user_app, user_model = settings.AUTH_USER_MODEL.split('.')
 ScaplUser = apps.get_app_config(user_app).get_model(user_model)
-cmodels = import_module("apps.{}.models".format(settings.COMMON_APP))
+cmodels = import_module("apps.common.models")
 
 profile_app, profile_model = settings.AUTH_ROLE_MODEL.split('.')
 ScaplRole = apps.get_app_config(profile_app).get_model(profile_model)

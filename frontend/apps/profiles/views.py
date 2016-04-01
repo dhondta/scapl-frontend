@@ -2,11 +2,10 @@
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.conf import settings
 from importlib import import_module
 from .forms import ScaplUserCreationForm, ScaplUserUpdateForm
 
-cviews = import_module("apps.{}.views".format(settings.COMMON_APP))
+cviews = import_module("apps.common.views")
 
 
 @login_required

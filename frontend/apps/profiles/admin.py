@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
-from django.conf import settings
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from importlib import import_module
 from .models import NormalUser, SecurityUser, ScaplRole
 
-cadmin = import_module("apps.{}.admin".format(settings.COMMON_APP))
-sadmin = import_module("apps.{}.admin".format(settings.SCHEME_APP))
+cadmin = import_module("apps.common.admin")
+sadmin = import_module("apps.scheme.admin")
 
 
 def scapl_user_admin(model=None):

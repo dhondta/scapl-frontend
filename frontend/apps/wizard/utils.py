@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
-from django.conf import settings
 from .forms import APLTaskItemForm
 from .models import APLTaskItem
 
-get_scheme = getattr(__import__("{}.utils".format(settings.SCHEME_SOURCE), fromlist=['utils']), 'get_scheme')
+get_scheme = getattr(__import__("apps.scheme.utils", fromlist=['utils']), 'get_scheme')
 
 
 def make_form(apl_id, seq_id):

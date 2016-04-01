@@ -1,11 +1,9 @@
 # -*- coding: UTF-8 -*-
-from django import forms
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from importlib import import_module
 from .models import ScaplUser
 
-cforms = import_module("apps.{}.forms".format(settings.COMMON_APP))
+cforms = import_module("apps.common.forms")
 
 # TODO: Add avatar management (see https://github.com/bitmazk/django-user-media)
 

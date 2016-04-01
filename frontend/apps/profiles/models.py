@@ -7,7 +7,7 @@ from importlib import import_module
 
 user_app, user_model = settings.AUTH_ABSTRACT_USER_MODEL.split('.')
 GenericUser = apps.get_app_config(user_app).get_model(user_model)
-cmodels = import_module("apps.{}.models".format(settings.COMMON_APP))
+cmodels = import_module("apps.common.models")
 
 
 class ScaplRole(models.Model):

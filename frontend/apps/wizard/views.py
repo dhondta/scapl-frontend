@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from django.contrib.auth.decorators import login_required
-from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
@@ -12,7 +11,7 @@ from .utils import make_form
 def create_apl(request):
     form = APLTaskInitStepForm(data=request.POST)
     if form.is_valid():
-        request.session['apl'] = form.save(request=request)
+        request.session['apl'] = form.save(request=request).id
     else:
         try:
             request.session['apl'] = APLTask.objects.get(keywords=form.data['keywords']).id
