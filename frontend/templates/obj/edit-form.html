@@ -8,9 +8,9 @@
 <br>
 
 <div class="row">
-	<div class="col-md-12">
+	<div class="col-md-12 profile-info-tabs">
 
-		<form method="post" role="form" class="form-horizontal form-groups-bordered">
+		<form method="post" id="profile-form" role="form" class="form-horizontal form-groups-bordered">
 			{% csrf_token %}
 
 			<div class="panel panel-primary" data-collapsed="0">
@@ -19,7 +19,7 @@
 					<div class="panel-title">{{ header_account }}</div>
 					<div class="panel-options">
 						<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-						<a href="#" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
+						<a href="#" onclick="$(this).closest('form').submit()" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
 					</div>
 				</div>
 
@@ -40,12 +40,6 @@
 						<div class="col-sm-5">{{ form.new_password1 }}</div>
 						<div class="col-sm-5">{{ form.new_password2 }}</div>
 					</div>
-
-					<div class="form-group">
-						<div class="col-sm-offset-3 col-sm-5">
-							<button type="submit" class="btn btn-default">{{ button_update }}</button>
-						</div>
-					</div>
 				</div>
 			</div>
 
@@ -54,7 +48,7 @@
 					<div class="panel-title">{{ header_persdata }}</div>
 					<div class="panel-options">
 						<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-						<a href="#" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
+						<a href="#" onclick="$(this).closest('form').submit()" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
 					</div>
 				</div>
 
@@ -105,12 +99,6 @@
 								</td>
 							</tr>
 						</table>
-					</div>
-
-					<div class="form-group">
-						<div class="col-sm-offset-3 col-sm-5">
-							<button type="submit" class="btn btn-default">{{ button_update }}</button>
-						</div>
 					</div>
 				</div>
 			</form>

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
 from .forms import APLTaskInitStepForm, APLTaskSequenceSelectionForm
@@ -60,6 +61,9 @@ def save_data_item(request):
                 di = APLTaskItem.objects.get(apl=apl, item_id=item_id)
             except APLTaskItem.DoesNotExist:
                 di = APLTaskItem(apl=apl, item_id=item_id)
-            di.value = request.POST['value']
-            di.save()
-    return HttpResponse('')
+            value = request.POST['value']
+            if value != '':
+                di.value = request.POST['value']
+                di.save()
+                return JsonResponse({'status': 200})
+    return JsonResponse({'status': 400})
