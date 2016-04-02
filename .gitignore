@@ -71,3 +71,6 @@ frontend/apps/wizard/migrations/
 
 # Django production settings
 frontend/frontend/settings/prod.py
+
+# Neon theme assets
+static/assets/
