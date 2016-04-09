@@ -1,27 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-{% load staticfiles bootstrap_themes cache i18n  %}
+{% load i18n  %}
 
-<html lang="en" dir="rtl">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="SCAPL frontend"/>
-    <meta name="author" content=""/>
-    {% include "scripts/index-scripts.html" %}
-    {% block extra_script %}
-    <script src="{% static 'assets/js/neon-login.js' %}"></script>
-    {% endblock %}
-
-
-    <!-- For login -->
-    <title>{% block title %}SCAPL - {% trans 'Sign in' %}{% endblock %}</title>
-
-</head>
-<body class="page-body login-page login-form-fall">
-
+{% block title %}SCAPL | {% trans "Index" %}{% endblock %}
+{% block navbar %}{% endblock %}
 
 <!-- This is needed when you send requests via Ajax
 
@@ -30,12 +12,5 @@ var baseurl = '';
 
 </script>
 -->
-
-<!--formLogin-->
-{% block form %}{% include "obj/signin-form.html" %}{% endblock %}
-
-<!-- Footer -->
+{% block content %}{% include "obj/index-content.html" %}{% endblock %}
 {% block footer %}{% include "obj/footer.html" %}{% endblock %}
-
-</body>
-</html>

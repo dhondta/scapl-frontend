@@ -20,9 +20,9 @@ class ProfilesAppConfig(AppConfig):
 
 class WizardAppConfig(AppConfig):
     name = 'apps.wizard'
-    verbose_name = _("4- Wizard Tasks")
+    verbose_name = _("4- Wizard Elements")
 
 
 class CeleryAppConfig(AppConfig):
     name = 'djcelery'
-    verbose_name = _("5- Asynchronous Background Tasks")
+    verbose_name = _("5- Celery Components")

@@ -7,11 +7,11 @@ cforms = import_module("apps.common.forms")
 
 # TODO: Add avatar management (see https://github.com/bitmazk/django-user-media)
 
-class ThemeSpecificMixin(object):
+class BootStrapMixin(object):
     """ A mix-in for handling theme-specific HTML attributes """
 
     def __init__(self, *args, **kwargs):
-        super(ThemeSpecificMixin, self).__init__(*args, **kwargs)
+        super(BootStrapMixin, self).__init__(*args, **kwargs)
         self.form_title = _("Edit your profile")
         self.fields['email'].widget.attrs['disabled'] = ''
         # Neon them-specific attributes settings
@@ -37,15 +37,15 @@ class ThemeSpecificMixin(object):
             self.fields[field].widget.attrs['autocomplete'] = 'off'
 
 
-class ScaplUserUpdateForm(ThemeSpecificMixin, cforms.GenericUserUpdateForm):
-    """ An extension of GenericUserForm to handle theme-specific HTML attributes """
+class ScaplUserUpdateForm(BootStrapMixin, cforms.GenericUserUpdateForm):
+    """ An extension of GenericUserForm to handle specific HTML attributes """
 
     class Meta(cforms.GenericUserForm.Meta):
         model = ScaplUser
 
 
-class ScaplUserCreationForm(ThemeSpecificMixin, cforms.GenericUserCreationForm):
-    """ An extension of ScaplUserUpdateForm and GenericUserCreationForm to handle theme-specific HTML attributes and duplicate emails """
+class ScaplUserCreationForm(BootStrapMixin, cforms.GenericUserCreationForm):
+    """ An extension of ScaplUserUpdateForm and GenericUserCreationForm to handle specific HTML attributes and duplicate emails """
 
     class Meta(cforms.GenericUserForm.Meta):
         model = ScaplUser

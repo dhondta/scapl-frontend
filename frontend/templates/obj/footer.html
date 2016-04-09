@@ -1,3 +1,17 @@
-<footer class="main">
-    &copy; 2016 <strong>SCAPL</strong> by Huss & Alex
+{% load staticfiles i18n %}
+
+{% trans "User Agreement" as link_useragreement %}
+{% trans "Privacy Policy" as link_privpolicy %}
+{% trans "Cookie Policy" as link_cookiepolicy %}
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2 text-left"><h6>&copy; 2016 <strong>SCAPL</strong> by Huss & Alex</h6></div>
+            <div class="col-sm-1"></div>
+            <div class="col-sm-2 text-center"><a href="#">{{ link_useragreement }}</a></div>
+            <div class="col-sm-2 text-center"><a href="#">{{ link_privpolicy }}</a></div>
+            <div class="col-sm-2 text-center"><a href="#">{{ link_cookiepolicy }}</a></div>
+        </div>
+    </div>
 </footer>

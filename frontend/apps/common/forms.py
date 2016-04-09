@@ -2,6 +2,10 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from .models import GenericUser, Title, Rank, Service
+try:
+    from bootstrap_themes import list_themes
+except ImportError:
+    list_themes = lambda: ()
 
 
 class GenericUserAdminForm(forms.ModelForm):
@@ -11,7 +15,7 @@ class GenericUserAdminForm(forms.ModelForm):
 
     class Meta:
         model = GenericUser
-        fields = ('email', 'first_name', 'last_name', 'title', 'rank', 'service', 'phone1', 'phone2', )
+        fields = ('email', 'first_name', 'last_name', 'title', 'rank', 'service', 'phone1', 'phone2', 'theme', )
         labels = {
             'email': _('E-mail'),
             'first_name': _('First name'),
@@ -21,6 +25,7 @@ class GenericUserAdminForm(forms.ModelForm):
             'service': _('Service'),
             'phone1': _('Professional phone'),
             'phone2': _('Personal phone'),
+            'theme': _('Theme'),
         }
 
 
@@ -29,7 +34,7 @@ class GenericUserForm(GenericUserAdminForm):
     error_messages = {
         'duplicate_email': _("This email address already exists"),
         'password_mismatch': _("Both password fields didn't match"),
-        'bad_old_password': _("Bad old password"),
+        'bad_old_password': _("Please enter your current password"),
     }
     new_password1 = forms.CharField(label=_("New password"), widget=forms.PasswordInput)
     new_password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput)
@@ -67,7 +72,6 @@ class GenericUserUpdateForm(GenericUserForm):
 
     def __init__(self, *args, **kwargs):
         super(GenericUserUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['email'].widget.value_from_datadict = lambda *args: self.instance.email
         self.fields['new_password1'].required = False
         self.fields['new_password2'].required = False
 
@@ -86,3 +90,6 @@ class GenericUserUpdateForm(GenericUserForm):
         if commit:
             user.save()
         return user
+
+    def validate_unique(self):
+        pass

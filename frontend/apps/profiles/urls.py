@@ -1,14 +1,13 @@
 # -*- coding: UTF-8 -*-
 from django.conf.urls import url
-from .views import home, password, profile, reports, signin, signout, signup
+from frontend.decorators import anonymous_only, user_only
+from .views import home, password, profile, signin_or_signup, signout
 
 
 urlpatterns = [
-    url(r'^$', signin, name='signin'),
-    url(r'^signup/$', signup, name='signup'),
-    url(r'^signout/$', signout, name='signout'),
-    url(r'^home/$', home, name='home'),
-    url(r'^edit/$', profile, name='profile'),
-    url(r'^reports/$', reports, name='reports'),
-    url(r'^password/$', password, name='password'),
+    url(r'^$', signin_or_signup, name='index'),
+    url(r'^signout/$', user_only(signout), name='signout'),
+    url(r'^home/$', user_only(home), name='home'),
+    url(r'^edit/$', user_only(profile), name='profile'),
+    url(r'^password/$', anonymous_only(password), name='password'),
 ]

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from .models import APLTask, APLTaskItem
+from .models import Task, TaskItem
 
 
 SAMPLE_KEYWORDS = (
@@ -13,12 +13,12 @@ SAMPLE_KEYWORDS = (
 )
 
 
-class ThemeSpecificMixin(object):
+class BootstrapMixin(object):
     """ A mix-in for handling theme-specific HTML attributes """
 
     def __init__(self, *args, **kwargs):
         title = kwargs.pop('title', None)
-        super(ThemeSpecificMixin, self).__init__(*args, **kwargs)
+        super(BootstrapMixin, self).__init__(*args, **kwargs)
         self.form_title = _(title or "Create an APL")
         # Neon them-specific attributes settings
         for field in self.fields.keys():
@@ -35,13 +35,13 @@ class ThemeSpecificMixin(object):
             self.fields[field].widget.attrs['autocomplete'] = 'off'
 
 
-class APLTaskInitStepForm(ThemeSpecificMixin, forms.ModelForm):
+class TaskInitStepForm(BootstrapMixin, forms.ModelForm):
     """ A form handling the first step of an APL task sequence """
     keywords = forms.ChoiceField(widget=forms.Select, choices=SAMPLE_KEYWORDS)
     packages = forms.FileField(required=False)
 
     class Meta:
-        model = APLTask
+        model = Task
         fields = ('keywords', 'packages', )
 
     def clean_keywords(self):
@@ -51,28 +51,28 @@ class APLTaskInitStepForm(ThemeSpecificMixin, forms.ModelForm):
 
     def save(self, commit=True, **kwargs):
         request = kwargs.pop('request', None)
-        task = super(APLTaskInitStepForm, self).save(commit=False)
+        task = super(TaskInitStepForm, self).save(commit=False)
         task.author = request.user
         if commit:
             task.save()
         return task
 
 
-class APLTaskItemForm(ThemeSpecificMixin, forms.ModelForm):
+class TaskItemForm(BootstrapMixin, forms.ModelForm):
     """ A form handling an APL task item """
 
     class Meta:
-        model = APLTaskItem
+        model = TaskItem
         fields = ('apl', 'item', 'value', )
 
 
-class APLTaskSequenceSelectionForm(ThemeSpecificMixin, forms.Form):
+class TaskSequenceSelectionForm(BootstrapMixin, forms.Form):
     """ A form handling the first step of an APL task sequence """
     sequence = forms.ChoiceField(choices=(), label=_('Sequence'))
 
     def __init__(self, *args, **kwargs):
         self.sequences = kwargs.pop('choices')
-        super(APLTaskSequenceSelectionForm, self).__init__(*args, **kwargs)
+        super(TaskSequenceSelectionForm, self).__init__(*args, **kwargs)
         choices = []
         for i, seq_obj in enumerate(self.sequences):
             choices.append((u'{}'.format(i), seq_obj.name, ))

@@ -1,88 +1,126 @@
 {% load staticfiles i18n %}
 
-<script src="{% static 'assets/js/jquery.bootstrap.wizard.min.js' %}"></script>
+{% trans "APL overview for" as legend_overview %}
+{% trans "Open the wizard" as button_start %}
+{% trans "APL Reference" as legend_reference %}
+
+<!--<script src="{% static 'assets/js/jquery.bootstrap.wizard.min.js' %}"></script>-->
+<script>
+var current_step = 'step-1';
+function changeStep(id) { current_step = id; };
+
+//$('body').keyup(function(e){
+//    if(e.keyCode == 8){ // user has pressed backspace
+//    	$('#a-step' + current_step);
+//        $(window).load(function(){ $('#wizard-modal').modal('show');
+//    }
+//});
+</script>
 <style>
-    input.success, textarea.success, select.success {
-        @color-rgba: rgba(red(@brand-success), green(@brand-success), blue(@brand-success), .6);
-        border-color: @color-rgba;
-        .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @{color-rgba}");
-    }
+label {
+	display: inline-block;
+	width: 5em;
+}
 </style>
 
-<form novalidate="novalidate" id="rootwizard" method="post" action="#" class="form-wizard" data-class="form_ajaxified">
-
-	<div style="margin-left: 10%; margin-right: 10%;" class="steps-progress">
-		<div style="width: 0px;" class="progress-indicator"></div>
-	</div>
-
-	<ul>
-        {% for step in wizard.steps %}
-		<li
-			{% if forloop.first %} class="active"{% endif %}>
-			<a href="#tab{{ forloop.counter }}" data-toggle="tab"><span>{{ forloop.counter }}</span>{{ step.title }}</a>
-		</li>
-        {% endfor %}
-	</ul>
-
-	<div class="tab-content">
-
-        {% for step in wizard.steps %}
-		<div class="tab-pane{% if forloop.first %} active{% endif %}" id="tab{{ forloop.counter }}">
-            {% for item in step.items %}
-			<div class="row">
-				<div class="col-md-6">
-					<form method="post" action="javascript:;"">
-						{% csrf_token %}
-						<script>
-							$(document).ready(function() {
-								$("#{{ item.id }}-save").click(function () {
-									$.ajax({
-										type: "POST",
-										url: "/wizard/save/",
-										data: {
-											csrfmiddlewaretoken: '{{ csrf_token }}',
-											apl: {{ request.session.apl }},
-											item: {{ item.id }},
-											value: $('#{{ item.id }}').val(),
-										},
-										success: function(response){
-											if (response.status == 200) {
-												$('#{{ item.id }}-group').addClass('has-success');
-											} else {
-												$('#{{ item.id }}-group').addClass('has-error');
-											}
-										}
-									});
-									return false;
-								});
-							});
-						</script>
-						<div class="form-group" id="{{ item.id }}-group">
-							<label class="control-label" for="{{ item.id }}">{{ item.label }}</label>
-							{{ item.form.value }} <a id="{{ item.id }}-save">Save</a>
-						</div>
-					</form>
+<legend>{{ legend_overview }} {{ wizard.reference }}</legend>
+<div class="container" style="width: 70%;">
+	<div class="row row-centered">
+		<p align="center"><a href="#wizard-modal" role="button" class="btn btn-default btn-lg" data-toggle="modal">{{ button_start }}</a></p>
+		{% for step in wizard.steps %}
+		<div class="well bs-component" id="step-{{ forloop.counter }}" onmouseover="changeStep(this.id);">
+			<fieldset>
+				<legend title="{{ step.help }}">{{ step.title }}</legend>
+				{% for item in step.items %}
+				<label class="col-lg-3 control-label" title="{{ item.help }}">{{ item.label }}</label>
+				<div class="panel panel-default col-lg-9">
+					<div class="panel-body" id="{{ item.id }}-value">
+						{{ item.instance.value|safe }}
+					</div>
 				</div>
-			</div>
-            {% endfor %}
+				{% endfor %}
+			</fieldset>
 		</div>
-        {% endfor %}
-
-        <ul class="pager wizard">
-			<li class="previous first">
-				<a href="#">First</a>
-			</li>
-			<li class="previous">
-				<a href="#"><i class="entypo-left-open"></i> Previous</a>
-			</li>
-
-			<li class="next last">
-				<a href="#">Last</a>
-			</li>
-			<li class="next">
-				<a href="#">Next <i class="entypo-right-open"></i></a>
-			</li>
-		</ul>
+		{% endfor %}
 	</div>
+</div>
 
+
+<form method="post" role="form1" id="signin-form" class="validate">
+{% csrf_token %}
+	<div id="wizard-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="wizard-modal-label" aria-hidden="true">
+        <div class="modal-dialog" style="width: 90%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="wizard-modal-label">{{ wizard.reference }}</h3>
+                </div>
+                <div class="modal-body" id="wizard-modal-body">
+					<div class="navbar">
+						<div class="navbar-inner">
+							<ul class="nav nav-pills">
+								{% for step in wizard.steps %}
+								<li{% if forloop.first %} class="active"{% endif %}>
+									<a class="btn btn-default" id="a-step{{ forloop.counter }}" href="#step{{ forloop.counter }}"
+											data-toggle="tab" data-step="{{ forloop.counter }}">
+										{{ forloop.counter }}. {{ step.title }}
+									</a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+					<div class="tab-content">
+						{% for step in wizard.steps %}
+						<div class="tab-pane fade{% if forloop.first %} in active{% endif %}" id="step{{ forloop.counter }}">
+							{% for item in step.items %}
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<script>
+										$(document).ready(function() {
+											$("#{{ item.id }}-save").click(function () {
+												$.ajax({
+													type: "POST",
+													url: "{% url 'save_di' %}",
+													data: {
+														csrfmiddlewaretoken: '{{ csrf_token }}',
+														apl: {{ request.session.apl }},
+														item: {{ item.id }},
+														value: $('#{{ item.id }}').val()
+													},
+													success: function(response){
+														if (response.status == 200) {
+															$('#{{ item.id }}-group').addClass('has-success');
+															$('#{{ item.id }}-value').text($('#{{ item.id }}').val());
+														} else {
+															$('#{{ item.id }}-group').addClass('has-error');
+															$().toastmessage('showToast', {text : response.error, type : 'danger'})
+														}
+													}
+												});
+												return false;
+											});
+										});
+									</script>
+									<div class="row">
+										<div class="col-md-6">
+											<form method="post" action="javascript:;">
+												{% csrf_token %}
+												<div class="form-group" id="{{ item.id }}-group">
+													<label class="control-label" for="{{ item.id }}">{{ item.label }}</label>
+													{{ item.form.value }} <a id="{{ item.id }}-save">Save</a>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+						</div>
+						{% endfor %}
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>

@@ -52,17 +52,17 @@ class AdministratorAdmin(cadmin.GenericUserAdmin):
 
 class ItemListAssociationsInline(SortableInlineAdminMixin, admin.StackedInline):
     model = ItemListAssociations
-    extra = 1
+    extra = 0
 
 
 class ListSequenceAssociationsInline(SortableInlineAdminMixin, admin.StackedInline):
     model = ListSequenceAssociations
-    extra = 1
+    extra = 0
 
 
 class SequenceRoleAssociationsInline(admin.StackedInline):
     model = SequenceRoleAssociations
-    extra = 1
+    extra = 0
 
 
 class EntityAdmin(admin.ModelAdmin):

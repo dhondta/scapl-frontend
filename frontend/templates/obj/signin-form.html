@@ -1,107 +1,72 @@
 {% load staticfiles i18n %}
 
-{% trans "Dear user, welcome to SCAPL, please sign in !" as msg_welcome %}
-{% trans "Signing in" as msg_signingin %}
-{% trans "Forgot your password ?" as msg_forgotpswd %}
-{% trans "Sign Up" as button_signup %}
+{% trans "Sign In" as button_signin %}
 
-<div class="login-container">
+{% if not request.POST.type == 'signup' %}
+<script type="text/javascript">
+    $(window).load(function(){ $('#signin-modal').modal('show'); $('#signup-modal').modal('hide'); });
+</script>
+{% endif %}
 
-    <div class="login-header login-caret" style="height: 400px;">
+<form method="post" role="form1" id="signin-form" class="validate">
+{% csrf_token %}
+    <div class="modal fade" role="dialog" id="signin-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{{ button_signin }}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="entypo-user"></i></div>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="Email" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="entypo-key"></i></div>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" name="type" value="signin"/>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            {{ button_signin }}
+                            <i class="entypo-login"></i>
+                        </button>
+                    </div>
 
-        <div class="login-content">
+                    <!-- Implemented in v1.1.4 -->
+                    <!--    <div class="form-group">
+                          <em>- or -</em>
+                      </div>
 
-            <a href="#" class="logo"><img src="{% static 'assets/images/logo-S.png' %}" width="300" height="300" alt=""/></a>
+                      <div class="form-group">
+                          <button type="button" class="btn btn-default btn-lg btn-block btn-icon icon-left facebook-button">
+                              Login with Facebook
+                              <i class="entypo-facebook"></i>
+                          </button>
+                      </div>
 
-            <p class="description">{{ msg_welcome }}</p>
+                      You can also use other social network buttons
+                      <div class="form-group">
+                          <button type="button" class="btn btn-default btn-lg btn-block btn-icon icon-left twitter-button">
+                              Login with Twitter
+                              <i class="entypo-twitter"></i>
+                          </button>
+                      </div>
 
-            <!-- progress bar indicator -->
-            <div class="login-progressbar-indicator">
-                <h3>0%</h3>
-                <span>{{ msg_signingin }}</span>
+                      <div class="form-group">
+                          <button type="button" class="btn btn-default btn-lg btn-block btn-icon icon-left google-button">
+                              Login with Google+
+                              <i class="entypo-gplus"></i>
+                          </button>
+                      </div> -->
+                </div>
             </div>
         </div>
-
     </div>
-
-
-    <div class="login-progressbar">
-        <div></div>
-    </div>
-
-
-    <div class="login-form">
-
-        <div class="login-content">
-
-            {% if request.message %}<div class="form-login-error" style="display: block;"><h3>{{ request.message }}</h3></div>{% endif %}
-
-            <form method="post" role="form" id="form1" class="validate">
-
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="entypo-user"></i></div>
-                        <input type="text" class="form-control" name="email" id="email" placeholder="Email"
-                               autocomplete="off" data-validate="email"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="entypo-key"></i></div>
-                        <input type="password" class="form-control" name="password" id="password" placeholder="Password"
-                               autocomplete="off"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block btn-login">
-                        Login In
-                        <i class="entypo-login"></i>
-                    </button>
-                </div>
-
-                <!-- Implemented in v1.1.4 -->
-                <!--    <div class="form-group">
-                      <em>- or -</em>
-                  </div>
-
-                  <div class="form-group">
-                      <button type="button" class="btn btn-default btn-lg btn-block btn-icon icon-left facebook-button">
-                          Login with Facebook
-                          <i class="entypo-facebook"></i>
-                      </button>
-                  </div>
-
-                  You can also use other social network buttons
-                  <div class="form-group">
-                      <button type="button" class="btn btn-default btn-lg btn-block btn-icon icon-left twitter-button">
-                          Login with Twitter
-                          <i class="entypo-twitter"></i>
-                      </button>
-                  </div>
-
-                  <div class="form-group">
-                      <button type="button" class="btn btn-default btn-lg btn-block btn-icon icon-left google-button">
-                          Login with Google+
-                          <i class="entypo-gplus"></i>
-                      </button>
-                  </div> -->
-            </form>
-
-            <div class="panel-body"></div>
-
-            <div class="login-bottom-links">
-                <a href="{% url 'password' %}" class="link">{{ msg_forgotpswd }}</a>
-                <br/>
-                <a href="{% url 'signup' %}">{{ button_signup }}</a>
-            </div>
-
-        </div>
-
-    </div>
-
-
-</div>
+</form>

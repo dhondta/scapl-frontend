@@ -1,5 +1,6 @@
 # Temp files
 *~
+*.backup
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
@@ -73,4 +74,5 @@ frontend/apps/wizard/migrations/
 frontend/frontend/settings/prod.py
 
 # Neon theme assets
-static/assets/
+#static/assets/
+static/*.zip

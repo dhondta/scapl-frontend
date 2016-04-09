@@ -1,102 +1,45 @@
 {% load staticfiles i18n %}
 
-{% trans "Create your account" as msg_create %}
-{% trans "Registration" as msg_registration %}
 {% trans "You have been successfully registered" as msg_success %}
 {% trans "We have emailed you the confirmation link for your account" as msg_mail %}
 {% trans "Credentials" as header_credentials %}
 {% trans "Personal data (Optional)" as header_persdata %}
-{% trans "Previous Step" as button_prev %}
-{% trans "Next Step" as button_next %}
-{% trans "Complete Registration" as button_complete %}
-{% trans "Return to Login Page" as link_login %}
-{% trans "Privacy Policy" as link_privpolicy %}
 
-<div class="login-container">
+{% if request.POST.type == 'signup' %}
+<script type="text/javascript">
+    $(window).load(function(){ $('#signin-modal').modal('hide'); $('#signup-modal').modal('show'); });
+</script>
+{% endif %}
 
-    <div class="login-header login-caret">
+<script src="{% static 'assets/js/jquery.modal-steps.min.js' %}"></script>
 
-        <div class="login-content">
-
-
-            <a href="/" class="logo">
-                <img src="{% static 'assets/images/Slogo.png' %}" width="150" height="100" alt=""/>
-            </a>
-
-            <p class="description">{{ msg_create }}</p>
-
-            <!-- progress bar indicator -->
-            <div class="login-progressbar-indicator">
-                <h3>0%</h3>
-                <span>{{ msg_registration }}...</span>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="login-progressbar">
-        <div></div>
-    </div>
-
-    <div class="login-form">
-
-        <div class="login-content">
-
-            <form method="post" role="form" id="form_register">
-
-                {% csrf_token %}
-
-                <div class="form-register-success">
-                    <i class="entypo-check"></i>
-                    <h3>{{ msg_success }}</h3>
-                    <p>{{ msg_mail }}</p>
+<form id="signup-form" role="form" method="post" action="#">
+{% csrf_token %}
+    <div class="modal fade" role="dialog" id="signup-modal">
+        <div class="modal-dialog">
+            <div class="modal-content" align="center">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="js-title-step"></h4>
                 </div>
-
-                <div class="form-steps">
-
-                    <div class="step current" id="step-1">
-
-                        <h3>{{ header_credentials }}</h3>
-
-                        {% if form.email.errors %}
-                            <div class="form-login-error" style="display: block;">
-                            {% for error in form.email.errors %}
-                                <h3>{{ error }}</h3>
-                            {% endfor %}
-                            </div>
-                        {% endif %}
-
+                <div class="modal-body" style="width: 95%;">
+                    <div class="row hide" data-step="1" data-title="{{ header_credentials }}">
                         <div class="form-group">
                             <div class="input-group{% if form.email.errors %} {{ 'validate-has-error' }}{% endif %}">
                                 <div class="input-group-addon"><i class="entypo-mail"></i></div>
-                                {{ form.email }}
+                                <input autocomplete="off" class="form-control" data-mask="email" id="email" maxlength="254" name="email" placeholder="E-mail *" type="email" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group{% if form.new_password1.errors %} {{ 'validate-has-error' }}{% endif %}">
                                 <div class="input-group-addon"><i class="entypo-lock"></i></div>
-                                {{ form.new_password1 }}
-                                {{ form.new_password2 }}
+                                <input autocomplete="off" class="form-control" id="new_password1" name="new_password1" placeholder="New password *" type="password" required>
+                                <input autocomplete="off" class="form-control" id="new_password2" name="new_password2" placeholder="Password confirmation *" type="password" required>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <button type="button" data-step="step-2" class="btn btn-primary btn-block btn-login">
-                                {{ button_next }}
-                                <i class="entypo-right-open-mini"></i>
-                            </button>
-                        </div>
-
-                        <div class="form-group">
-                            {% blocktrans with v1=1 v2=2 %}Step {{ v1 }} of {{ v2 }}{% endblocktrans %}
-                        </div>
-
+                        <input id="acceptTerms-2" name="acceptTerms" type="checkbox" class="required"> <label for="acceptTerms-2">I agree with the Terms and Conditions.</label>
                     </div>
-
-                    <div class="step" id="step-2">
-
-                        <h3>{{ header_persdata }}</h3>
-
+                    <div class="row hide" data-step="2" data-title="{{ header_persdata }}">
                         <div class="form-group">
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="entypo-user"></i></div>
@@ -137,58 +80,46 @@
                         -->
                         <div class="form-group">
                             <div class="input-group">
-                                <div class="input-group-addon"></div>
+                                <div class="input-group-addon"><i class="entypo-star"></i></div>
                                 {{ form.title }}
-                                <!--<input type="text" class="form-control" name="title" id="title"
-                                       placeholder="Title" autocomplete="off"/>-->
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon"></div>
                                 {{ form.rank }}
-                                <!--<input type="text" class="form-control" name="rank" id="rank"
-                                       placeholder="Rank" autocomplete="off"/>-->
                             </div>
                         </div>
-                        <div class="form-group">
+                       <div class="form-group">
                             <div class="input-group">
-                                <div class="input-group-addon"></div>
+                                <div class="input-group-addon"><i class="entypo-users"></i></div>
                                 {{ form.service }}
-                                <!--<input type="text" class="form-control" name="service" id="service"
-                                       placeholder="Service" autocomplete="off"/>-->
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <button type="button" data-step="step-1" class="btn btn-primary btn-block btn-login">
-                                {{ button_prev }}
-                                <i class="entypo-left-open-mini"></i>
-                            </button>
-                            <button type="submit" class="btn btn-success btn-block btn-login">
-                                {{ button_complete }}
-                                <i class="entypo-right-open-mini"></i>
-                            </button>
-                        </div>
-                        <div class="form-group">
-                            {% blocktrans with v1=2 v2=2 %}Step {{ v1 }} of {{ v2 }}{% endblocktrans %}
-                        </div>
-
                     </div>
-
                 </div>
-            </form>
-
-
-            <div class="login-bottom-links">
-                <a href="/" class="link"><i class="entypo-lock"></i>{{ link_login }}</a>
-                <br/>
-                <a href="#">{{ link_privpolicy }}</a>
+                <div class="modal-footer">
+                    <p>(*) Mandatory</p>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default js-btn-step" data-orientation="previous"></button>
+                        <button type="button" class="btn btn-default js-btn-step" data-orientation="next"></button>
+                    </div>
+                    {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <div class="alert alert-dismissible alert-danger">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <p align="center">{{ error }}</p>
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
             </div>
-
         </div>
-
     </div>
+</form>
 
-</div>
+<script type="text/javascript">
+$('#signup-modal').modalSteps({
+    btnPreviousHtml: '<font size="4"><i class="fa fa-chevron-left"></i></font>',
+    btnNextHtml: '<font size="4"><i class="fa fa-chevron-right"></i></font>',
+    btnLastStepHtml: '<font size="4"><i class="fa fa-check"></i></font>',
+    callBack: {
+        '1': $("#signup-form").validate()
+    }
+});
+</script>

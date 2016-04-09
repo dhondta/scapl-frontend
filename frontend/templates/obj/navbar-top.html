@@ -1,0 +1,78 @@
+{% load staticfiles i18n %}
+
+{% trans "New task" as label_wizard %}
+{% trans "Pending tasks" as label_tasks %}
+{% trans "Reports" as label_reports %}
+{% trans "Help" as label_help %}
+{% trans "Blog" as label_blog %}
+{% trans "Search for APL" as placeholder_search %}
+{% trans "Welcome" as label_welcome %}
+{% trans "Profile" as label_profile %}
+{% trans "Sign out" as label_signout %}
+
+{% trans "Dutch" as label_dutch %}
+{% trans "English" as label_english %}
+{% trans "French" as label_french %}
+
+<style>body { padding-top: 50px; }</style>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">SCAPL</a>
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false" id="apl_menu">
+                        APL
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="apl_menu">
+                        <li><a href="{% url 'wizard' %}"><span>{{ label_wizard }}</span></a></li>
+                        <li><a href="{% url 'tasks' %}"><span>{{ label_tasks }}</span></a></li>
+                        <li><a href="{% url 'reports' %}"><span>{{ label_reports }}</span></a></li>
+                    </ul>
+                </li>
+                <li><a href="/help/">{{ label_help }}</a></li>
+                <li><a href="/blog/">{{ label_blog }}</a></li>
+            </ul>
+
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input class="form-control" placeholder="{{ placeholder_search }}" type="text">
+                </div>
+                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+            </form>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="lang_menu">
+                        <img src="{% static 'assets/images/lang/flag-uk.png' %}"/>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="lang_menu">
+                        <li class="active"><a href="#"><img src="{% static 'assets/images/lang/flag-uk.png' %}"/><span>{{ label_english }}</span></a></li>
+                        <li><a href="#"><img src="{% static 'assets/images/lang/flag-fr.png' %}"/><span>{{ label_french }}</span></a></li>
+                        <li><a href="#"><img src="{% static 'assets/images/lang/flag-ne.png' %}"/><span>{{ label_dutch }}</span></a></li>
+                    </ul>
+                </li>
+                <li><a href="#">{{ label_welcome }}, <strong>{{ request.user.get_short_name }}</strong></a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user_menu">
+                        <i class="entypo-menu"></i>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="user_menu">
+                        <li><a href="{% url 'profile' %}"><i class="entypo-user"></i><span>{{ label_profile }}</span></a></li>
+                        <li><a href="{% url 'signout' %}"><i class="entypo-logout"></i><span>{{ label_signout }}</span></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

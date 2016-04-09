@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import djcelery  # Django-Celery integration
+from django.contrib import messages
+from ..admin import ADMIN_REORDER
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -39,11 +41,15 @@ SECRET_KEY = 'vm-ucdk*adk1$47^ri1!&8sp)ms%u^$26v)zhq6l$r@s_&ur%8'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-SITE_ID=1
+DENIED_HOSTS = []
+SITE_ID = 1
 
 # Application definition
 INSTALLED_APPS = (
+    # style applications
     'bootstrap3',
+    'bootstrap_themes',
+    # native applications
     'django_admin_bootstrapped',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -52,25 +58,49 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # extra applications (core)
+    'djcelery',
     'django_extensions',
     'django_libs',
-    'forms_ajaxified',
+    'form_utils',
     'smuggler',
     'adminsortable2',
-    'bootstrap_themes',
     # TODO: Enable 'storages' for production version
     #    'storages',
-    'frontend.apps.CeleryAppConfig',
-    'frontend.apps.CommonAppConfig',
-    'frontend.apps.ProfilesAppConfig',
-    'frontend.apps.SchemeAppConfig',
-    'frontend.apps.WizardAppConfig',
     #'celery_haystack',
     #'queued_search',
+    # SCAPL application configurations
+    'apps.common',
+    'apps.profiles',
+    'apps.scheme',
+    'apps.wizard',
+#    'frontend.apps.CeleryAppConfig',
+#    'frontend.apps.CommonAppConfig',
+#    'frontend.apps.ProfilesAppConfig',
+#    'frontend.apps.SchemeAppConfig',
+#    'frontend.apps.WizardAppConfig',
+    # add-on applications (optional)
+    'admin_honeypot',
+    'admin_reorder',
+    'overextends',
 )
+# Useful list of additional apps: https://github.com/rosarior/awesome-django#admin-interface
+# TODO: convert admin site to django-admin2
+# TODO: use django-wysiwyg for data items
+# TODO: optimize JS and CSS transfer with django-pipeline
+# TODO: consider using django-analytical
+# TODO: consider using django-blog-zinnia or puput for blog part
+# TODO: consider adding a project dashboard using django-dashing
+# TODO: consider using django-imagekit for managing avatar processing
+# TODO: consider using django-autocomplete-light or django-searchable-select for select's
+# TODO: consider using  for Search field
+# TODO: optimize security with django-security and django-sslify
+# TODO: consider simplifying settings.py with django-environ or django-split-settings
+# TODO: consider using django-taggit for tagging assets (e.g. APL tasks)
+# TODO: consider integrating BPMN workflows sketching with django-viewflow (for the Automation System)
 
 # Login URL settings
-LOGIN_URL = LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = LOGOUT_URL = ADMIN_LOGOUT_URL = LOGIN_REDIRECT_URL = '/'
 
 # Backends for using the customized user model and for automatically creating a superuser
 AUTHENTICATION_BACKENDS = (
@@ -79,6 +109,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE_CLASSES = (
+#    'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -86,6 +117,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
+#    'django.middleware.cache.FetchFromCacheMiddleware',
+#    'frontend.middleware.RemoteAddrMiddleware',
+#    'frontend.middleware.FilterIPMiddleware',
 )
 
 ROOT_URLCONF = 'frontend.urls'
@@ -115,15 +150,10 @@ DATABASES = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -136,22 +166,29 @@ Copy the static files to the public accessible folder using manage.py
 #
 python manage.py collectstatic -link --noinput
 """
-# web accessible folder
+# web accessible folders
 STATICFILES_DIRS = (
     os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, 'static/').replace('\\', '/'),
     # location of application, should not be public web accessible
 )
 # URL prefix for static files.
-# STATIC_URL = os.path.join(os.path.dirname(__file__),os.pardir,os.pardir,os.pardir, 'static/').replace('\\', '/')
-STATIC_URL = '/static/'
-# web accessible folder
-STATIC_ROOT = '/var/www/scapl-frontend/static/'
+STATIC_ROOT = STATIC_URL = '/static/'
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+# URL prefix for media files (must be different from STATIC_URL).
+MEDIA_URL = '/media/'
+# TODO: Enable FTP for production version
+# Web accessible folder (must be different from STATIC_ROOT)
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, 'media/').replace('\\', '/')
+# DEFAULT_FILE_STORAGE = 'storages.backends.ftp.FTPStorage'
+AVATARS_LOCATION = 'avatars/'    # for user profiles
+PACKAGES_LOCATION = 'packages/'  # for APL packages
+REPORTS_LOCATION = 'reports/'    # for APL generated reports
 
 # For handling automatic admin creation
 ADMIN_EMAIL = 'admin@localhost'
@@ -193,8 +230,10 @@ PASSWORD_HASHERS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'templates').replace('\\', '/')],
-        'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'templates').replace('\\', '/'),
+        ],
+#        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -206,9 +245,16 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'builtins': [
+                'overextends.templatetags.overextends_tags'
+            ],
             'libraries': {
                 'common_tags': 'apps.common.tags',
             },
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
         },
     },
 ]
@@ -220,12 +266,6 @@ TEMPLATES = [
 DI_ID_DIGITS = 5
 DL_ID_DIGITS = 3
 DS_ID_DIGITS = 2
-RL_ID_DIGITS = 2
-
-# TODO: Enable FTP for production version
-# File storage (for APL packages)
-MEDIA_ROOT = MEDIA_URL = '/packages/'
-# DEFAULT_FILE_STORAGE = 'storages.backends.ftp.FTPStorage'
 
 # TODO: Enable Memcache for production version
 # Cache management
@@ -258,3 +298,16 @@ AUTH_ABSTRACT_USER_MODEL = 'common.GenericUser'
 AUTH_USER_MODEL = 'profiles.ScaplUser'
 AUTH_ROLE_MODEL = 'profiles.ScaplRole'
 AUTH_ADMIN_MODEL = 'scheme.Administrator'
+
+# Admin bootstrapped configuration
+DAB_FIELD_RENDERER = 'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
+MESSAGE_TAGS = {
+    messages.SUCCESS: 'alert-success success',
+    messages.WARNING: 'alert-warning warning',
+    messages.ERROR: 'alert-danger error'
+}
+
+# In order to get the list of available themes, go to a Python shell and type:
+#   from bootstrap_themes import list_themes
+#   list_themes()
+DEFAULT_BOOTSTRAP_THEME = 'default'

@@ -92,9 +92,10 @@ class DataList(Entity):
 
 class DataItem(Entity):
     """ This model defines the generic structure of a data item """
+    objects = InheritanceManager()
+
     author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_items")
     lists = models.ManyToManyField(DataList, through='ItemListAssociations', related_name="items")
-    objects = InheritanceManager()
 
     class Meta:
         ordering = ('id', )

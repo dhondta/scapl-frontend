@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% load i18n  %}
+
+{% block title %}SCAPL | {% trans "Error" %}{% endblock %}
+{% block navbar %}{% endblock %}
+{% block content %}
+<h1>{% trans "Page Not Found" %}</h1>
+<h3>{% trans "The page you were looking for could not be found." %}</h3>
+{% endblock %}
+{% block footer %}{% include "obj/footer.html" %}{% endblock %}

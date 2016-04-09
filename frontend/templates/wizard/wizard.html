@@ -3,4 +3,13 @@
 {% load i18n staticfiles %}
 
 {% block title %}SCAPL - {% trans "Wizard" %}{% endblock %}
-{% block content %}{% include "obj/wizard-form.html" %}{% endblock %}
+
+{% block content %}
+{% if create_form %}
+    {% include "obj/create-apl-form.html" %}
+{% elif select_form %}
+    {% include "obj/select-seq-form.html" %}
+{% else %}
+    {% include "obj/wizard-form.html" %}
+{% endif %}
+{% endblock %}

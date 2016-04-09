@@ -22,7 +22,7 @@ class Package(models.Model):
     file = models.FileField(upload_to=apl_packages_path)
 
 
-class APLStatus(models.Model):
+class Status(models.Model):
     status = models.CharField(max_length=32, null=True, blank=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
@@ -32,19 +32,30 @@ class APLStatus(models.Model):
 
     def save(self, *args, **kwargs):
         self.status = self.status.upper()
-        super(APLStatus, self).save(*args, **kwargs)
+        super(Status, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.status
 
 
-class APLTask(models.Model):
+class Report(models.Model):
+    document = models.FileField(upload_to=settings.REPORTS_LOCATION)
+    date_generated = models.DateTimeField(verbose_name=_(u'Generation date'), auto_now_add=True, auto_now=False, editable=False)
+
+    class Meta:
+        verbose_name = _("Report")
+        verbose_name_plural = _("Reports")
+
+
+class Task(models.Model):
     author = models.ForeignKey(GenericUser, related_name="created_tasks")
-    contributors = models.ManyToManyField(GenericUser, through='APLTaskContributors', related_name="apl_tasks")
+    contributors = models.ManyToManyField(GenericUser, through='TaskContributors', related_name="apl_tasks")
     keywords = models.CharField(max_length=1024, unique=True)  # TODO: change it to JSONField (Django 1.9+ if used with PostgreSQL)
     packages = models.ForeignKey(Package, blank=True, null=True, default=None)
     code = models.CharField(max_length=8, blank=True, null=True, editable=False)
-    status = models.ForeignKey(APLStatus, blank=True, null=True, editable=False, default=None, related_name="related_tasks")
+    status = models.ForeignKey(Status, blank=True, null=True, editable=False, default=None, related_name="related_tasks")
+    date_created = models.DateTimeField(verbose_name=_(u'Creation date'), auto_now_add=True, auto_now=False, editable=False)
+    date_modified = models.DateTimeField(verbose_name=_(u'Last modification date'), auto_now_add=False, auto_now=True, editable=False)
 
     class Meta:
         verbose_name = _("Task")
@@ -54,12 +65,14 @@ class APLTask(models.Model):
         return self.reference
 
     def save(self, *args, **kwargs):
-        if not self.code:
-            self.code = "{}_{}".format(now().year, str(self.pk).zfill(3))
         if not self.status:
-            status = APLStatus.objects.filter(order=1)
-            self.status = None if len(status) == 0 else status[0]
-        super(APLTask, self).save(*args, **kwargs)
+            status = Status.objects.filter(order=1)
+            self.status = 'UNDEFINED' if len(status) == 0 else status[0]
+        super(Task, self).save(*args, **kwargs)
+        if not self.code:
+            self.code = "{}_{}".format(now().year, str(self.pk or 'X' * 3).zfill(3))
+        kwargs.update({'update_fields': ['code']})
+        super(Task, self).save(*args, **kwargs)
 
     # TODO: this is error-prone due to the field's length ; add a validation
     # def setkeywords(self, keywords):
@@ -69,13 +82,20 @@ class APLTask(models.Model):
     #     return json.loads(self.keywords)
 
     @property
+    def progress(self):
+        n = DataItem.objects.count()
+        m = TaskItem.objects.filter(apl=self).count()
+        return int(100 * m / n) if n > 0 else 0
+
+    @property
     def reference(self):
         return "{}_{}".format(self.code, self.status) if self.status else self.code
 
 
-class APLTaskContributors(models.Model):
-    apl = models.ForeignKey(APLTask, on_delete=models.CASCADE)
+class TaskContributors(models.Model):
+    apl = models.ForeignKey(Task, on_delete=models.CASCADE)
     contributor = models.ForeignKey(GenericUser, on_delete=models.CASCADE)
+    date_joined = models.DateTimeField(verbose_name=_(u'Join date'), auto_now_add=True, auto_now=False, editable=False)
 
     class Meta:
         ordering = ('apl', 'contributor', )
@@ -86,8 +106,8 @@ class APLTaskContributors(models.Model):
         return str(self.contributor)
 
 
-class APLTaskItem(models.Model):
-    apl = models.ForeignKey(APLTask)
+class TaskItem(models.Model):
+    apl = models.ForeignKey(Task)
     item = models.ForeignKey(DataItem)
     value = models.TextField()
     date_filled = models.DateTimeField(auto_now_add=True, editable=False)

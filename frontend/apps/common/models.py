@@ -1,10 +1,16 @@
 # -*- coding: UTF-8 -*-
-from bootstrap_themes import list_themes
+import os
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
+try:
+    from bootstrap_themes import list_themes
+except ImportError:
+    list_themes = lambda: tuple()
 
 """
 This module defines base models for handling users information such as the title, rank, address and their related fields.
@@ -142,6 +148,11 @@ class GenericUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
+def upload_avatar(self, fn):
+    filename, extension = os.path.splitext(fn)
+    return '{}/{}_{}{}'.format(settings.AVATARS_LOCATION, str(self.id).zfill(3), slugify(filename), extension)
+
+
 class GenericUser(AbstractBaseUser, PermissionsMixin):
     """ This model defines a new generic user with additional fields compared to auth module's User model
      using the email as the authentication data """
@@ -157,7 +168,8 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True, editable=False)
-    theme = models.CharField(max_length=128, default="default", choices=list_themes())
+    avatar = models.ImageField(upload_to=upload_avatar, default='{}/default.png'.format(settings.AVATARS_LOCATION))
+    theme = models.CharField(max_length=128, default=settings.DEFAULT_BOOTSTRAP_THEME, choices=list_themes())
 
     objects = GenericUserManager()
 

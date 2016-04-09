@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+import logging
 import os
+import shutil
 import sys
 from django.conf import settings
 from django.core.management import execute_from_command_line
@@ -7,15 +9,23 @@ from django.core.management import execute_from_command_line
 
 # TODO: [optional] collect app names instead of providing a flat list
 APPS = ['common', 'profiles', 'scheme', 'wizard']
+logger = logging.getLogger('django')
 
 
 def fail_silently(args, msg=None):
     print("{}: ".format(args[-1])),
     try:
         execute_from_command_line(args)
-    except:
+        return
+    except Exception as e:
         if isinstance(msg, str):
             print(msg)
+        if isinstance(e, TypeError):
+            logger.warning("  +---> Please refer to 'BUGFIX' in the 'data' folder for this kind of error")
+        else:
+            with open(args[-1]) as f:
+                if f.read().strip(" \n[]") == "":
+                    logger.warning("  +---> This fixture is emtpy")
 
 
 def migrate_apps_then_run(apps=APPS, load_data=True):
@@ -40,6 +50,11 @@ if __name__ == "__main__":
             os.remove("./scapl.sqlite3")
         except OSError:  # if the DB was already removed, simply pass
             pass
+        for app in APPS:
+            try:
+                shutil.rmtree(os.path.join('./apps', app, 'migrations'))
+            except OSError:
+                pass
         migrate_apps_then_run()
     elif sys.argv[1] == "migrate-and-run":
         migrate_apps_then_run(load_data=False)
