@@ -76,3 +76,4 @@ frontend/frontend/settings/prod.py
 # Neon theme assets
 #static/assets/
 static/*.zip
+static/assets/*.zip
