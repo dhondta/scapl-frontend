@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-from admin_honeypot.models import LoginAttempt
 from django.apps import apps
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -12,6 +11,18 @@ admin.site.site_header = _('SCAPL Administration')
 admin.site.index_title = _('SCAPL-FE Internals Management')
 admin.site.unregister(Site)
 
+"""
+In order to disable Celery models:
+
+    from djcelery.models import (TaskState, WorkerState,
+                     PeriodicTask, IntervalSchedule, CrontabSchedule)
+    admin.site.unregister(TaskState)
+    admin.site.unregister(WorkerState)
+    admin.site.unregister(IntervalSchedule)
+    admin.site.unregister(CrontabSchedule)
+    admin.site.unregister(PeriodicTask)
+"""
+
 admin.autodiscover()
 
 urlpatterns = [
@@ -19,6 +30,7 @@ urlpatterns = [
     url(r'^admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
 ] + required(user_only, [
     url(r'^', include('apps.wizard.urls')),
+    url(r'^summernote/', include('django_summernote.urls')),
 ]) + required(admin_only, [
     url(r'^dd5daef9ece2a85010e72a971ff35ea4/', include('smuggler.urls')),  # before admin url patterns!
     url(r'^dd5daef9ece2a85010e72a971ff35ea4/logout/', apps.get_app_config('profiles').module.views.signout),

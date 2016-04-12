@@ -21,9 +21,7 @@ def signin(template='index.html', home_view='home'):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    msg = _("Successfully signed in")
-                    if not msg in [m.message for m in messages.get_messages(request)]:
-                        messages.add_message(request, messages.SUCCESS, msg)
+                    messages.add_message(request, 100, _("Welcome") + ", {} !".format(user.first_name))
                     return redirect(next or home_view)
                 else:
                     messages.add_message(request, messages.ERROR, _("Disabled account"))
@@ -73,9 +71,7 @@ def signin_or_signup(template='index.html', form_class=GenericUserCreationForm, 
                 if user is not None:
                     if user.is_active:
                         login(request, user)
-                        msg = _("Successfully signed in")
-                        if not msg in [m.message for m in messages.get_messages(request)]:
-                            messages.add_message(request, messages.SUCCESS, msg)
+                        messages.add_message(request, 100, _("Welcome") + ", {} !".format(user.first_name))
                         return redirect(next or home_view)
                     else:
                         messages.add_message(request, messages.ERROR, _("Disabled account"))
@@ -85,7 +81,7 @@ def signin_or_signup(template='index.html', form_class=GenericUserCreationForm, 
                 form = form_class(data=request.POST)
                 if form.is_valid():
                     user = form.save()
-                    messages.add_message(request, messages.SUCCESS, _("Successfully signed up"))
+                    messages.add_message(request, messages.SUCCESS, _("Successfully registered"))
                     if user.type == 0:
                         user = authenticate(email=request.POST['email'], password=request.POST['password'])
                         if user is not None:

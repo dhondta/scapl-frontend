@@ -1,5 +1,5 @@
 from django import template
-from django.contrib.messages import ERROR, INFO, SUCCESS, WARNING
+from django.conf import settings
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -27,17 +27,10 @@ js_onload = """<script type="text/javascript">
   });
 </script>"""
 
-type_mapping = {
-    ERROR: 'Error',
-    INFO: 'Notice',
-    SUCCESS: 'Success',
-    WARNING: 'Warning',
-}
-
 
 @register.simple_tag
 def toast(message, script_wrap=True):
-    res = toast_str % {'message': message, 'type': 'show%sToast' % type_mapping[message.level]}
+    res = toast_str % {'message': message, 'type': 'show%sToast' % settings.MESSAGES_TOAST_MAPPING[message.level]}
     if script_wrap:
         res = js_onload % res
     return mark_safe(res)

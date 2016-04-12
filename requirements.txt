@@ -9,9 +9,11 @@ django-celery
 django-extensions
 django-form-utils
 django-formtools
+django-modeladmin-reorder
 django-model-utils
-django-storages
+django-simple-history
 django-smuggler
+django-storages
 python-dateutil
 python-memcached
 coverage>=3.0

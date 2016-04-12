@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 from .models import Task, TaskItem
 
 
@@ -58,12 +59,19 @@ class TaskInitStepForm(BootstrapMixin, forms.ModelForm):
         return task
 
 
-class TaskItemForm(BootstrapMixin, forms.ModelForm):
-    """ A form handling an APL task item """
+class MySummernoteWidget(SummernoteInplaceWidget):
+    def render(self, name, value, attrs=None):
+        # native Summernote widget only takes attrs from its __init__ whereas attrs is set during the wizard creation ;
+        #  this avoids KeyError on 'id' because, in this implementation, attrs is None and self.attrs is to be used
+        return super(MySummernoteWidget, self).render(name, value, attrs or self.attrs)
 
+
+class TaskItemForm(forms.ModelForm):
+    """ A form handling an APL task item """
     class Meta:
         model = TaskItem
         fields = ('apl', 'item', 'value', )
+        widgets = {'value': MySummernoteWidget()}
 
 
 class TaskSequenceSelectionForm(BootstrapMixin, forms.Form):

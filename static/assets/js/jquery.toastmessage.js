@@ -61,7 +61,7 @@
 				stayTime: 			5000,				// time in miliseconds before the item has to disappear
 				text: 				'',					// content of the item. Might be a string or a jQuery object. Be aware that any jQuery object which is acting as a message will be deleted when the toast is fading away.
 				sticky: 			false,				// should the toast item sticky or not?
-				type: 				'notice', 			// notice, warning, error, success
+				type: 				'info', 			// notice, warning, error, success
                 position:           'top-right',        // top-left, top-center, top-right, middle-left, middle-center, middle-right ... Position of the toast container holding different toast. Position can be set only once at the very first call, changing the position after the first call does nothing
                 closeText:          '',                 // text which will be shown as close button, set to '' when you want to introduce an image via css
                 close:              null                // callback function when the toastmessage is closed
@@ -84,7 +84,7 @@
             var toastWrapAll, toastItemOuter, toastItemInner, toastItemClose, toastItemImage;
 
 /*
-//
+// this is the original version of the toast[...] variables
 			toastWrapAll	= (!$('.toast-container').length) ? $('<div></div>').addClass('toast-container').addClass('toast-position-' + localSettings.position).appendTo('body') : $('.toast-container');
 			toastItemOuter	= $('<div></div>').addClass('toast-item-wrapper');
 			toastItemInner	= $('<div></div>').hide().addClass('toast-item toast-type-' + localSettings.type).appendTo(toastWrapAll).html($('<p>').append (localSettings.text)).animate(localSettings.inEffect, localSettings.inEffectDuration).wrap(toastItemOuter);
@@ -96,7 +96,7 @@
 			toastItemOuter	= $('<div></div>').addClass('bs-component');
 			toastItemInner	= $('<div></div>').hide().addClass('toast-item alert alert-dismissible alert-' + localSettings.type).appendTo(toastWrapAll).html($('<p>').append (localSettings.text)).animate(localSettings.inEffect, localSettings.inEffectDuration).wrap(toastItemOuter);
 			toastItemClose	= $('<button type="button" class="close" data-dismiss="alert"></button>').prependTo(toastItemInner).html('&times;').click(function() { $().toastmessage('removeToast',toastItemInner, localSettings) });
-			toastItemImage  = $('<div></div>').addClass('toast-item-image').addClass('toast-item-image-' + localSettings.type).prependTo(toastItemInner);
+			toastItemImage  = $('<div></div>').addClass('toast-item-image-' + localSettings.image).addClass('toast-item-image').prependTo(toastItemInner);
         // changed toast structure to fit to Bootstrap - END
 
             if(navigator.userAgent.match(/MSIE 6/i))
@@ -115,27 +115,38 @@
             return toastItemInner;
 		},
 
+        /* added 'image' field in 'options' to add custom toasts */
         showNoticeToast : function (message)
         {
-            var options = {text : message, type : 'info'}; // changed 'notice' to 'info' to fit to Bootstrap
+            var options = {text : message, type : 'info', image : 'info'}; // changed 'notice' to 'info' to fit to Bootstrap
             return $().toastmessage('showToast', options);
         },
 
+        /* added 'image' field in 'options' */
         showSuccessToast : function (message)
         {
-            var options = {text : message, type : 'success'};
+            var options = {text : message, type : 'success', image : 'success'};
             return $().toastmessage('showToast', options);
         },
 
+        /* added 'image' field in 'options' */
         showErrorToast : function (message)
         {
-            var options = {text : message, type : 'danger'}; // changed 'error' to 'danger' to fit to Bootstrap
+            var options = {text : message, type : 'danger', image : 'danger'}; // changed 'error' to 'danger' to fit to Bootstrap
             return $().toastmessage('showToast', options);
         },
 
+        /* added 'image' field in 'options' */
         showWarningToast : function (message)
         {
-            var options = {text : message, type : 'warning'};
+            var options = {text : message, type : 'warning', image : 'warning'};
+            return $().toastmessage('showToast', options);
+        },
+
+        /* added 'image' field in 'options' */
+        showWelcomeToast : function (message)
+        {
+            var options = {text : message, type : 'success', image : 'welcome'};
             return $().toastmessage('showToast', options);
         },
 

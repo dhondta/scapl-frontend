@@ -39,10 +39,11 @@ ADMIN_REORDER = (
         'label': _("5- Celery Components"),
     },
     {
-        'app': 'admin_honeypot',
+        'app': 'tooltips',
         'label': _('6- Add-ons'),
         'models': (
-            {'model': 'admin_honeypot.LoginAttempt', 'label': '[Admin Honeypot] Login attempts'},
+            {'model': 'tooltips.Tooltip', 'label': 'Tooltips'},
+            {'model': 'admin_honeypot.LoginAttempt', 'label': 'Login attempts (Admin Honeypot)'},
         )
     },
 )

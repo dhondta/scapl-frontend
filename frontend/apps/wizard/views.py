@@ -2,26 +2,12 @@
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from .forms import TaskInitStepForm, TaskSequenceSelectionForm
 from .models import Report, Task, TaskItem
 from .search import get_query
 from .utils import make_datatable, make_wizard
-
-
-def create_apl(request):
-    form = TaskInitStepForm(data=request.POST)
-    if form.is_valid():
-        request.session['apl'] = form.save(request=request).id
-        messages.add_message(request, messages.SUCCESS, _('New APL task created'))
-    else:
-        try:
-            request.session['apl'] = Task.objects.get(keywords=form.data['keywords']).id
-            messages.add_message(request, messages.INFO, _('APL task already exists'))
-        except (KeyError, Task.DoesNotExist):
-            pass
-    return start_wizard(request) if request.session.get('apl') is not None \
-        else render(request, 'wizard/wizard.html', {'create_form': form})
 
 
 def list_reports(request):
@@ -56,38 +42,91 @@ def search(request):
     return JsonResponse({'status': 400})
 
 
-def select_sequence(request):
-    form, sequences = None, request.user.role.related_sequences.all()
-    if len(sequences) == 0:
-        request.message = _("You don't have any sequence associated yet, please contact your administrator.")
-    elif len(sequences) == 1:
-        request.session['sequence'] = sequences[0].id
-    else:
-        form = TaskSequenceSelectionForm(data=request.POST, choices=sequences)
+def start_wizard(request, apl_id=None, seq_id=None):
+
+    def allowed_apl(sr, a):
+        if isinstance(a, int):
+            a = Task.objects.get(id=a)
+        if request.user.pk not in [a.author.pk] + [x.pk for x in a.contributors.all()]:
+            messages.add_message(sr, messages.ERROR, _('You are not allowed to edit this task'))
+            return False
+        return True
+
+    def allowed_sequence(sr, s):
+        if s not in [x.pk for x in request.user.role.related_sequences.all()]:
+            messages.add_message(request, messages.ERROR, _('You are not allowed to run this wizard'))
+            return False
+        return True
+
+    def create_apl(subrequest):
+        form = TaskInitStepForm(data=subrequest.POST)
         if form.is_valid():
-            request.session['sequence'] = sequences[int(form.cleaned_data['sequence'])].id
-    return start_wizard(request) if request.session.get('sequence') is not None \
-        else render(request, 'wizard/wizard.html', {'select_form': form})
+            apl = form.save(request=subrequest)
+            subrequest.session['apl'] = [apl.id, apl.reference]
+            messages.add_message(subrequest, messages.SUCCESS, _('New APL task created'))
+        else:
+            try:
+                apl = Task.objects.get(keywords=form.data['keywords'])
+                messages.add_message(subrequest, messages.WARNING, _('APL task already exists'))
+                if not allowed_apl(subrequest, apl):
+                    return redirect('tasks')
+                subrequest.session['apl'] = [apl.id, apl.reference]
+            except (KeyError, Task.DoesNotExist):
+                pass
+        return start_wizard(subrequest) if subrequest.session.get('apl') is not None \
+            else render(subrequest, 'wizard/wizard.html', {'create_form': form})
 
+    def select_sequence(subrequest):
+        form, sequences = None, subrequest.user.role.related_sequences.all()
+        if len(sequences) == 0:
+            messages.add_message(subrequest, messages.ERROR, _("You don't have any sequence associated yet, please contact your administrator."))
+            return redirect('home')
+        elif len(sequences) == 1:
+            subrequest.session['sequence'] = [sequences[0].id, sequences[0].name]
+        else:
+            form = TaskSequenceSelectionForm(data=subrequest.POST, choices=sequences)
+            if form.is_valid():
+                seq_id = int(form.cleaned_data['sequence'])
+                if not allowed_sequence(subrequest, seq_id):
+                    return redirect('tasks')
+                sequence = sequences[seq_id]
+                subrequest.session['sequence'] = [sequence.id, sequence.name]
+        return start_wizard(subrequest) if subrequest.session.get('sequence') is not None \
+            else render(subrequest, 'wizard/wizard.html', {'select_form': form})
 
-def start_wizard(request):
-    request.session.setdefault('pending', {})
-    request.session.setdefault('creation', False)
-    apl_id, seq_id = request.session.get('apl'), request.session.get('sequence')
-    # if a task is already pending, put it in sessin and release 'apl' and 'sequence'
-    if apl_id is not None and seq_id is not None and not request.session['creation']:
-        request.session['creation'] = True
-        request.session['pending'][apl_id] = seq_id
+    # if ID's are given in GET parameters, then ensure not in creation mode, check if user is authorized to edit this task
+    #  and load the task if relevant
+    if apl_id and seq_id:
+        apl_id, seq_id = int(apl_id), int(seq_id)
+        if not allowed_apl(request, apl_id) or not allowed_sequence(request, seq_id):
+            return redirect('tasks')
+        for pending in request.session['pending']:
+            if pending['apl_id'] == apl_id:
+                break
+        # put the pending task at the end of the 'pending' list
+        request.session['pending'].remove(pending)
+        request.session['pending'].append(pending)
+        current = (apl_id, seq_id, )
+    # otherwise, create a new task
+    else:
+        # ensure that required fields are present
+        request.session.setdefault('pending', [])
+        apl, seq = request.session.get('apl'), request.session.get('sequence')
+        # if no currently selected APL, create one
+        if apl is None:
+            return create_apl(request)
+        # if no currently selected data sequence, select one (or if only one for the current user, immediately return seq_id)
+        if seq is None:
+            return select_sequence(request)
+        # then set 'creation' flag to False, update the current APL data and update pending tasks list
+        if apl[0] not in [x['apl_id'] for x in request.session['pending']]:
+            request.session['pending'].append({'apl_id': apl[0], 'seq_id': seq[0], 'reference': apl[1], 'sequence': seq[1]})
+        while len(request.session['pending']) > 3:
+            request.session['pending'].pop(0)
+        current = (request.session['apl'][0], request.session['sequence'][0], )
         request.session['apl'] = None
         request.session['sequence'] = None
-        apl_id, seq_id = None, None
-    if apl_id is None:
-        return create_apl(request)
-    if seq_id is None:
-        return select_sequence(request)
-    request.session['creation'] = False
-    request.session['current'] = (apl_id, seq_id, )
-    return render(request, 'wizard/wizard.html', {'wizard': make_wizard(apl_id, seq_id)})
+    return render(request, 'wizard/wizard.html', {'wizard': make_wizard(*current)})
 
 
 def save_data_item(request):
@@ -99,11 +138,13 @@ def save_data_item(request):
             except TaskItem.DoesNotExist:
                 di = TaskItem(apl=apl, item_id=item_id)
             value = request.POST['value']
-            if value != '':
-                di.value = request.POST['value']
+            if value.strip() != '<br>':
+                # TODO: implement HTML filtering and/or checking before returning 'value' to the user
+                value = mark_safe(value)
+                di.value = value
                 di.save()
                 apl.save(update_fields=['date_modified'])
-                return JsonResponse({'status': 200})
+                return JsonResponse({'status': 200, 'value': value})
             return JsonResponse({'status': 400, 'error': _('Item save failed').__unicode__()})
         else:
             return JsonResponse({'status': 400, 'error': _('You are not allowed to edit this task').__unicode__()})

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 import djcelery  # Django-Celery integration
 from django.contrib import messages
+from django.utils.text import slugify
 from ..admin import ADMIN_REORDER
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -69,20 +70,18 @@ INSTALLED_APPS = (
     #    'storages',
     #'celery_haystack',
     #'queued_search',
+    # add-on applications (optional)
+    'django_summernote',
+    'simple_history',
+    'tooltips',
+    'admin_honeypot',
+    'admin_reorder',
+    'overextends',
     # SCAPL application configurations
     'apps.common',
     'apps.profiles',
     'apps.scheme',
     'apps.wizard',
-#    'frontend.apps.CeleryAppConfig',
-#    'frontend.apps.CommonAppConfig',
-#    'frontend.apps.ProfilesAppConfig',
-#    'frontend.apps.SchemeAppConfig',
-#    'frontend.apps.WizardAppConfig',
-    # add-on applications (optional)
-    'admin_honeypot',
-    'admin_reorder',
-    'overextends',
 )
 # Useful list of additional apps: https://github.com/rosarior/awesome-django#admin-interface
 # TODO: convert admin site to django-admin2
@@ -118,6 +117,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'admin_reorder.middleware.ModelAdminReorder',
+    'simple_history.middleware.HistoryRequestMiddleware',
 #    'django.middleware.cache.FetchFromCacheMiddleware',
 #    'frontend.middleware.RemoteAddrMiddleware',
 #    'frontend.middleware.FilterIPMiddleware',
@@ -233,7 +233,6 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'templates').replace('\\', '/'),
         ],
-#        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -244,6 +243,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tooltips.processors.tooltips',
             ],
             'builtins': [
                 'overextends.templatetags.overextends_tags'
@@ -302,12 +302,52 @@ AUTH_ADMIN_MODEL = 'scheme.Administrator'
 # Admin bootstrapped configuration
 DAB_FIELD_RENDERER = 'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
 MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info info',
     messages.SUCCESS: 'alert-success success',
     messages.WARNING: 'alert-warning warning',
-    messages.ERROR: 'alert-danger error'
+    messages.ERROR: 'alert-danger danger',
+    messages.INFO: 'alert-info info',
+    100: 'alert-success success',
 }
 
 # In order to get the list of available themes, go to a Python shell and type:
 #   from bootstrap_themes import list_themes
 #   list_themes()
 DEFAULT_BOOTSTRAP_THEME = 'default'
+
+# Custom message storage to avoid duplicate messages
+MESSAGE_STORAGE = 'apps.common.storage.CustomMessageStorage'
+MESSAGES_TOAST_MAPPING = {
+    messages.DEBUG: 'Notice',
+    messages.SUCCESS: 'Success',
+    messages.WARNING: 'Warning',
+    messages.ERROR: 'Error',
+    messages.INFO: 'Notice',
+    100: 'Welcome',
+}
+
+
+# Summernote settings
+def upload_attachment(self, fn):
+    filename, extension = os.path.splitext(fn)
+    return '{}/{}_{}{}'.format('uploads', str(self), slugify(filename), extension)
+
+SUMMERNOTE_CONFIG = {
+    'iframe': False,
+    'airMode': False,
+    'styleWithTags': True,
+    'direction': 'ltr',
+    'width': '100%',
+    'height': '250',
+    'lang': None,
+    'toolbar': [
+        ['style', ['style']],
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['para', ['ul', 'ol', 'height']],
+        ['insert', ['link']],
+    ],
+    'attachment_require_authentication': False,
+    'attachment_upload_to': upload_attachment,
+    'disable_upload': False,
+}
+# Note: JS and CSS are manually imported in the relevant templates

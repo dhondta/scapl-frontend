@@ -11,7 +11,7 @@
 .toast-item {
 	height: auto;
 /*	background: #333;*/
-    opacity: 0.5;
+    opacity: 0.7;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 /*	color: #eee;*/
@@ -64,6 +64,14 @@
 
 .toast-item-image-danger {
     background:url(../images/notify/danger.png);
+}
+
+.toast-item-image-welcome {
+    height: 40px;
+    width: 40px;
+    top: 1px;
+    left: 1px;
+    background:url(../images/notify/welcome.png);
 }
 
 

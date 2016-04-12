@@ -102,7 +102,7 @@
   "model": "scheme.dataitem",
   "pk": 3,
   "fields": {
-    "name": "Detected vulnerabilies",
+    "name": "Detected Vulnerabilities",
     "description": "Vulnerabilities detected by the vulnerability assessment system.",
     "date_created": "2016-03-20T15:13:14.159Z",
     "date_modified": "2016-03-20T15:13:14.159Z",
@@ -135,7 +135,7 @@
   "model": "scheme.dataitem",
   "pk": 6,
   "fields": {
-    "name": "Known Vulnerabilies",
+    "name": "Known Vulnerabilities",
     "description": "Found known vulnerabilities from common security sources.",
     "date_created": "2016-03-28T10:31:08.016Z",
     "date_modified": "2016-03-28T10:31:08.016Z",

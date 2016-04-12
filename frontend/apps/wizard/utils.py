@@ -46,7 +46,9 @@ def make_wizard(apl_id, seq_id):
             # occurs when 'filter' method returns an empty queryset ('[0]' then causes this error)
             except IndexError:
                 form = TaskItemForm()
-            form.fields['value'].widget.attrs['id'] = item_id
+            # Summernote is used as a textarea editor ; as its JS uses variable names depending on 'id',
+            #  this has to start with characters and not digits (that's why 'di' is used as a prefix)
+            form.fields['value'].widget.attrs['id'] = "di{}".format(item_id)
             item = {'label': di.name, 'help': di.description, 'id': item_id, 'form': form}
             step['items'].append(item)
         wizard['steps'].append(step)

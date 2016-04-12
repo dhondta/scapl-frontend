@@ -1,21 +1,13 @@
 {% load staticfiles i18n %}
 
 {% trans "APL overview for" as legend_overview %}
-{% trans "Open the wizard" as button_start %}
 {% trans "APL Reference" as legend_reference %}
+{% trans "Value successfully updated" as message_success %}
 
-<!--<script src="{% static 'assets/js/jquery.bootstrap.wizard.min.js' %}"></script>-->
-<script>
-var current_step = 'step-1';
-function changeStep(id) { current_step = id; };
-
-//$('body').keyup(function(e){
-//    if(e.keyCode == 8){ // user has pressed backspace
-//    	$('#a-step' + current_step);
-//        $(window).load(function(){ $('#wizard-modal').modal('show');
-//    }
-//});
-</script>
+<link rel="stylesheet" href="{% static 'django_summernote/summernote.css' %}">
+<!--
+<link rel="stylesheet" href="{% static 'django_summernote/plugins/myplugin.css' %}">
+-->
 <style>
 label {
 	display: inline-block;
@@ -24,18 +16,28 @@ label {
 </style>
 
 <legend>{{ legend_overview }} {{ wizard.reference }}</legend>
-<div class="container" style="width: 70%;">
+<div class="container" id="apl-overview" style="width: 70%;">
 	<div class="row row-centered">
-		<p align="center"><a href="#wizard-modal" role="button" class="btn btn-default btn-lg" data-toggle="modal">{{ button_start }}</a></p>
 		{% for step in wizard.steps %}
-		<div class="well bs-component" id="step-{{ forloop.counter }}" onmouseover="changeStep(this.id);">
+		<script>
+			$(document).ready(function() {
+				$("#overview-step-{{ forloop.counter }}").click(function () {
+                    $("ul.nav > li.active").removeClass('active');
+                    $("#a-step{{ forloop.counter }}").parent('li').addClass('active');
+                    $("div.tab-content > div.active").removeClass('active').removeClass('in');
+                    $("#step{{ forloop.counter }}").addClass('in').addClass('active');
+				    $("#wizard-modal").modal({ show: 'true' });
+				});
+			});
+		</script>
+		<div class="well bs-component" id="overview-step-{{ forloop.counter }}">
 			<fieldset>
 				<legend title="{{ step.help }}">{{ step.title }}</legend>
 				{% for item in step.items %}
 				<label class="col-lg-3 control-label" title="{{ item.help }}">{{ item.label }}</label>
 				<div class="panel panel-default col-lg-9">
 					<div class="panel-body" id="{{ item.id }}-value">
-						{{ item.instance.value|safe }}
+						{{ item.form.instance.value|safe }}
 					</div>
 				</div>
 				{% endfor %}
@@ -44,7 +46,6 @@ label {
 		{% endfor %}
 	</div>
 </div>
-
 
 <form method="post" role="form1" id="signin-form" class="validate">
 {% csrf_token %}
@@ -76,43 +77,52 @@ label {
 							{% for item in step.items %}
 							<div class="panel panel-default">
 								<div class="panel-body">
-									<script>
-										$(document).ready(function() {
-											$("#{{ item.id }}-save").click(function () {
-												$.ajax({
-													type: "POST",
-													url: "{% url 'save_di' %}",
-													data: {
-														csrfmiddlewaretoken: '{{ csrf_token }}',
-														apl: {{ request.session.apl }},
-														item: {{ item.id }},
-														value: $('#{{ item.id }}').val()
-													},
-													success: function(response){
-														if (response.status == 200) {
-															$('#{{ item.id }}-group').addClass('has-success');
-															$('#{{ item.id }}-value').text($('#{{ item.id }}').val());
-														} else {
-															$('#{{ item.id }}-group').addClass('has-error');
-															$().toastmessage('showToast', {text : response.error, type : 'danger'})
-														}
-													}
-												});
-												return false;
-											});
-										});
-									</script>
 									<div class="row">
 										<div class="col-md-6">
 											<form method="post" action="javascript:;">
 												{% csrf_token %}
-												<div class="form-group" id="{{ item.id }}-group">
-													<label class="control-label" for="{{ item.id }}">{{ item.label }}</label>
-													{{ item.form.value }} <a id="{{ item.id }}-save">Save</a>
+												<div class="form-group" id="di{{ item.id }}-group">
+													<label class="control-label col-sm-6" for="di{{ item.id }}" style="z-index: 10;">{{ item.label }}</label>
+													{{ item.form.value|safe }}<a id="di{{ item.id }}-save">Save</a>
 												</div>
 											</form>
 										</div>
 									</div>
+									<script>
+										$(document).ready(function() {
+											$("#di{{ item.id }}-save").click(function (e) {
+											    e.preventDefault();
+											    var new_value = $('#di{{ item.id }}').summernote('code').trim();
+											    var old_value = $('#{{ item.id }}-value').html().trim();
+											    if (new_value === old_value) {
+											    $('#di{{ item.id }}-group').addClass('has-warning');
+											    	$().toastmessage('showToast', {text : 'No change', type : 'warning', image : 'warning'})
+											    } else {
+													$.ajax({
+														type: "POST",
+														url: "{% url 'save_di' %}",
+														data: {
+															csrfmiddlewaretoken: '{{ csrf_token }}',
+															apl: {% with request.session.pending|last as last %}{{ last.apl_id }}{% endwith %},
+															item: {{ item.id }},
+															value: new_value,
+														},
+														success: function(response){
+															if (response.status == 200) {
+																$('#di{{ item.id }}-group').addClass('has-success');
+																$('#{{ item.id }}-value').html(response.value);
+																$().toastmessage('showToast', {text : '{{ message_success }}', type : 'success', image : 'success'})
+															} else {
+																$('#di{{ item.id }}-group').addClass('has-error');
+																$().toastmessage('showToast', {text : response.error, type : 'danger', image : 'danger'})
+															}
+														}
+													});
+												}
+												return false;
+											});
+										});
+									</script>
 								</div>
 							</div>
 							{% endfor %}
@@ -124,3 +134,11 @@ label {
         </div>
     </div>
 </form>
+
+<script src="{% static 'django_summernote/jquery.ui.widget.js' %}"></script>
+<script src="{% static 'django_summernote/jquery.iframe-transport.js' %}"></script>
+<script src="{% static 'django_summernote/jquery.fileupload.js' %}"></script>
+<script src="{% static 'django_summernote/summernote.min.js' %}"></script>
+<!--
+<script src="{% static 'django_summernote/plugins/myplugin.js' %}"></script>
+-->

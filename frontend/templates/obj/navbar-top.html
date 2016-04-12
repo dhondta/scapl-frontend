@@ -1,12 +1,12 @@
 {% load staticfiles i18n %}
 
 {% trans "New task" as label_wizard %}
-{% trans "Pending tasks" as label_tasks %}
+{% trans "My tasks" as label_mytasks %}
+{% trans "All tasks" as label_alltasks %}
 {% trans "Reports" as label_reports %}
 {% trans "Help" as label_help %}
 {% trans "Blog" as label_blog %}
 {% trans "Search for APL" as placeholder_search %}
-{% trans "Welcome" as label_welcome %}
 {% trans "Profile" as label_profile %}
 {% trans "Sign out" as label_signout %}
 
@@ -14,7 +14,7 @@
 {% trans "English" as label_english %}
 {% trans "French" as label_french %}
 
-<style>body { padding-top: 50px; }</style>
+<style>body { padding-top: 70px; }</style>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -34,8 +34,15 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="apl_menu">
                         <li><a href="{% url 'wizard' %}"><span>{{ label_wizard }}</span></a></li>
-                        <li><a href="{% url 'tasks' %}"><span>{{ label_tasks }}</span></a></li>
+                        <li><a href="{% url 'tasks' %}"><span>{{ label_alltasks }}</span></a></li>
                         <li><a href="{% url 'reports' %}"><span>{{ label_reports }}</span></a></li>
+                        {% if request.session.pending|length > 0 %}
+                        <li role="separator" class="divider"></li>
+                        <h6 class="dropdown-header">{{ label_mytasks }}</h6>
+                        {% for task in request.session.pending reversed %}
+                        <li><a href="{% url 'wizard' apl_id=task.apl_id seq_id=task.seq_id %}"><span title="{{ task.sequence }}">{{ task.reference }}</span></a></li>
+                        {% endfor %}
+                        {% endif %}
                     </ul>
                 </li>
                 <li><a href="/help/">{{ label_help }}</a></li>
@@ -61,10 +68,9 @@
                         <li><a href="#"><img src="{% static 'assets/images/lang/flag-ne.png' %}"/><span>{{ label_dutch }}</span></a></li>
                     </ul>
                 </li>
-                <li><a href="#">{{ label_welcome }}, <strong>{{ request.user.get_short_name }}</strong></a></li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user_menu">
-                        <i class="entypo-menu"></i>
+                        {{ request.user.get_short_name }}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu pull-right" aria-labelledby="user_menu">

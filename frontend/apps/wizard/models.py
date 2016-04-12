@@ -4,6 +4,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from simple_history.models import HistoricalRecords
+import os
 
 user_app, user_model = settings.AUTH_USER_MODEL.split('.')
 GenericUser = apps.get_app_config(user_app).get_model(user_model)
@@ -14,12 +16,12 @@ get_scheme = getattr(__import__("apps.scheme.utils", fromlist=['utils']), 'get_s
 """ (see SCAPL's SDD section 4.2 Data Dictionary for more details about the data scheme and models' meaning) """
 
 
-def apl_packages_path(instance, filename):
+def upload_packages(instance, filename):
     return 'packages/apl_{}/{}'.format(instance.apl.id, filename)
 
 
 class Package(models.Model):
-    file = models.FileField(upload_to=apl_packages_path)
+    file = models.FileField(upload_to=upload_packages)
 
 
 class Status(models.Model):
@@ -56,6 +58,7 @@ class Task(models.Model):
     status = models.ForeignKey(Status, blank=True, null=True, editable=False, default=None, related_name="related_tasks")
     date_created = models.DateTimeField(verbose_name=_(u'Creation date'), auto_now_add=True, auto_now=False, editable=False)
     date_modified = models.DateTimeField(verbose_name=_(u'Last modification date'), auto_now_add=False, auto_now=True, editable=False)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = _("Task")
@@ -106,6 +109,13 @@ class TaskContributors(models.Model):
         return str(self.contributor)
 
 
+class TaskHistory(models.Model):
+    apl = models.ForeignKey(Task, on_delete=models.CASCADE)
+    reference = models.CharField(max_length=32, editable=False)
+    date_created = models.DateTimeField(auto_now_add=True, auto_now=False, editable=False)
+    date_last_modified = models.DateTimeField(auto_now_add=True, auto_now=False, editable=False)
+
+
 class TaskItem(models.Model):
     apl = models.ForeignKey(Task)
     item = models.ForeignKey(DataItem)
@@ -119,4 +129,4 @@ class TaskItem(models.Model):
         verbose_name_plural = _("Items")
 
     def __str__(self):
-        return "{}-".format(self.apl.reference)
+        return "{}/{}".format(self.apl.reference, repr(self.item))

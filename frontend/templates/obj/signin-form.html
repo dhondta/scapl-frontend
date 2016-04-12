@@ -2,12 +2,6 @@
 
 {% trans "Sign In" as button_signin %}
 
-{% if not request.POST.type == 'signup' %}
-<script type="text/javascript">
-    $(window).load(function(){ $('#signin-modal').modal('show'); $('#signup-modal').modal('hide'); });
-</script>
-{% endif %}
-
 <form method="post" role="form1" id="signin-form" class="validate">
 {% csrf_token %}
     <div class="modal fade" role="dialog" id="signin-modal">
@@ -70,3 +64,9 @@
         </div>
     </div>
 </form>
+
+{% if not request.POST.type == 'signup' %}
+<script type="text/javascript">
+    $(window).load(function(){ $('#signin-modal').modal('show'); $('#signup-modal').modal('hide'); });
+</script>
+{% endif %}

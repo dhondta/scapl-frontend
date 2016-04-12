@@ -42,6 +42,7 @@
     <![endif]-->
     <title>{% block title %}SCAPL{% endblock %}</title>
 </head>
+{% include "tooltips/tooltips.html" %}
 <body class="page-fade" role="document">
     {% if messages %}{% toast_all messages %}{% endif %}
     {% if request.user.is_authenticated %}{% block navbar %}{% include "obj/navbar-top.html" %}{% endblock %}{% endif %}
