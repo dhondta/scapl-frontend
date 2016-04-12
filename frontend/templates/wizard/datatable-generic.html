@@ -1,18 +1,7 @@
 {% load staticfiles i18n common_tags %}
 
-{# Datatables #}
 <link rel="stylesheet" href="{% static 'assets/css/dataTables.bootstrap4.min.css' %}">
 <link rel="stylesheet" href="{% static 'assets/css/buttons.bootstrap4.min.css' %}">
-<script src="{% static 'assets/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'assets/js/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'assets/js/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'assets/js/buttons.bootstrap4.min.js' %}"></script>
-<script src="{% static 'assets/js/jszip.min.js' %}"></script>
-<script src="{% static 'assets/js/pdfmake.min.js' %}"></script>
-<script src="{% static 'assets/js/vfs_fonts.js' %}"></script>
-<script src="{% static 'assets/js/buttons.html5.min.js' %}"></script>
-<script src="{% static 'assets/js/buttons.print.min.js' %}"></script>
-<script src="{% static 'assets/js/buttons.colVis.min.js' %}"></script>
 <script class="init" type="text/javascript">
 $(document).ready(function() {
     var table = $('#apl-table').DataTable( {
@@ -47,3 +36,14 @@ $(document).ready(function() {
         </table>
     </div>
 </div>
+
+<script src="{% static 'datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'datatables/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'datatables/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'base/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'base/js/jszip.min.js' %}"></script>
+<script src="{% static 'base/js/pdfmake.min.js' %}"></script>
+<script src="{% static 'base/js/vfs_fonts.js' %}"></script>
+<script src="{% static 'base/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'base/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'base/js/buttons.colVis.min.js' %}"></script>

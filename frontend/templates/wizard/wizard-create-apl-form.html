@@ -2,13 +2,6 @@
 
 {% trans "Create" as button_create %}
 
-<script type="text/javascript">
-    $(window).load(function(){ $('#create-modal').modal({
-    	show: true,
-		backdrop: 'static',
-		keyboard: false
-	}); });
-</script>
 <form method="post" role="form" class="form-horizontal form-groups-bordered">
 {% csrf_token %}
     <div class="modal fade" role="dialog" id="create-modal">
@@ -39,3 +32,11 @@
 		</div>
 	</div>
 </form>
+
+<script type="text/javascript">
+    $(window).load(function(){ $('#create-modal').modal({
+    	show: true,
+		backdrop: 'static',
+		keyboard: false
+	}); });
+</script>

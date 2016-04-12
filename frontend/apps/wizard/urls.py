@@ -4,6 +4,7 @@ from .views import list_reports, list_tasks, start_wizard, save_data_item
 
 urlpatterns = [
     url(r'^wizard/(?P<apl_id>[0-9]+)/(?P<seq_id>[0-9]+)/$', start_wizard, name='wizard'),
+    url(r'^wizard/(?P<apl_id>[0-9]+)/$', start_wizard, name='wizard'),
     url(r'^wizard/$', start_wizard, name='wizard'),
     url(r'^save/$', save_data_item, name='save_di'),
     url(r'^tasks/$', list_tasks, name='tasks'),

@@ -2,5 +2,5 @@
 
 {% load i18n  %}
 
-{% block title %}SCAPL - {% trans "Home" %}{% endblock %}
-{% block content %}{% endblock %}
+{% block title %}{{ PROJECT_NAME }} - {% trans "Home" %}{% endblock %}
+{% block content %}{% include "profiles/home-content.html" %}{% endblock %}

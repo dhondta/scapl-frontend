@@ -15,6 +15,9 @@ from django.contrib import messages
 from django.utils.text import slugify
 from ..admin import ADMIN_REORDER
 
+PROJECT_NAME = 'SCAPL'
+PROJECT_AUTHORS = 'Alex & Hussein'
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 djcelery.setup_loader()
@@ -235,6 +238,7 @@ TEMPLATES = [
         ],
         'OPTIONS': {
             'context_processors': [
+                'frontend.context_processors.project_name',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.template.context_processors.i18n',
@@ -344,7 +348,7 @@ SUMMERNOTE_CONFIG = {
         ['style', ['style']],
         ['style', ['bold', 'italic', 'underline', 'clear']],
         ['para', ['ul', 'ol', 'height']],
-        ['insert', ['link']],
+        ['insert', ['link', 'specialchars', 'hello']],
     ],
     'attachment_require_authentication': False,
     'attachment_upload_to': upload_attachment,

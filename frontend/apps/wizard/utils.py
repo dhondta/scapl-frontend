@@ -8,22 +8,39 @@ get_scheme = getattr(__import__("apps.scheme.utils", fromlist=['utils']), 'get_s
 
 
 def make_datatable(template_name, objects, exclude_fields=[]):
+    """ This function makes a valid Datatables from a template dictionary using objects (that is, instances of a model),
+     discarding invalid fields
+    :param template_name: the template dictionary to use to build the table
+    :param objects: list of instances of a model
+    :param exclude_fields: list of fields to be excluded (aimed to discard badly formatted fields
+    :return: a triple (title, order of columns, list of records)
+    """
     headers, records = [], []
+    # the following lambda lazily triggers the evaluation of item 'i' handling an input object if specified
+    evaluate = lambda i, o=None: (i(o) if o else i()) if isinstance(i, type(lambda: None)) else i
+    # retrieve template
     try:
         template = globals()['{}_template'.format(template_name)]
     except NameError:
         return 'Undefined', [], [], []
+    # drop excluded fields
     for field in exclude_fields:
         template['fields'].pop(field, None)
+    # prepare the header according to the provided order
     for field in template['order']:
         headers.append(template['fields'][field]['header'])
+    # now prepare the list of records
     for obj in objects:
         record = {}
         for field in template['fields'].keys():
             try:
-                value = template['fields'][field]['value']
-                # the following lazily triggers the evaluation of field['value'] (that could refer to 'obj')
-                record[field] = mark_safe(value(obj) if isinstance(value, type(lambda: None)) else value)
+                field_obj = template['fields'][field]
+                value = evaluate(field_obj['value'], obj)
+                # now, other keywords can be handled
+                if 'url' in field_obj.keys():
+                    value = '<a href="{}">{}</a>'.format(evaluate(field_obj['url'], obj), value)
+                # finally, save the handled value in the record
+                record[field] = mark_safe(value)
             except:
                 exclude_fields.append(field)
                 return make_datatable(template_name, objects, exclude_fields)
@@ -32,6 +49,11 @@ def make_datatable(template_name, objects, exclude_fields=[]):
 
 
 def make_wizard(apl_id, seq_id):
+    """ This function makes a wizard from the data scheme defined with the application 'scheme' using the utility function 'get_scheme'
+    :param apl_id: APL identifying number
+    :param seq_id: sequence identifying number
+    :return: a wizard dictionary containing its structure, help texts, ...
+    """
     scheme = get_scheme(seq_id)
     apl = Task.objects.get(id=apl_id)
     saved_di = TaskItem.objects.filter(apl=apl)

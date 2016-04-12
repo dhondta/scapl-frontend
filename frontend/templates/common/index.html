@@ -2,9 +2,7 @@
 
 {% load i18n  %}
 
-{% block title %}SCAPL | {% trans "Index" %}{% endblock %}
-{% block navbar %}{% endblock %}
-
+{% block title %}{{ PROJECT_NAME }} | {% trans "Index" %}{% endblock %}
 <!-- This is needed when you send requests via Ajax
 
 <script type="text/javascript">
@@ -12,5 +10,4 @@ var baseurl = '';
 
 </script>
 -->
-{% block content %}{% include "obj/index-content.html" %}{% endblock %}
-{% block footer %}{% include "obj/footer.html" %}{% endblock %}
+{% block content %}{% include "common/index-content.html" %}{% endblock %}

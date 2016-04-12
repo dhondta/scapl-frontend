@@ -3,13 +3,6 @@
 {% trans "Select a sequence" as header_select %}
 {% trans "Select" as button_select %}
 
-<script type="text/javascript">
-    $(window).load(function(){ $('#select-modal').modal({
-    	show: true,
-		backdrop: 'static',
-		keyboard: false
-	}); });
-</script>
 <form method="post" role="form" class="form-horizontal form-groups-bordered">
 {% csrf_token %}
     <div class="modal fade" role="dialog" id="select-modal">
@@ -36,3 +29,11 @@
 		</div>
 	</div>
 </form>
+
+<script type="text/javascript">
+    $(window).load(function(){ $('#select-modal').modal({
+    	show: true,
+		backdrop: 'static',
+		keyboard: false
+	}); });
+</script>

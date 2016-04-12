@@ -5,9 +5,7 @@
 {% trans "Value successfully updated" as message_success %}
 
 <link rel="stylesheet" href="{% static 'django_summernote/summernote.css' %}">
-<!--
-<link rel="stylesheet" href="{% static 'django_summernote/plugins/myplugin.css' %}">
--->
+{# <link rel="stylesheet" href="{% static 'django_summernote/plugins/myplugin.css' %}"> #}
 <style>
 label {
 	display: inline-block;
@@ -88,41 +86,7 @@ label {
 											</form>
 										</div>
 									</div>
-									<script>
-										$(document).ready(function() {
-											$("#di{{ item.id }}-save").click(function (e) {
-											    e.preventDefault();
-											    var new_value = $('#di{{ item.id }}').summernote('code').trim();
-											    var old_value = $('#{{ item.id }}-value').html().trim();
-											    if (new_value === old_value) {
-											    $('#di{{ item.id }}-group').addClass('has-warning');
-											    	$().toastmessage('showToast', {text : 'No change', type : 'warning', image : 'warning'})
-											    } else {
-													$.ajax({
-														type: "POST",
-														url: "{% url 'save_di' %}",
-														data: {
-															csrfmiddlewaretoken: '{{ csrf_token }}',
-															apl: {% with request.session.pending|last as last %}{{ last.apl_id }}{% endwith %},
-															item: {{ item.id }},
-															value: new_value,
-														},
-														success: function(response){
-															if (response.status == 200) {
-																$('#di{{ item.id }}-group').addClass('has-success');
-																$('#{{ item.id }}-value').html(response.value);
-																$().toastmessage('showToast', {text : '{{ message_success }}', type : 'success', image : 'success'})
-															} else {
-																$('#di{{ item.id }}-group').addClass('has-error');
-																$().toastmessage('showToast', {text : response.error, type : 'danger', image : 'danger'})
-															}
-														}
-													});
-												}
-												return false;
-											});
-										});
-									</script>
+									{% include 'wizard/wizard-form-ajax-save.html' %}
 								</div>
 							</div>
 							{% endfor %}
@@ -139,6 +103,6 @@ label {
 <script src="{% static 'django_summernote/jquery.iframe-transport.js' %}"></script>
 <script src="{% static 'django_summernote/jquery.fileupload.js' %}"></script>
 <script src="{% static 'django_summernote/summernote.min.js' %}"></script>
-<!--
-<script src="{% static 'django_summernote/plugins/myplugin.js' %}"></script>
--->
+<script src="{% static 'summernote/plugins/specialchars.js' %}"></script>
+<script src="{% static 'summernote/plugins/hello.js' %}"></script>
+{# <script src="{% static 'django_summernote/plugins/myplugin.js' %}"></script> #}

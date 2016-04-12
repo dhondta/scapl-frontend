@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import timesince
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,6 +46,7 @@ tasks_template = {
         'reference': {
             'header': _('APL Reference'),
             'value': lambda obj: obj.reference,
+            'url': lambda obj: reverse('wizard', kwargs={'apl_id': obj.id}),
         },
         'author': {
             'header': _('Author'),

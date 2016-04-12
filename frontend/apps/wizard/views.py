@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import re
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -100,15 +101,22 @@ def start_wizard(request, apl_id=None, seq_id=None):
         apl_id, seq_id = int(apl_id), int(seq_id)
         if not allowed_apl(request, apl_id) or not allowed_sequence(request, seq_id):
             return redirect('tasks')
+        pending = None
         for pending in request.session['pending']:
             if pending['apl_id'] == apl_id:
                 break
+        if not pending:
+            pending = request.session['pending'][-1]
         # put the pending task at the end of the 'pending' list
         request.session['pending'].remove(pending)
         request.session['pending'].append(pending)
         current = (apl_id, seq_id, )
     # otherwise, create a new task
     else:
+        # test if apl_id exists (occurs when coming from an anchor in the tasks list (NB: no sequence selected yet)
+        if apl_id:
+            apl = Task.objects.get(id=int(apl_id))
+            request.session['apl'] = [apl.id, apl.reference]
         # ensure that required fields are present
         request.session.setdefault('pending', [])
         apl, seq = request.session.get('apl'), request.session.get('sequence')
@@ -123,7 +131,7 @@ def start_wizard(request, apl_id=None, seq_id=None):
             request.session['pending'].append({'apl_id': apl[0], 'seq_id': seq[0], 'reference': apl[1], 'sequence': seq[1]})
         while len(request.session['pending']) > 3:
             request.session['pending'].pop(0)
-        current = (request.session['apl'][0], request.session['sequence'][0], )
+        current = (apl[0], seq[0], )
         request.session['apl'] = None
         request.session['sequence'] = None
     return render(request, 'wizard/wizard.html', {'wizard': make_wizard(*current)})
@@ -138,13 +146,13 @@ def save_data_item(request):
             except TaskItem.DoesNotExist:
                 di = TaskItem(apl=apl, item_id=item_id)
             value = request.POST['value']
-            if value.strip() != '<br>':
+            if not re.sub(r'^\<p\>', '', re.sub(r'\<\/p\>$', '', value)) in ['', '<br>']:
                 # TODO: implement HTML filtering and/or checking before returning 'value' to the user
-                value = mark_safe(value)
-                di.value = value
+                sanitized_value = mark_safe(value)
+                di.value = sanitized_value
                 di.save()
                 apl.save(update_fields=['date_modified'])
-                return JsonResponse({'status': 200, 'value': value})
+                return JsonResponse({'status': 200, 'value': sanitized_value})
             return JsonResponse({'status': 400, 'error': _('Item save failed').__unicode__()})
         else:
             return JsonResponse({'status': 400, 'error': _('You are not allowed to edit this task').__unicode__()})
