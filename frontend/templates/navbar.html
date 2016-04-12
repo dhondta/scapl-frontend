@@ -14,7 +14,6 @@
 {% trans "English" as label_english %}
 {% trans "French" as label_french %}
 
-<style>body { padding-top: 70px; }</style>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -59,13 +58,13 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="lang_menu">
-                        <img src="{% static 'assets/images/lang/flag-uk.png' %}"/>
+                        <img src="{% static 'base/images/lang/flag-uk.png' %}"/>
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu pull-right" aria-labelledby="lang_menu">
-                        <li class="active"><a href="#"><img src="{% static 'assets/images/lang/flag-uk.png' %}"/><span>{{ label_english }}</span></a></li>
-                        <li><a href="#"><img src="{% static 'assets/images/lang/flag-fr.png' %}"/><span>{{ label_french }}</span></a></li>
-                        <li><a href="#"><img src="{% static 'assets/images/lang/flag-ne.png' %}"/><span>{{ label_dutch }}</span></a></li>
+                        <li class="active"><a href="#"><img src="{% static 'base/images/lang/flag-uk.png' %}"/><span>{{ label_english }}</span></a></li>
+                        <li><a href="#"><img src="{% static 'base/images/lang/flag-fr.png' %}"/><span>{{ label_french }}</span></a></li>
+                        <li><a href="#"><img src="{% static 'base/images/lang/flag-ne.png' %}"/><span>{{ label_dutch }}</span></a></li>
                     </ul>
                 </li>
                 <li class="dropdown">

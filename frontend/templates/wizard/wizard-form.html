@@ -4,8 +4,9 @@
 {% trans "APL Reference" as legend_reference %}
 {% trans "Value successfully updated" as message_success %}
 
-<link rel="stylesheet" href="{% static 'django_summernote/summernote.css' %}">
-{# <link rel="stylesheet" href="{% static 'django_summernote/plugins/myplugin.css' %}"> #}
+<link rel="stylesheet" href="{% static 'summernote/summernote.css' %}">
+<link rel="stylesheet" href="{% static 'google-prettify/prettify.css' %}">
+{# <link rel="stylesheet" href="{% static 'summernote/plugins/myplugin.css' %}"> #}
 <style>
 label {
 	display: inline-block;
@@ -76,9 +77,9 @@ label {
 							<div class="panel panel-default">
 								<div class="panel-body">
 									<div class="row">
-										<div class="col-md-6">
+										<div class="col-sm-6">
 											<form method="post" action="javascript:;">
-												{% csrf_token %}
+											{% csrf_token %}
 												<div class="form-group" id="di{{ item.id }}-group">
 													<label class="control-label col-sm-6" for="di{{ item.id }}" style="z-index: 10;">{{ item.label }}</label>
 													{{ item.form.value|safe }}<a id="di{{ item.id }}-save">Save</a>
@@ -102,7 +103,8 @@ label {
 <script src="{% static 'django_summernote/jquery.ui.widget.js' %}"></script>
 <script src="{% static 'django_summernote/jquery.iframe-transport.js' %}"></script>
 <script src="{% static 'django_summernote/jquery.fileupload.js' %}"></script>
-<script src="{% static 'django_summernote/summernote.min.js' %}"></script>
-<script src="{% static 'summernote/plugins/specialchars.js' %}"></script>
-<script src="{% static 'summernote/plugins/hello.js' %}"></script>
-{# <script src="{% static 'django_summernote/plugins/myplugin.js' %}"></script> #}
+<script src="{% static 'summernote/summernote.min.js' %}"></script>
+<script src="{% static 'google-prettify/prettify.js' %}"></script>
+<script src="{% static 'summernote/plugin/hello/summernote-ext-hello.js' %}"></script>
+<script src="{% static 'summernote/plugin/highlight/summernote-ext-highlight.js' %}"></script>
+{# <script src="{% static 'summernote/plugins/myplugin.js' %}"></script> #}

@@ -15,8 +15,8 @@
     <meta name="description" content="SCAPL frontend"/>
     <meta name="author" content=""/>
     {# Fonts #}
-    <link rel="stylesheet" href="{% static 'base/css/font-icons/entypo/css/entypo.css' %}">
-    <link rel="stylesheet" href="{% static 'base/css/font-icons/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'entypo/css/entypo.css' %}">
+    <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'base/css/font-noto-sans.css' %}">
     {# jQuery #}
     <link rel="stylesheet" href="{% static 'jquery-ui/jquery-ui.min.css' %}">
@@ -46,7 +46,7 @@
     <title>{% block title %}{{ PROJECT_NAME }}{% endblock %}</title>
 </head>
 {% include "tooltips/tooltips.html" %}
-<body class="page-fade" role="document">
+<body class="page-fade{% if request.user.is_authenticated %} with-nav{% endif %}" role="document">
     {% if messages %}{% toast_all messages %}{% endif %}
     {% if request.user.is_authenticated %}{% include "navbar.html" %}{% endif %}
     <div class="container" role="main">

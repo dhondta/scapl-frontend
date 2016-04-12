@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import re
+from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -129,7 +130,7 @@ def start_wizard(request, apl_id=None, seq_id=None):
         # then set 'creation' flag to False, update the current APL data and update pending tasks list
         if apl[0] not in [x['apl_id'] for x in request.session['pending']]:
             request.session['pending'].append({'apl_id': apl[0], 'seq_id': seq[0], 'reference': apl[1], 'sequence': seq[1]})
-        while len(request.session['pending']) > 3:
+        while len(request.session['pending']) > settings.MAX_PENDING_TASKS:
             request.session['pending'].pop(0)
         current = (apl[0], seq[0], )
         request.session['apl'] = None

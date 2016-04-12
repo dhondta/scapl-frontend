@@ -270,6 +270,7 @@ TEMPLATES = [
 DI_ID_DIGITS = 5
 DL_ID_DIGITS = 3
 DS_ID_DIGITS = 2
+MAX_PENDING_TASKS = 5
 
 # TODO: Enable Memcache for production version
 # Cache management
@@ -290,6 +291,7 @@ SMUGGLER_EXCLUDE_LIST = [
     'sessions.session'
 ]
 
+# Particular language settings
 getText = lambda x: x
 LANGUAGES = (
     ('en', getText('EN')),
@@ -345,13 +347,19 @@ SUMMERNOTE_CONFIG = {
     'height': '250',
     'lang': None,
     'toolbar': [
+        ['action', ['undo', 'redo']],
         ['style', ['style']],
-        ['style', ['bold', 'italic', 'underline', 'clear']],
-        ['para', ['ul', 'ol', 'height']],
-        ['insert', ['link', 'specialchars', 'hello']],
+        ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+        ['font', ['fontname', 'fontsize', 'color']],
+        ['para', ['ul', 'ol', 'paragraph', 'height']],
+        ['insert', ['table', 'link', 'picture', 'hr']],
+        ['highlight', ['highlight']],
+        ['view', ['fullscreen', 'codeview']],
+        ['help', ['help']]
     ],
     'attachment_require_authentication': False,
     'attachment_upload_to': upload_attachment,
     'disable_upload': False,
+    'prettifyHtml': False,
 }
 # Note: JS and CSS are manually imported in the relevant templates
