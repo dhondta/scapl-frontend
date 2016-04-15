@@ -80,26 +80,46 @@ label {
 							<div class="panel panel-default">
 								<div class="panel-body">
 									<div class="container">
-										<div class="row-fluid">
-											<div class="col-md-6">
-												<form method="post" action="javascript:;">
-												{% csrf_token %}
-													<div class="form-group" id="di{{ item.id }}-group">
-														<label class="control-label col-sm-6" for="di{{ item.id }}" style="z-index: 10;">{{ item.label }}</label>
-														{{ item.form.value|safe }}
-													</div>
-												</form>
+										<div class="row">
+											<div class="col-md-5">
+												<label class="control-label col-sm-12" id="di{{ item.id }}-label" style="z-index: 10;">{{ item.label }}</label>
 											</div>
-											<div class="col-xs-1">
-												<div class="btn-group-vertical">
+											<div class="col-md-1">
+												<div class="btn-group" style="float: right">
 													<a class="btn btn-default" id="di{{ item.id }}-save"><i class="fa fa-save" aria-hidden="true"></i></a>
-													<a class="btn btn-default" id="di{{ item.id }}-trigger"><i class="fa fa-refresh" aria-hidden="true"></i></a>
 												</div>
 											</div>
-											<div class="col-md-5 item-trigger-result-wrapper">
-												<div class="panel panel-default item-trigger-result">
-													<div class="panel-body item-trigger-result">
-														<h4>No result yet</h4>
+											<div class="col-md-5">
+
+											</div>
+											<div class="col-md-1">
+												<div class="btn-group" style="float: right">
+													<a class="btn btn-default" id="di{{ item.id }}-trigger"><i class="fa fa-refresh"></i></a>
+													<a class="btn btn-default" id="di{{ item.id }}-fullscreen"><i class="note-icon-arrows-alt"></i></a>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="row-height">
+												<div class="col-md-6 col-xs-height">
+													<div class="inside-full-height">
+														<form method="post" action="javascript:;">
+														{% csrf_token %}
+															<div class="form-group form-group-item no-margin-bottom" id="di{{ item.id }}-group">
+																{{ item.form.value|safe }}
+															</div>
+														</form>
+													</div>
+												</div>
+												<div class="col-md-6 col-xs-height col-xs-top">
+													<div class="panel panel-default inside-full-height">
+														<div class="panel-body inside-full-height">
+															<div class="container container-result">
+																<div class="row-fluid row-result">
+																	<p class="text-muted"><font class="align-middle" size="6">No result yet</font></p>
+																</div>
+															</div>
+														</div>
 													</div>
 												</div>
 											</div>

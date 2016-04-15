@@ -242,7 +242,6 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'frontend.context_processors.project_info',
-                'frontend.context_processors.layout_parameters',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.template.context_processors.i18n',
@@ -343,7 +342,7 @@ SUMMERNOTE_CONFIG = {
     'styleWithTags': True,
     'direction': 'ltr',
     'width': '100%',
-    'height': '250',
+    'height': '300',
     'tabsize': 2,
     'lang': 'en-US',
     'lang_matches': {
