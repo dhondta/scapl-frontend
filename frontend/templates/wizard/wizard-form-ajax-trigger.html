@@ -1,0 +1,23 @@
+<script>
+    $(document).ready(function() {
+        $('#di{{ item.id }}-trigger').click(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "{% url 'trigger_di' %}",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    task: '{% with request.session.recent|last as last %}{{ last.id.0 }}{% endwith %}-{{ item.id }}',
+                },
+                success: function(response){
+                    if (response.status == 200) {
+                        $().toastmessage('showToast', {text : '{{ message_triggered }}', type : 'success', image : 'success'})
+                    } else {
+                        $().toastmessage('showToast', {text : response.error, type : 'danger', image : 'danger'})
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>

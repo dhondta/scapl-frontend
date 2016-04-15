@@ -1,0 +1,34 @@
+[
+{
+  "model": "wizard.status",
+  "pk": 1,
+  "fields": {
+    "status": "DRAFT",
+    "order": 1
+  }
+},
+{
+  "model": "wizard.status",
+  "pk": 2,
+  "fields": {
+    "status": "APPROVED",
+    "order": 2
+  }
+},
+{
+  "model": "wizard.status",
+  "pk": 3,
+  "fields": {
+    "status": "LIMITED",
+    "order": 3
+  }
+},
+{
+  "model": "wizard.status",
+  "pk": 4,
+  "fields": {
+    "status": "REJECTED",
+    "order": 4
+  }
+}
+]

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% load i18n staticfiles %}
+
+{% block title %}{{ PROJECT_NAME }} - {% trans "Wizard" %}{% endblock %}
+
+{% block content %}
+{% if create_form %}
+    {% include "wizard/wizard-create-apl-form.html" %}
+{% elif select_form %}
+    {% include "wizard/wizard-select-seq-form.html" %}
+{% else %}
+    {% include "wizard/wizard-form.html" %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,37 @@
+<script>
+    $(document).ready(function() {
+        $('#di{{ item.id }}-save').click(function (e) {
+            prettyPrint();
+            e.preventDefault();
+            var new_value = $('#di{{ item.id }}').summernote('code').trim();
+            var old_value = $('#{{ item.id }}-value').html().trim();
+            if (new_value === old_value) {
+                $('#di{{ item.id }}-group').addClass('has-warning');
+                $().toastmessage('showToast', {text : '{{ message_nochange }}', type : 'warning', image : 'warning'})
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'save_di' %}",
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        apl: {% with request.session.recent|last as last %}{{ last.id.0 }}{% endwith %},
+                        item: {{ item.id }},
+                        value: new_value,
+                    },
+                    success: function(response){
+                        if (response.status == 200) {
+                            $('#di{{ item.id }}-group').addClass('has-success');
+                            $('#{{ item.id }}-value').html(response.value);
+                            $().toastmessage('showToast', {text : '{{ message_success }}', type : 'success', image : 'success'})
+                        } else {
+                            $('#di{{ item.id }}-group').addClass('has-error');
+                            $().toastmessage('showToast', {text : response.error, type : 'danger', image : 'danger'})
+                            $('#di{{ item.id }}').summernote("code", old_value);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+    });
+</script>
