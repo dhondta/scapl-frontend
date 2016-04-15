@@ -1,16 +1,23 @@
 # -*- coding: UTF-8 -*-
 import re
+from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.html import mark_safe
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from importlib import import_module
+from kombu import Connection
+from kombu.compat import Publisher, Consumer
 from .forms import TaskInitStepForm, TaskSequenceSelectionForm
 from .models import Report, Task, TaskItem
 from .search import get_query
 from .utils import make_datatable, make_wizard
+
+smodels = import_module("apps.scheme.models")
 
 
 @require_http_methods(["GET"])
@@ -146,31 +153,63 @@ def start_wizard(request, apl_id=None, seq_id=None):
 
 @require_http_methods(["POST"])
 def save_data_item(request):
-    if request.method == 'POST':
-        apl, item_id = Task.objects.get(id=int(request.POST['apl'])), int(request.POST['item'])
-        if apl.author == request.user or request.user in apl.contributors.all():
-            try:
-                di = TaskItem.objects.get(apl=apl, item_id=item_id)
-            except TaskItem.DoesNotExist:
-                di = TaskItem(apl=apl, item_id=item_id)
-            value = request.POST['value']
-            if not re.sub(r'^\<p\>', '', re.sub(r'\<\/p\>$', '', value)) in ['', '<br>']:
-                # TODO: implement HTML filtering and/or checking before returning 'value' to the user
-                sanitized_value = mark_safe(value)
-                di.value = sanitized_value
-                di.save()
-                apl.save(update_fields=['date_modified'])
-                return JsonResponse({'status': 200, 'value': sanitized_value})
-            return JsonResponse({'status': 400, 'error': _('Item save failed').__unicode__()})
-        else:
-            return JsonResponse({'status': 400, 'error': _('You are not allowed to edit this task').__unicode__()})
-    return JsonResponse({'status': 400})
+    apl, item_id = Task.objects.get(id=int(request.POST['apl'])), int(request.POST['item'])
+    if apl.author == request.user or request.user in apl.contributors.all():
+        try:
+            di = TaskItem.objects.get(apl=apl, item_id=item_id)
+        except TaskItem.DoesNotExist:
+            di = TaskItem(apl=apl, item_id=item_id)
+        value = request.POST['value']
+        if not re.sub(r'^\<p\>', '', re.sub(r'\<\/p\>$', '', value)) in ['', '<br>']:
+            # TODO: implement HTML filtering and/or checking before returning 'value' to the user
+            sanitized_value = mark_safe(value)
+            di.value = sanitized_value
+            di.save()
+            apl.save(update_fields=['date_modified'])
+            return JsonResponse({'status': 200, 'value': sanitized_value})
+        return JsonResponse({'status': 400, 'error': _('Item save failed').__unicode__()})
+    else:
+        return JsonResponse({'status': 400, 'error': _('You are not allowed to edit this task').__unicode__()})
 
 
 @require_http_methods(["POST"])
-def trigger_data_item(request):
-    if request.method == 'POST':
-        task_id = request.POST['task']
-        test = [{'url': 'http://www.example.com', 'descr': 'This is an example.'}]
-        return JsonResponse({'status': 200, 'result': test})
-    return JsonResponse({'status': 400, 'error': 'Something fucking bad happened...'})
+def trigger_data_item(request, task_id=None):
+
+    def send_as_task(task, task_id, args=(), kwargs={}, routing='default', retries=0):
+        with Connection(settings.BROKER_URL) as conn:
+            with Publisher(connection=conn, exchange="scapl", exchange_type="topic",
+                           routing_key=settings.ROUTING_KEYS[routing]) as pub:
+                payload = {
+                    'task': task,
+                    'id': task_id,
+                    'args': args,
+                    "kwargs": kwargs,
+                    "retries": retries,
+                    "eta": str(now()),
+                }
+                pub.send(payload)
+
+    # if no task_id provided, trigger the data item
+    args, kwargs = (), {}
+    if task_id is None:
+        apl_id, item_id = int(request.POST['apl']), int(request.POST['item'])
+        apl = Task.objects.get(id=apl_id)
+        di = smodels.DataItem.objects.get(id=item_id)
+        if isinstance(di, smodels.SEDataItem):
+            routing = 'search'
+            args = ('Scapl', di.api, )
+            kwargs = {'keywords': di.keywords, 'suggestions': di.max_suggestions}
+        elif isinstance(di, smodels.SEDataItem):
+            routing = 'automation'
+            args = ('Scapl', di.call, )
+        else:
+            return JsonResponse({'status': 200, 'result': None})
+        task = '{}-{}'.format(repr(apl), repr(di))
+        task_id = '{}-{}'.format(apl_id, item_id)
+        send_as_task(task, task_id, args, kwargs, routing=routing)
+        return JsonResponse({'status': 200, 'result': task_id})
+    # otherwise, ask for result of the designated task
+    else:
+        task = AsyncResult(task_id)
+        result = task.get() if task.status == 'SUCCESS' else None
+        return JsonResponse({'status': 200, 'task_status': task.status, 'result': result})

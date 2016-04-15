@@ -1,23 +1,42 @@
+{% with request.session.recent|last as last %}
+{% with apl_id=last.id.0|stringformat:"i" item_id=item.id|stringformat:"i" %}
+{% with apl_id|add:"-"|add:item_id as task_id %}
 <script>
+    var ajax_template = {
+        type: 'POST',
+        url: '{% url 'trigger_di' %}',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            apl: '{{ last.id.0 }}',
+            item: '{{ item.id }}',
+        },
+        success: function(response){
+            if (response.status != 200) {
+                $().toastmessage('showToast', {text: response.error, type: 'danger', image: 'danger'});
+            }
+        },
+    }
     $(document).ready(function() {
+        $.ajax(ajax_template);
+        ajax_template['url'] = '{% url 'trigger_di' task_id %}';
+        ajax_template['success'] = function(response) {
+            if (response.status == 200) {
+                if (response.result != null) {
+                    $().toastmessage('showToast', {text: 'Received ' + response.result, type: 'success', image: 'success'});
+                } else { // for maintenance tasks triggered from the frontend
+                    $().toastmessage('showToast', {text: 'Received empty result', type: 'warning', image: 'warning'});
+                }
+            } else {
+                $().toastmessage('showToast', {text: response.error, type: 'danger', image: 'danger'});
+            }
+        };
         $('#di{{ item.id }}-trigger').click(function (e) {
             e.preventDefault();
-            $.ajax({
-                type: "POST",
-                url: "{% url 'trigger_di' %}",
-                data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    task: '{% with request.session.recent|last as last %}{{ last.id.0 }}{% endwith %}-{{ item.id }}',
-                },
-                success: function(response){
-                    if (response.status == 200) {
-                        $().toastmessage('showToast', {text : '{{ message_triggered }}', type : 'success', image : 'success'})
-                    } else {
-                        $().toastmessage('showToast', {text : response.error, type : 'danger', image : 'danger'})
-                    }
-                }
-            });
+            $.ajax(ajax_template);
             return false;
         });
     });
 </script>
+{% endwith %}
+{% endwith %}
+{% endwith %}

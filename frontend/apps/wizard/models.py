@@ -61,6 +61,9 @@ class Task(models.Model):
         verbose_name = _("Task")
         verbose_name_plural = _("Tasks")
 
+    def __repr__(self):
+        return u'DL{}'.format(str(self.id).zfill(settings.APL_ID_DIGITS))
+
     def __str__(self):
         return self.reference
 

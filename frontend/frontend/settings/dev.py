@@ -22,17 +22,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 djcelery.setup_loader()
 
-#BROKER_URL = "amqp://frontend:frontend@192.168.1.10:5672//"
-#CELERY_RESULT_BACKEND = "celery"
-#CELERY SETTINGS
+# Celery settings
 BROKER_URL='amqp://scapl:scapl@localhost:5672/vScapl'
-CELERY_ACCEPT_CONTENT=['json']
-CELERY_TASK_SERIALIZER='json'
-CELERY_RESULT_SERIALIZER='json'
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
-#Enable the celery-haystack signal processor in the settings
-#HAYSTACK_SIGNAL_PROCESSOR = 'celery_haystack.signals.CelerySignalProcessor'
+ROUTINE_KEYS = {
+    'default': 'default',
+    'search': 'se.task',
+    'automation': 'as.task',
+}
+# CELERY_ACCEPT_CONTENT=['json']
+# CELERY_TASK_SERIALIZER='json'
+# CELERY_RESULT_SERIALIZER='json'
+# CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -274,6 +275,7 @@ AUTH_USER_MODEL = 'profiles.ScaplUser'
 DI_ID_DIGITS = 5
 DL_ID_DIGITS = 3
 DS_ID_DIGITS = 2
+APL_ID_DIGITS = 3
 MAX_RECENT_TASKS = 5
 
 # TODO: Enable Memcache for production version
