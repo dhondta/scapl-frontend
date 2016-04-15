@@ -7,7 +7,8 @@
     "description": "General information about the product.",
     "date_created": "2016-03-20T16:02:37.999Z",
     "date_modified": "2016-03-28T10:26:38.296Z",
-    "author": 1
+    "author": 1,
+    "main": true
   }
 },
 {

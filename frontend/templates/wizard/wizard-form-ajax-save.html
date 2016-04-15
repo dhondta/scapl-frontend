@@ -1,19 +1,20 @@
 <script>
     $(document).ready(function() {
-        $("#di{{ item.id }}-save").click(function (e) {
+        $('#di{{ item.id }}-save').click(function (e) {
+            prettyPrint();
             e.preventDefault();
             var new_value = $('#di{{ item.id }}').summernote('code').trim();
             var old_value = $('#{{ item.id }}-value').html().trim();
             if (new_value === old_value) {
-            $('#di{{ item.id }}-group').addClass('has-warning');
-                $().toastmessage('showToast', {text : 'No change', type : 'warning', image : 'warning'})
+                $('#di{{ item.id }}-group').addClass('has-warning');
+                $().toastmessage('showToast', {text : '{{ message_nochange }}', type : 'warning', image : 'warning'})
             } else {
                 $.ajax({
                     type: "POST",
                     url: "{% url 'save_di' %}",
                     data: {
                         csrfmiddlewaretoken: '{{ csrf_token }}',
-                        apl: {% with request.session.pending|last as last %}{{ last.apl_id }}{% endwith %},
+                        apl: {% with request.session.recent|last as last %}{{ last.id.0 }}{% endwith %},
                         item: {{ item.id }},
                         value: new_value,
                     },

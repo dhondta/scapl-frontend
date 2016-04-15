@@ -35,10 +35,10 @@
                         <li><a href="{% url 'wizard' %}"><span>{{ label_wizard }}</span></a></li>
                         <li><a href="{% url 'tasks' %}"><span>{{ label_alltasks }}</span></a></li>
                         <li><a href="{% url 'reports' %}"><span>{{ label_reports }}</span></a></li>
-                        {% if request.session.pending|length > 0 %}
+                        {% if request.session.recent|length > 0 %}
                         <li role="separator" class="divider"></li>
                         <h6 class="dropdown-header">{{ label_mytasks }}</h6>
-                        {% for task in request.session.pending reversed %}
+                        {% for task in request.session.recent reversed %}
                         <li><a href="{% url 'wizard' apl_id=task.apl_id seq_id=task.seq_id %}"><span title="{{ task.sequence }}">{{ task.reference }}</span></a></li>
                         {% endfor %}
                         {% endif %}

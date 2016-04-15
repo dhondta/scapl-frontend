@@ -27,6 +27,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^', include('apps.profiles.urls')),
+    url(r'^password/', apps.get_app_config('common').module.views.password, name='password'),
     url(r'^admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
 ] + required(user_only, [
     url(r'^', include('apps.wizard.urls')),

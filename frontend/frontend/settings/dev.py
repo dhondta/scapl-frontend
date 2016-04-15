@@ -90,6 +90,7 @@ INSTALLED_APPS = (
 # TODO: convert admin site to django-admin2
 # TODO: use django-wysiwyg for data items
 # TODO: optimize JS and CSS transfer with django-pipeline
+# TODO: consider using django-feedback for adding a feedback feature where needed
 # TODO: consider using django-analytical
 # TODO: consider using django-blog-zinnia or puput for blog part
 # TODO: consider adding a project dashboard using django-dashing
@@ -100,6 +101,8 @@ INSTALLED_APPS = (
 # TODO: consider simplifying settings.py with django-environ or django-split-settings
 # TODO: consider using django-taggit for tagging assets (e.g. APL tasks)
 # TODO: consider integrating BPMN workflows sketching with django-viewflow (for the Automation System)
+# TODO: consider using django-defender for protection against brute-force login attempts
+# TODO: consider using django-badgify for managing user badges
 
 # Login URL settings
 LOGIN_URL = LOGOUT_URL = ADMIN_LOGOUT_URL = LOGIN_REDIRECT_URL = '/'
@@ -267,10 +270,11 @@ TEMPLATES = [
 # CSRF_COOKIE_HTTPONLY = False
 
 # Specific SCAPL config
+AUTH_USER_MODEL = 'profiles.ScaplUser'
 DI_ID_DIGITS = 5
 DL_ID_DIGITS = 3
 DS_ID_DIGITS = 2
-MAX_PENDING_TASKS = 5
+MAX_RECENT_TASKS = 5
 
 # TODO: Enable Memcache for production version
 # Cache management
@@ -298,12 +302,6 @@ LANGUAGES = (
     ('fr', getText('FR')),
     ('nl', getText('NL')),
 )
-
-# Particular application customized authentication settings
-AUTH_ABSTRACT_USER_MODEL = 'common.GenericUser'
-AUTH_USER_MODEL = 'profiles.ScaplUser'
-AUTH_ROLE_MODEL = 'profiles.ScaplRole'
-AUTH_ADMIN_MODEL = 'scheme.Administrator'
 
 # Admin bootstrapped configuration
 DAB_FIELD_RENDERER = 'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
@@ -342,10 +340,17 @@ SUMMERNOTE_CONFIG = {
     'iframe': False,
     'airMode': False,
     'styleWithTags': True,
+#    'styleWithSpan': True,
     'direction': 'ltr',
     'width': '100%',
     'height': '250',
-    'lang': None,
+    'tabsize': 2,
+    'lang': 'en-US',
+    'lang_matches': {
+        'en': 'en-US',
+        'fr': 'fr-FR',
+        'nl': 'nl-NL',
+    },
     'toolbar': [
         ['action', ['undo', 'redo']],
         ['style', ['style']],
@@ -356,8 +361,11 @@ SUMMERNOTE_CONFIG = {
         ['highlight', ['highlight']],
         ['view', ['fullscreen', 'codeview']],
         ['help', ['help']]
+        # TODO: add a plugin for managing keywords such as 'None', 'Not available', 'Not applicable'
     ],
     'attachment_require_authentication': False,
+    'attachment_filesize_limit': 1024 * 1024,
+    'attachment_storage_class': None,
     'attachment_upload_to': upload_attachment,
     'disable_upload': False,
     'prettifyHtml': False,

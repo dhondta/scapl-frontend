@@ -45,10 +45,12 @@
     <![endif]-->
     <title>{% block title %}{{ PROJECT_NAME }}{% endblock %}</title>
 </head>
-{% include "tooltips/tooltips.html" %}
 <body class="page-fade{% if request.user.is_authenticated %} with-nav{% endif %}" role="document">
     {% if messages %}{% toast_all messages %}{% endif %}
-    {% if request.user.is_authenticated %}{% include "navbar.html" %}{% endif %}
+    {% if request.user.is_authenticated %}
+        {% include "navbar.html" %}
+        {% include "tooltips/tooltips.html" %}
+    {% endif %}
     <div class="container" role="main">
         {% block content %}{% endblock %}
     </div>
