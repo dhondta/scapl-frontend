@@ -79,17 +79,30 @@ label {
 							{% for item in step.items %}
 							<div class="panel panel-default">
 								<div class="panel-body">
-									<div class="row">
-										<div class="col-sm-6">
-											<form method="post" action="javascript:;">
-											{% csrf_token %}
-												<div class="form-group" id="di{{ item.id }}-group">
-													<label class="control-label col-sm-6" for="di{{ item.id }}" style="z-index: 10;">{{ item.label }}</label>
-													{{ item.form.value|safe }}
-													<a id="di{{ item.id }}-save">Save</a>
-													<a id="di{{ item.id }}-trigger">Trigger</a>
+									<div class="container">
+										<div class="row-fluid">
+											<div class="col-md-6">
+												<form method="post" action="javascript:;">
+												{% csrf_token %}
+													<div class="form-group" id="di{{ item.id }}-group">
+														<label class="control-label col-sm-6" for="di{{ item.id }}" style="z-index: 10;">{{ item.label }}</label>
+														{{ item.form.value|safe }}
+													</div>
+												</form>
+											</div>
+											<div class="col-xs-1">
+												<div class="btn-group-vertical">
+													<a class="btn btn-default" id="di{{ item.id }}-save"><i class="fa fa-save" aria-hidden="true"></i></a>
+													<a class="btn btn-default" id="di{{ item.id }}-trigger"><i class="fa fa-refresh" aria-hidden="true"></i></a>
 												</div>
-											</form>
+											</div>
+											<div class="col-md-5 item-trigger-result-wrapper">
+												<div class="panel panel-default item-trigger-result">
+													<div class="panel-body item-trigger-result">
+														<h4>No result yet</h4>
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
 									{% include 'wizard/wizard-form-ajax-save.html' %}

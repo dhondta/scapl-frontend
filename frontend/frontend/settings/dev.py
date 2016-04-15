@@ -241,7 +241,8 @@ TEMPLATES = [
         ],
         'OPTIONS': {
             'context_processors': [
-                'frontend.context_processors.project_name',
+                'frontend.context_processors.project_info',
+                'frontend.context_processors.layout_parameters',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.template.context_processors.i18n',
@@ -340,7 +341,6 @@ SUMMERNOTE_CONFIG = {
     'iframe': False,
     'airMode': False,
     'styleWithTags': True,
-#    'styleWithSpan': True,
     'direction': 'ltr',
     'width': '100%',
     'height': '250',

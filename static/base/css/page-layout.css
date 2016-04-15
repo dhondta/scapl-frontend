@@ -52,3 +52,11 @@ footer {
   vertical-align: top;
   width: 90%;
 }
+.item-trigger-result-wrapper {
+  height: auto;
+}
+.item-trigger-result {
+  height: 100%;
+  width: 100%;
+  vertical-align: middle;
+}
