@@ -1,0 +1,36 @@
+[
+{
+  "model": "common.genericuser",
+  "pk": 1,
+  "fields": {
+    "password": "bcrypt_sha256$$2a$12$Gt54zH8Vta8mft0m4QRuzO0o6aqGlt298/NF6q3qF41HBGH/9ypBe",
+    "last_login": "2016-03-22T11:28:00.682Z",
+    "is_superuser": true,
+    "email": "admin@localhost",
+    "first_name": "admin",
+    "last_name": null,
+    "title": null,
+    "rank": null,
+    "service": null,
+    "phone1": null,
+    "phone2": null,
+    "comments": null,
+    "is_active": true,
+    "is_staff": true,
+    "date_joined": "2016-03-22T11:28:00.673Z",
+    "theme": "default",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "profiles.scapluser",
+  "pk": 1,
+  "fields": {
+    "type": 2,
+    "role": null,
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

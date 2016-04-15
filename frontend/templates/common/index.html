@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% load i18n  %}
+
+{% block title %}{{ PROJECT_NAME }} | {% trans "Index" %}{% endblock %}
+<!-- This is needed when you send requests via Ajax
+
+<script type="text/javascript">
+var baseurl = '';
+
+</script>
+-->
+{% block content %}{% include "common/index-content.html" %}{% endblock %}

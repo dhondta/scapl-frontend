@@ -1,0 +1,116 @@
+{% load staticfiles i18n %}
+
+{% trans "APL overview for" as legend_overview %}
+{% trans "APL Reference" as legend_reference %}
+{% trans "Value successfully updated" as message_success %}
+{% trans "No change" as message_nochange %}
+{% trans "Task triggered" as message_triggered %}
+
+<link rel="stylesheet" href="{% static 'summernote/summernote.css' %}">
+<link rel="stylesheet" href="{% static 'google-prettify/prettify.css' %}">
+{# <link rel="stylesheet" href="{% static 'summernote/plugins/myplugin.css' %}"> #}
+<style>
+label {
+	display: inline-block;
+	width: 5em;
+}
+</style>
+
+<legend>{{ legend_overview }} {{ wizard.reference }}</legend>
+<div class="container" id="apl-overview" style="width: 70%;">
+	<div class="row row-centered">
+		{% for step in wizard.steps %}
+		<script>
+			$(document).ready(function() {
+				$("#overview-step-{{ forloop.counter }}").click(function () {
+                    $("ul.nav > li.active").removeClass('active');
+                    $("#a-step{{ forloop.counter }}").parent('li').addClass('active');
+                    $("div.tab-content > div.active").removeClass('active').removeClass('in');
+                    $("#step{{ forloop.counter }}").addClass('in').addClass('active');
+				    $("#wizard-modal").modal({ show: 'true' });
+				});
+			});
+		</script>
+		<div class="well bs-component" id="overview-step-{{ forloop.counter }}">
+			<fieldset>
+				<legend title="{{ step.help }}">{{ step.title }}</legend>
+				{% for item in step.items %}
+				<label class="col-lg-3 control-label" title="{{ item.help }}">{{ item.label }}</label>
+				<div class="panel panel-default col-lg-9">
+					<div class="panel-body" id="{{ item.id }}-value">
+						{{ item.form.instance.value|safe }}
+					</div>
+				</div>
+				{% endfor %}
+			</fieldset>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+
+{% if edit_mode %}
+<form method="post" role="form1" id="signin-form" class="validate">
+{% csrf_token %}
+	<div id="wizard-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="wizard-modal-label" aria-hidden="true">
+        <div class="modal-dialog wizard">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="wizard-modal-label">{{ wizard.reference }}</h3>
+                </div>
+                <div class="modal-body" id="wizard-modal-body">
+					<div class="navbar">
+						<div class="navbar-inner">
+							<ul class="nav nav-pills">
+								{% for step in wizard.steps %}
+								<li{% if forloop.first %} class="active"{% endif %}>
+									<a class="btn btn-default" id="a-step{{ forloop.counter }}" href="#step{{ forloop.counter }}"
+											data-toggle="tab" data-step="{{ forloop.counter }}">
+										{{ forloop.counter }}. {{ step.title }}
+									</a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+					<div class="tab-content">
+						{% for step in wizard.steps %}
+						<div class="tab-pane fade{% if forloop.first %} in active{% endif %}" id="step{{ forloop.counter }}">
+							{% for item in step.items %}
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-sm-6">
+											<form method="post" action="javascript:;">
+											{% csrf_token %}
+												<div class="form-group" id="di{{ item.id }}-group">
+													<label class="control-label col-sm-6" for="di{{ item.id }}" style="z-index: 10;">{{ item.label }}</label>
+													{{ item.form.value|safe }}
+													<a id="di{{ item.id }}-save">Save</a>
+													<a id="di{{ item.id }}-trigger">Trigger</a>
+												</div>
+											</form>
+										</div>
+									</div>
+									{% include 'wizard/wizard-form-ajax-save.html' %}
+									{% include 'wizard/wizard-form-ajax-trigger.html' %}
+								</div>
+							</div>
+							{% endfor %}
+						</div>
+						{% endfor %}
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script src="{% static 'django_summernote/jquery.ui.widget.js' %}"></script>
+<script src="{% static 'django_summernote/jquery.iframe-transport.js' %}"></script>
+<script src="{% static 'django_summernote/jquery.fileupload.js' %}"></script>
+<script src="{% static 'summernote/summernote.min.js' %}"></script>
+<script src="{% static 'google-prettify/prettify.js' %}"></script>
+<script src="{% static 'summernote/plugin/hello/summernote-ext-hello.js' %}"></script>
+<script src="{% static 'summernote/plugin/highlight/summernote-ext-highlight.js' %}"></script>
+{# <script src="{% static 'summernote/plugins/myplugin.js' %}"></script> #}
+{%endif %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% load i18n  %}
+
+{% block title %}SCAPL | {% trans "Error" %}{% endblock %}
+{% block navbar %}{% endblock %}
+{% block content %}
+<h1>{% trans "Server Internal Error" %}</h1>
+<h3>{% trans "Server failed to handle your request." %}</h3>
+{% endblock %}
+{% block footer %}{% include "obj/footer.html" %}{% endblock %}
