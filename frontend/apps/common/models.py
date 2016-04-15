@@ -2,8 +2,11 @@
 import os
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -167,7 +170,7 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
     comments = models.TextField(max_length=1000, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True, editable=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
     avatar = models.ImageField(upload_to=upload_avatar, default='{}/default.png'.format(settings.AVATARS_LOCATION))
     theme = models.CharField(max_length=128, default=settings.DEFAULT_BOOTSTRAP_THEME, choices=list_themes())
 
@@ -194,10 +197,16 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         short_name = u'{}. {}'.format(self.first_name[0] if self.first_name else '', self.last_name or '').strip(" .")
-        return self.first_name if len(short_name) == 1 else (short_name if short_name != '' else 'nobody')
+        return self.first_name if len(short_name) == 1 else (short_name if short_name != '' else _('undefined name'))
 
     def get_extended_name(self):
         return u'{} {} {}'.format(self.rank or '', self.get_short_name() or '', self.title or '').strip(" ")
 
     def natural_key(self):
         return (self.pk, )
+
+
+@receiver(pre_delete, sender=GenericUser)
+def delete_user(sender, instance, **kwargs):
+    if instance.is_superuser:
+        raise PermissionDenied

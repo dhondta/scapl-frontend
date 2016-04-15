@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 import json
-from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -8,17 +7,8 @@ from importlib import import_module
 from model_utils.managers import InheritanceManager
 
 
-user_app, user_model = settings.AUTH_USER_MODEL.split('.')
-ScaplUser = apps.get_app_config(user_app).get_model(user_model)
 cmodels = import_module("apps.common.models")
-
-profile_app, profile_model = settings.AUTH_ROLE_MODEL.split('.')
-ScaplRole = apps.get_app_config(profile_app).get_model(profile_model)
-
-# for name, obj in inspect.getmembers(settings.PROFILE_APP):
-#     if inspect.isclass(obj) and name.endswith("User"):
-#         exec("{} = {}".format(name, obj))
-
+pmodels = import_module("apps.profiles.models")
 
 """ (see SCAPL's SDD section 4.2 Data Dictionary for more details about the data scheme and models' meaning) """
 
@@ -28,7 +18,7 @@ class AdministratorManager(cmodels.GenericUserManager):
         return super(AdministratorManager, self).get_queryset().filter(type=2)
 
 
-class Administrator(ScaplUser):
+class Administrator(pmodels.ScaplUser):
     """ This model defines an administrator for the wizard application """
     objects = AdministratorManager()
 
@@ -57,9 +47,10 @@ class Entity(models.Model):
 
 class DataSequence(Entity):
     """ This model defines the structure of a data sequence """
-    author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_sequences")
-    roles = models.ManyToManyField(ScaplRole, through='SequenceRoleAssociations', related_name="related_sequences")
-    # max_users = models.IntegerField(default=5)
+    author = models.ForeignKey(pmodels.ScaplUser, null=True, blank=True, related_name="created_sequences")
+    roles = models.ManyToManyField(pmodels.ScaplRole, through='SequenceRoleAssociations', related_name="related_sequences")
+    max_users = models.IntegerField(default=5)
+    main = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('id', )
@@ -72,10 +63,18 @@ class DataSequence(Entity):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if self.main:
+            for ds in DataSequence.objects.all():
+                if ds.main:
+                    ds.main = False
+                    ds.save()
+        return super(DataSequence, self).save(*args, **kwargs)
+
 
 class DataList(Entity):
     """ This model defines the structure of a data list """
-    author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_lists")
+    author = models.ForeignKey(pmodels.ScaplUser, null=True, blank=True, related_name="created_lists")
     sequences = models.ManyToManyField(DataSequence, through='ListSequenceAssociations', related_name="lists")
 
     class Meta:
@@ -92,10 +91,9 @@ class DataList(Entity):
 
 class DataItem(Entity):
     """ This model defines the generic structure of a data item """
-    objects = InheritanceManager()
-
-    author = models.ForeignKey(ScaplUser, null=True, blank=True, related_name="created_items")
+    author = models.ForeignKey(pmodels.ScaplUser, null=True, blank=True, related_name="created_items")
     lists = models.ManyToManyField(DataList, through='ItemListAssociations', related_name="items")
+    objects = InheritanceManager()
 
     class Meta:
         ordering = ('id', )
@@ -171,7 +169,7 @@ class ListSequenceAssociations(models.Model):
 
 class SequenceRoleAssociations(models.Model):
     sequence = models.ForeignKey(DataSequence, on_delete=models.CASCADE)
-    role = models.ForeignKey(ScaplRole, on_delete=models.CASCADE)
+    role = models.ForeignKey(pmodels.ScaplRole, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Sequence/role association")

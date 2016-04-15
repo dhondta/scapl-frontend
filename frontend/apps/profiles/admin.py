@@ -12,18 +12,18 @@ def scapl_user_admin(model=None):
     class ScaplUserAdmin(cadmin.GenericUserAdmin):
         list_display = ('email_extended', 'is_active', 'service', 'role', )
         list_filter = cadmin.GenericUserAdmin.list_filter + ('role', )
-        fieldsets = (
+        update_fieldsets = (
             (None, {'fields': (('email', ), )}),
             (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ),
                                              ('service', 'role', ), ('phone1', 'phone2', ), )}),
-            (_('Status'), {'fields': ('is_active', ('last_login', 'date_joined', ), )}),
+            (_('Status'), {'fields': ('is_active', ('date_joined', 'last_login', ), )}),
         )
-        add_fieldsets = fieldsets
 
         def get_form(self, request, obj=None, **kwargs):
             form = super(ScaplUserAdmin, self).get_form(request, obj, **kwargs)
-            form.base_fields['role'].queryset = ScaplRole.objects \
-                .filter(scope__in=[0, [NormalUser, SecurityUser].index(self.model) + 1])
+            if obj is not None:
+                form.base_fields['role'].queryset = ScaplRole.objects \
+                    .filter(scope__in=[0, [NormalUser, SecurityUser].index(self.model) + 1])
             return form
 
         def queryset(self, request):

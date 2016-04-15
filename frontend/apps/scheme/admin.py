@@ -8,7 +8,6 @@ from .models import Administrator, Entity, ManualDataItem, ASDataItem, SEDataIte
     ItemListAssociations, ListSequenceAssociations, SequenceRoleAssociations
 
 cadmin = import_module("apps.common.admin")
-forms = import_module("apps.common.forms")
 
 
 def shorten(text, length=50):
@@ -33,14 +32,6 @@ make_list_orphan.short_description = _("Unlink selected Data Lists")
 @admin.register(Administrator)
 class AdministratorAdmin(cadmin.GenericUserAdmin):
     list_display = ('email_emphasize_su', 'service', 'is_active', )
-    filter_horizontal = ('user_permissions', )
-    fieldsets = (
-        (None, {'fields': ('email', ('password1', 'password2', ), )}),
-        (_('Personal info'), {'fields': (('first_name', 'last_name', ), ('title', 'rank', ), 'service', ('phone1', 'phone2', ), )}),
-        (_('Permissions'), {'fields': (('is_active', 'is_staff', ), 'user_permissions', )}),
-        (_('Status'), {'fields': (('last_login', 'date_joined', ), )}),
-    )
-    add_fieldsets = fieldsets
 
     class Meta:
         model = Administrator
@@ -127,6 +118,7 @@ class DataListAdmin(EntityAdmin):
 
 @admin.register(DataSequence)
 class DataSequenceAdmin(EntityAdmin):
+    fieldsets = EntityAdmin.fieldsets + ((None, {'fields': ('main', )}), )
     inlines = (ListSequenceAssociationsInline, SequenceRoleAssociationsInline, )
     # FIXME: List save returns error "save() prohibited to prevent data loss due to unsaved related object 'sequence'." if items are provided with the stackedinlines.
     #  see save_model() and save_formset() for a fix

@@ -15,7 +15,7 @@ class GenericUserAdminForm(forms.ModelForm):
 
     class Meta:
         model = GenericUser
-        fields = ('email', 'first_name', 'last_name', 'title', 'rank', 'service', 'phone1', 'phone2', 'theme', )
+        fields = ('email', 'first_name', 'last_name', 'title', 'rank', 'service', 'phone1', 'phone2', 'theme', 'is_active', )
         labels = {
             'email': _('E-mail'),
             'first_name': _('First name'),
@@ -26,6 +26,7 @@ class GenericUserAdminForm(forms.ModelForm):
             'phone1': _('Professional phone'),
             'phone2': _('Personal phone'),
             'theme': _('Theme'),
+            "is_active": _('Activated'),
         }
 
 

@@ -11,6 +11,12 @@ if hasattr(settings, 'DEFAULT_BOOTSTRAP_THEME'):
     default_theme = settings.DEFAULT_BOOTSTRAP_THEME
 
 
+def password(template='index.html', home_view='home'):
+    def password_template(request):
+        return redirect(home_view)
+    return password_template
+
+
 def signin(template='index.html', home_view='home'):
     def signin_template(request):
         next = request.GET.get('next')

@@ -7,7 +7,7 @@ from .models import Task, TaskItem
 get_scheme = getattr(__import__("apps.scheme.utils", fromlist=['utils']), 'get_scheme')
 
 
-def make_datatable(template_name, objects, exclude_fields=[]):
+def make_datatable(template_name, objects, exclude_field=None):
     """ This function makes a valid Datatables from a template dictionary using objects (that is, instances of a model),
      discarding invalid fields
     :param template_name: the template dictionary to use to build the table
@@ -23,9 +23,10 @@ def make_datatable(template_name, objects, exclude_fields=[]):
         template = globals()['{}_template'.format(template_name)]
     except NameError:
         return 'Undefined', [], [], []
-    # drop excluded fields
-    for field in exclude_fields:
-        template['fields'].pop(field, None)
+    # drop excluded field
+    if exclude_field:
+        template['fields'].pop(exclude_field, None)
+        template['order'].remove(exclude_field)
     # prepare the header according to the provided order
     for field in template['order']:
         headers.append(template['fields'][field]['header'])
@@ -42,8 +43,7 @@ def make_datatable(template_name, objects, exclude_fields=[]):
                 # finally, save the handled value in the record
                 record[field] = mark_safe(value)
             except:
-                exclude_fields.append(field)
-                return make_datatable(template_name, objects, exclude_fields)
+                return make_datatable(template_name, objects, field)
         records.append(record)
     return template['title'], template['order'], headers, records
 

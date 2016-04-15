@@ -1,17 +1,17 @@
 # -*- coding: UTF-8 -*-
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.timezone import now
+from importlib import import_module
 
-user_app, user_model = settings.AUTH_USER_MODEL.split('.')
-admin_app, admin_model = settings.AUTH_ADMIN_MODEL.split('.')
+pmodels = import_module("apps.profiles.models")
+smodels = import_module("apps.scheme.models")
 
 
 class GenericBackend(ModelBackend):
-    """ Generic class to handle 'user_class' property creation using the AUTH_USER_MODEL from the settings. """
+    """ Generic class to handle 'user_class' property creation using the ScaplUser model from the 'profiles' app. """
 
     def get_user(self, user_id):
         try:
@@ -22,14 +22,14 @@ class GenericBackend(ModelBackend):
     @property
     def user_model(self):
         if not hasattr(self, '_user_model'):
-            self._user_model = apps.get_app_config(user_app).get_model(user_model)
+            self._user_model = pmodels.ScaplUser
             if not self._user_model:
                 raise ImproperlyConfigured('Could not get custom user model')
         return self._user_model
 
 
 class GenericUserBackend(GenericBackend):
-    """ Authenticate using the AUTH_USER_MODEL from the settings. """
+    """ Authenticate using the ScaplUser model from the 'profiles' app. """
 
     def authenticate(self, username=None, password=None, **kwargs):
         email = username or kwargs.get(self.user_model.USERNAME_FIELD)
@@ -47,7 +47,7 @@ class SuperUserCreationBackend(GenericBackend):
     @property
     def admin_model(self):
         if not hasattr(self, '_admin_model'):
-            self._admin_model = apps.get_app_config(admin_app).get_model(admin_model)
+            self._admin_model = smodels.Administrator
             if not self._admin_model:
                 raise ImproperlyConfigured('Could not get custom administrator model')
         return self._admin_model

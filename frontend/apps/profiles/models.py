@@ -1,18 +1,14 @@
 # -*- coding: UTF-8 -*-
-from django.apps import apps
-from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from importlib import import_module
 
-user_app, user_model = settings.AUTH_ABSTRACT_USER_MODEL.split('.')
-GenericUser = apps.get_app_config(user_app).get_model(user_model)
 cmodels = import_module("apps.common.models")
 
 
 class ScaplRole(models.Model):
     """ This model defines possible roles for users in relationship with the DataSequence model """
-    author = models.ForeignKey(GenericUser, null=True, blank=True, related_name="created_roles")
+    author = models.ForeignKey(cmodels.GenericUser, null=True, blank=True, related_name="created_roles")
     name = models.CharField(max_length=120)
     description = models.TextField(null=True)
     date_created = models.DateTimeField(verbose_name=_(u'Creation date'), auto_now_add=True, auto_now=False, editable=False)
@@ -37,7 +33,7 @@ class SecurityUserManager(cmodels.GenericUserManager):
         return super(SecurityUserManager, self).get_queryset().filter(type=1)
 
 
-class ScaplUser(GenericUser):
+class ScaplUser(cmodels.GenericUser):
     type = models.IntegerField(choices=((0, _("Normal user"), ), (1, _("Security user"), )), default=0)
     role = models.ForeignKey(ScaplRole, related_name="scapl_users", blank=True, null=True)
 

@@ -5,13 +5,10 @@ from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from simple_history.models import HistoricalRecords
-import os
+from importlib import import_module
 
-user_app, user_model = settings.AUTH_USER_MODEL.split('.')
-GenericUser = apps.get_app_config(user_app).get_model(user_model)
-
-DataItem = apps.get_app_config('scheme').get_model('DataItem')
-get_scheme = getattr(__import__("apps.scheme.utils", fromlist=['utils']), 'get_scheme')
+pmodels = import_module("apps.profiles.models")
+smodels = import_module("apps.scheme.models")
 
 """ (see SCAPL's SDD section 4.2 Data Dictionary for more details about the data scheme and models' meaning) """
 
@@ -50,8 +47,8 @@ class Report(models.Model):
 
 
 class Task(models.Model):
-    author = models.ForeignKey(GenericUser, related_name="created_tasks")
-    contributors = models.ManyToManyField(GenericUser, through='TaskContributors', related_name="apl_tasks")
+    author = models.ForeignKey(pmodels.ScaplUser, related_name="created_tasks")
+    contributors = models.ManyToManyField(pmodels.ScaplUser, through='TaskContributors', related_name="apl_tasks")
     keywords = models.CharField(max_length=1024, unique=True)  # TODO: change it to JSONField (Django 1.9+ if used with PostgreSQL)
     packages = models.ForeignKey(Package, blank=True, null=True, default=None)
     code = models.CharField(max_length=8, blank=True, null=True, editable=False)
@@ -86,7 +83,7 @@ class Task(models.Model):
 
     @property
     def progress(self):
-        n = DataItem.objects.count()
+        n = smodels.DataItem.objects.count()
         m = TaskItem.objects.filter(apl=self).count()
         return int(100 * m / n) if n > 0 else 0
 
@@ -97,7 +94,7 @@ class Task(models.Model):
 
 class TaskContributors(models.Model):
     apl = models.ForeignKey(Task, on_delete=models.CASCADE)
-    contributor = models.ForeignKey(GenericUser, on_delete=models.CASCADE)
+    contributor = models.ForeignKey(pmodels.ScaplUser, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(verbose_name=_(u'Join date'), auto_now_add=True, auto_now=False, editable=False)
 
     class Meta:
@@ -118,7 +115,7 @@ class TaskHistory(models.Model):
 
 class TaskItem(models.Model):
     apl = models.ForeignKey(Task)
-    item = models.ForeignKey(DataItem)
+    item = models.ForeignKey(smodels.DataItem)
     value = models.TextField()
     date_filled = models.DateTimeField(auto_now_add=True, editable=False)
     date_updated = models.DateTimeField(auto_now=True, editable=False)
