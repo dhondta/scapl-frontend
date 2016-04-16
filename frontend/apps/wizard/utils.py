@@ -79,7 +79,6 @@ def make_wizard(apl_id, seq_id):
                 'help': di.description,
                 'form': form,
                 'is_auto': not isinstance(di, smodels.ManualDataItem),
-                'type': str(type(di)),
             }
             step['items'].append(item)
         wizard['steps'].append(step)
