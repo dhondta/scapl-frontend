@@ -21,6 +21,7 @@
         ajax_template_{{ item.id }}['url'] = '{% url 'trigger_di' task_id %}';
         ajax_template_{{ item.id }}['success'] = function(response) {
             if (response.status == 200) {
+                alert (response.result['output']);
                 if (response.result != null) {
                     $().toastmessage('showToast', {text: 'Received ' + response.result, type: 'success', image: 'success'});
                 } else { // for maintenance tasks triggered from the frontend

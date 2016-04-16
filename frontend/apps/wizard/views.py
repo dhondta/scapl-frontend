@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 import re
+from volatility.plugins.overlays.linux.linux import task_struct
+
 from celery import Celery
 from celery.result import AsyncResult
 from django.conf import settings
@@ -176,7 +178,7 @@ def save_data_item(request):
 @require_http_methods(["POST"])
 def trigger_data_item(request, task_id=None):
 
-    def send_as_task(task_id, args=(), kwargs={}, routing='default', retries=0):
+    def send_as_task( task_id, args=(), kwargs={}, routing='default', retries=0):
         with Connection(settings.BROKER_URL) as conn:
             with Publisher(connection=conn, exchange="scapl", exchange_type="topic",
                            routing_key=settings.ROUTING_KEYS[routing]) as pub:
@@ -197,18 +199,23 @@ def trigger_data_item(request, task_id=None):
         di = smodels.DataItem.objects.filter(id=item_id).select_subclasses()[0]
         if isinstance(di, smodels.SEDataItem):
             routing = 'search'
-            args = ('Scapl', di.api, )
-            kwargs = {'keywords': di.keywords, 'suggestions': di.max_suggestions}
+            args = (apl.keywords,di.api,di.keywords,di.max_suggestions )
+            #kwargs = {'keywords': di.keywords, 'suggestions': di.max_suggestions}
         elif isinstance(di, smodels.ASDataItem):
             routing = 'automation'
-            args = ('Scapl', di.call, )
+            args = ( di.call, )
         else:
             return JsonResponse({'status': 200, 'result': None})
-        send_as_task('{}-{}'.format(repr(apl), repr(di)), args, kwargs, routing=routing)
+        task_id='{}-{}'.format(repr(apl), repr(di))
+        send_as_task(task_id, args, kwargs, routing=routing)
         return JsonResponse({'status': 200, 'result': task_id})
     # otherwise, ask for result of the designated task
     else:
         app = Celery('Scapl', broker='amqp://scapl:scapl@localhost:5672/vScapl', backend='amqp')
+        apl_id, item_id = task_id.split('-')
+        apl = Task.objects.get(id=apl_id)
+        di = smodels.DataItem.objects.filter(id=item_id).select_subclasses()[0]
+        task_id='{}-{}'.format(repr(apl), repr(di))
         task = app.AsyncResult(task_id)
         result = task.get() if task.status == 'SUCCESS' else None
         return JsonResponse({'status': 200, 'task_status': task.status, 'result': result})
