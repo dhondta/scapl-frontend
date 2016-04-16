@@ -94,8 +94,10 @@ label {
 											</div>
 											<div class="col-md-1">
 												<div class="btn-group" style="float: right">
+													{% if item.is_auto %}
 													<a class="btn btn-default" id="di{{ item.id }}-trigger"><i class="fa fa-refresh"></i></a>
 													<a class="btn btn-default" id="di{{ item.id }}-fullscreen"><i class="note-icon-arrows-alt"></i></a>
+													{% endif %}
 												</div>
 											</div>
 										</div>
@@ -116,7 +118,11 @@ label {
 														<div class="panel-body inside-full-height">
 															<div class="container container-result">
 																<div class="row-fluid row-result">
+																	{% if item.is_auto %}
 																	<p class="text-muted"><font class="align-middle" size="6">No result yet</font></p>
+																	{% else %}
+																	<p class="text-muted"><font class="align-middle" size="6">Manual Item</font></p>
+																	{% endif %}
 																</div>
 															</div>
 														</div>
@@ -126,7 +132,7 @@ label {
 										</div>
 									</div>
 									{% include 'wizard/wizard-form-ajax-save.html' %}
-									{% include 'wizard/wizard-form-ajax-trigger.html' %}
+									{% if item.is_auto %}{% include 'wizard/wizard-form-ajax-trigger.html' %}{% endif %}
 								</div>
 							</div>
 							{% endfor %}

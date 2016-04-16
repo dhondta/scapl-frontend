@@ -1,10 +1,12 @@
 # -*- coding: UTF-8 -*-
 from django.utils.safestring import mark_safe
+from importlib import import_module
 from .datatables import reports_template, tasks_template
 from .forms import TaskItemForm
 from .models import Task, TaskItem
 
 get_scheme = getattr(__import__("apps.scheme.utils", fromlist=['utils']), 'get_scheme')
+smodels = import_module("apps.scheme.models")
 
 
 def make_datatable(template_name, objects, exclude_field=None):
@@ -71,7 +73,14 @@ def make_wizard(apl_id, seq_id):
             # Summernote is used as a textarea editor ; as its JS uses variable names depending on 'id',
             #  this has to start with characters and not digits (that's why 'di' is used as a prefix)
             form.fields['value'].widget.attrs['id'] = "di{}".format(item_id)
-            item = {'label': di.name, 'help': di.description, 'id': item_id, 'form': form}
+            item = {
+                'id': item_id,
+                'label': di.name,
+                'help': di.description,
+                'form': form,
+                'is_auto': not isinstance(di, smodels.ManualDataItem),
+                'type': str(type(di)),
+            }
             step['items'].append(item)
         wizard['steps'].append(step)
     return wizard

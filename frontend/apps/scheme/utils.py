@@ -31,5 +31,5 @@ def get_scheme(sequence_id=1):
         dl = DataList.objects.get(id=dl_association.list_id)
         scheme[ds][dl] = []
         for di_association in ItemListAssociations.objects.filter(list=dl.id):
-            scheme[ds][dl].append(DataItem.objects.get(id=di_association.item_id))
+            scheme[ds][dl].append(DataItem.objects.filter(id=di_association.item_id).select_subclasses()[0])
     return scheme

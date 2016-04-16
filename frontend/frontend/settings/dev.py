@@ -23,8 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 djcelery.setup_loader()
 
 # Celery settings
-BROKER_URL='amqp://scapl:scapl@localhost:5672/vScapl'
-ROUTINE_KEYS = {
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+#BROKER_URL = 'amqp://scapl:scapl@localhost:5672/vScapl'
+ROUTING_KEYS = {
     'default': 'default',
     'search': 'se.task',
     'automation': 'as.task',

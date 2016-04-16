@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import re
+from celery import Celery
 from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
@@ -175,41 +176,39 @@ def save_data_item(request):
 @require_http_methods(["POST"])
 def trigger_data_item(request, task_id=None):
 
-    def send_as_task(task, task_id, args=(), kwargs={}, routing='default', retries=0):
+    def send_as_task(task_id, args=(), kwargs={}, routing='default', retries=0):
         with Connection(settings.BROKER_URL) as conn:
             with Publisher(connection=conn, exchange="scapl", exchange_type="topic",
                            routing_key=settings.ROUTING_KEYS[routing]) as pub:
-                payload = {
-                    'task': task,
+                pub.send({
+                    'task': 'generic',
                     'id': task_id,
                     'args': args,
                     "kwargs": kwargs,
                     "retries": retries,
                     "eta": str(now()),
-                }
-                pub.send(payload)
+                })
 
     # if no task_id provided, trigger the data item
     args, kwargs = (), {}
     if task_id is None:
         apl_id, item_id = int(request.POST['apl']), int(request.POST['item'])
         apl = Task.objects.get(id=apl_id)
-        di = smodels.DataItem.objects.get(id=item_id)
+        di = smodels.DataItem.objects.filter(id=item_id).select_subclasses()[0]
         if isinstance(di, smodels.SEDataItem):
             routing = 'search'
             args = ('Scapl', di.api, )
             kwargs = {'keywords': di.keywords, 'suggestions': di.max_suggestions}
-        elif isinstance(di, smodels.SEDataItem):
+        elif isinstance(di, smodels.ASDataItem):
             routing = 'automation'
             args = ('Scapl', di.call, )
         else:
             return JsonResponse({'status': 200, 'result': None})
-        task = '{}-{}'.format(repr(apl), repr(di))
-        task_id = '{}-{}'.format(apl_id, item_id)
-        send_as_task(task, task_id, args, kwargs, routing=routing)
+        send_as_task('{}-{}'.format(repr(apl), repr(di)), args, kwargs, routing=routing)
         return JsonResponse({'status': 200, 'result': task_id})
     # otherwise, ask for result of the designated task
     else:
-        task = AsyncResult(task_id)
+        app = Celery('Scapl', broker='amqp://scapl:scapl@localhost:5672/vScapl', backend='amqp')
+        task = app.AsyncResult(task_id)
         result = task.get() if task.status == 'SUCCESS' else None
         return JsonResponse({'status': 200, 'task_status': task.status, 'result': result})
