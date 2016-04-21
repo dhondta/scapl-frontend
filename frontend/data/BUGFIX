@@ -1,7 +1,7 @@
 # FIXME: Fixtures load
 #
-#  PROBLEM: Using Smuggler, fixture dump and reload for records linked by a foreign key fails ;
-"    e.g. when resetting the DB and reloading such a fixture, it gives the following error:
+#  PROBLEM 1: Using Smuggler, fixture dump and reload for records linked by a foreign key fails ;
+#    i.e. when resetting the DB and reloading such a fixture, it gives the following error:
 #
 #   ValueError: Problem installing fixture '.../fixture.json':
 #    "<...Model...: >" needs to have a value for field "...parent_model..." before this many-to-many relationship can be used.
@@ -42,6 +42,39 @@
     "role": null,
     "groups": [],
     "user_permissions": []
+  }
+}
+]
+
+#
+#  PROBLEM 2: Using Smuggler, fixture dump and reload for records linked by a foreign key fails ;
+#    i.e. when resetting the DB and reloading such a fixture, foreign key relationships are badly
+#           handled and prevent the fixture from loading
+#
+#  REASON: Loaddata command will fail on a foreign key value formatted as a list (like hereafter)
+#
+#    [
+#    {
+#      ...
+#      "author": [
+#        1
+#      ],
+#      ...
+#    }
+#    ]
+#
+#  SOLUTION: Simply format the foreign key value as a single value, not a list, like this:
+[
+{
+  "model": "scheme.datasequence",
+  "pk": 1,
+  "fields": {
+    "name": "General information",
+    "description": "General information about the product.",
+    "date_created": "2016-03-20T16:02:37.999Z",
+    "date_modified": "2016-03-28T10:26:38.296Z",
+    "author": 1,
+    "main": true
   }
 }
 ]

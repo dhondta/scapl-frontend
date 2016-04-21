@@ -238,7 +238,7 @@
   "fields": {
     "max_suggestions": 10,
     "keywords": "system,requirements",
-    "api": "py-web-search"
+    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
   }
 },
 {
@@ -247,7 +247,7 @@
   "fields": {
     "max_suggestions": 1,
     "keywords": "website",
-    "api": "pws"
+    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
   }
 },
 {
@@ -256,7 +256,7 @@
   "fields": {
     "max_suggestions": 0,
     "keywords": "%name%",
-    "api": "cve-search"
+    "api": "cve-search/bin/search.py --keywords {keywords}"
   }
 },
 {
@@ -265,7 +265,7 @@
   "fields": {
     "max_suggestions": 5,
     "keywords": "update,policy",
-    "api": "pws"
+    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
   }
 },
 {
@@ -274,7 +274,7 @@
   "fields": {
     "max_suggestions": 3,
     "keywords": "vendor,support",
-    "api": "pws"
+    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
   }
 },
 {
