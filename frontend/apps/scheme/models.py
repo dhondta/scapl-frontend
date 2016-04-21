@@ -35,14 +35,16 @@ class Administrator(pmodels.ScaplUser):
 
 class Entity(models.Model):
     """ This model defines the generic structure of a data entity """
-    name = models.CharField(max_length=120)
+    name = models.CharField(max_length=120, unique=True)
     description = models.TextField(null=True)
     date_created = models.DateTimeField(verbose_name=_(u'Creation date'), auto_now_add=True, auto_now=False, editable=False)
     date_modified = models.DateTimeField(verbose_name=_(u'Last modification date'), auto_now_add=False, auto_now=True, editable=False)
 
     class Meta:
         abstract = True
-        unique_together = ('name', 'description', )
+
+    def __str__(self):
+        return self.name
 
 
 class DataSequence(Entity):
@@ -59,9 +61,6 @@ class DataSequence(Entity):
 
     def __repr__(self):
         return u'DS{}'.format(str(self.id).zfill(settings.DS_ID_DIGITS))
-
-    def __str__(self):
-        return self.name
 
     def save(self, *args, **kwargs):
         if self.main:
@@ -85,9 +84,6 @@ class DataList(Entity):
     def __repr__(self):
         return u'DL{}'.format(str(self.id).zfill(settings.DL_ID_DIGITS))
 
-    def __str__(self):
-        return self.name
-
 
 class DataItem(Entity):
     """ This model defines the generic structure of a data item """
@@ -100,9 +96,6 @@ class DataItem(Entity):
 
     def __repr__(self):
         return u'DI{}'.format(str(self.id).zfill(settings.DI_ID_DIGITS))
-
-    def __str__(self):
-        return self.name
 
 
 class ManualDataItem(DataItem):
@@ -177,3 +170,23 @@ class SequenceRoleAssociations(models.Model):
 
     def __str__(self):
         return self.sequence.description
+
+
+class PluginParameter(models.Model):
+    name = models.CharField(max_length=120)
+    label = models.TextField(blank=True, null=True, default=None)
+    type = models.IntegerField(choices=((0, 'string', ), (1, 'integer', ), (2, 'list', ), ), default=0)
+
+    def __repr__(self):
+        return '{}:{}'.format(self.type, self.name)
+
+    def __str__(self):
+        return self.name
+
+
+class Plugin(Entity):
+    slug = models.SlugField(max_length=30)
+    parameters = models.ForeignKey(PluginParameter)
+
+    def __repr__(self):
+        return self.slug
