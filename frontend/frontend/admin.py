@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django.utils.translation import ugettext_lazy as _
 
+
 # admin_reorder settings
 ADMIN_REORDER = (
     # Keep original label and models
@@ -32,15 +33,12 @@ ADMIN_REORDER = (
         'models': (
             {'model': 'wizard.Task', 'label': 'APL'},
             {'model': 'wizard.Status', 'label': 'Status hierarchy'},
+            {'model': 'wizard.TaskItemResult', 'label': 'Triggered asynchronous tasks'},
         )
     },
     {
-        'app': 'djcelery',
-        'label': _("5- Celery Components"),
-    },
-    {
         'app': 'tooltips',
-        'label': _('6- Add-ons'),
+        'label': _('5- Add-ons'),
         'models': (
             {'model': 'tooltips.Tooltip', 'label': 'Tooltips'},
             {'model': 'admin_honeypot.LoginAttempt', 'label': 'Login attempts (Admin Honeypot)'},

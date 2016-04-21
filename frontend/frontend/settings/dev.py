@@ -10,7 +10,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import djcelery  # Django-Celery integration
 from django.contrib import messages
 from django.utils.text import slugify
 from ..admin import ADMIN_REORDER
@@ -20,21 +19,21 @@ PROJECT_AUTHORS = 'Alex & Hussein'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-djcelery.setup_loader()
-
 # Celery settings
-#BROKER_URL = 'amqp://guest:guest@localhost:5672/'
-BROKER_URL = 'amqp://scapl:scapl@localhost:5672/vScapl'
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+#BROKER_URL = 'amqp://scapl:scapl@localhost:5672/vScapl'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'amqp'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
 ROUTING_KEYS = {
     'default': 'default',
     'search': 'se.task',
     'automation': 'as.task',
 }
-# CELERY_ACCEPT_CONTENT=['json']
-# CELERY_TASK_SERIALIZER='json'
-# CELERY_RESULT_SERIALIZER='json'
-# CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
-# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+RESULT_REFRESH_DELAY = 300  # seconds
+ASYNC_TASK_EXPIRATION = 10  # 24 * 3600
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -49,6 +48,14 @@ DEBUG = True
 ALLOWED_HOSTS = []
 DENIED_HOSTS = []
 SITE_ID = 1
+
+# SCAPL application definition
+SCAPL_INSTALLED_APPS = (
+    'apps.common',
+    'apps.profiles',
+    'apps.scheme',
+    'apps.wizard',
+)
 
 # Application definition
 INSTALLED_APPS = (
@@ -65,29 +72,26 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # extra applications (core)
-    'djcelery',
-    'django_extensions',
-    'django_libs',
-    'form_utils',
-    'smuggler',
+    'admin_reorder',
     'adminsortable2',
+    'django_libs',
+    'django_summernote',
+    'expirables',
+    'form_utils',
+    'overextends',
+    'smuggler',
     # TODO: Enable 'storages' for production version
     #    'storages',
     #'celery_haystack',
     #'queued_search',
     # add-on applications (optional)
-    'django_summernote',
+    'django_extensions',
     'simple_history',
     'tooltips',
     'admin_honeypot',
-    'admin_reorder',
-    'overextends',
-    # SCAPL application configurations
-    'apps.common',
-    'apps.profiles',
-    'apps.scheme',
-    'apps.wizard',
-)
+    # SCAPL project,
+    'frontend',
+) + SCAPL_INSTALLED_APPS
 # Useful list of additional apps: https://github.com/rosarior/awesome-django#admin-interface
 # TODO: convert admin site to django-admin2
 # TODO: use django-wysiwyg for data items
@@ -146,14 +150,6 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': ''},
-    'celery': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'celery.sqlite3'),
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': ''
-    }
 }
 
 # Internationalization
@@ -244,6 +240,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'frontend.context_processors.project_info',
+                'frontend.context_processors.async_task_parameters',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.template.context_processors.i18n',

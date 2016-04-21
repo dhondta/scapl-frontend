@@ -12,18 +12,6 @@ admin.site.site_header = _('SCAPL Administration')
 admin.site.index_title = _('SCAPL-FE Internals Management')
 admin.site.unregister(Site)
 
-"""
-In order to disable Celery models:
-
-    from djcelery.models import (TaskState, WorkerState,
-                     PeriodicTask, IntervalSchedule, CrontabSchedule)
-    admin.site.unregister(TaskState)
-    admin.site.unregister(WorkerState)
-    admin.site.unregister(IntervalSchedule)
-    admin.site.unregister(CrontabSchedule)
-    admin.site.unregister(PeriodicTask)
-"""
-
 admin.autodiscover()
 
 urlpatterns = [

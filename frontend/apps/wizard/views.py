@@ -1,20 +1,14 @@
 # -*- coding: UTF-8 -*-
 import re
-from volatility.plugins.overlays.linux.linux import task_struct
-
-from celery import Celery
-from celery.result import AsyncResult
 from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.html import mark_safe
-from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from frontend import celery_app
 from importlib import import_module
-from kombu import Connection
-from kombu.compat import Publisher, Consumer
 from .forms import TaskInitStepForm, TaskSequenceSelectionForm
 from .models import Report, Task, TaskItem
 from .search import get_query
@@ -113,7 +107,7 @@ def start_wizard(request, apl_id=None, seq_id=None):
     if apl_id and seq_id:
         apl_id, seq_id, recent = int(apl_id), int(seq_id), None
         current = (apl_id, seq_id, )
-        edit = not allowed_apl(request, apl_id) or not allowed_sequence(request, seq_id)
+        edit = allowed_apl(request, apl_id) and allowed_sequence(request, seq_id)
         # check if selected task is in the recent ones
         for recent in request.session['recent']:
             if recent['id'][0] == apl_id:
@@ -151,7 +145,10 @@ def start_wizard(request, apl_id=None, seq_id=None):
             request.session['recent'].pop(0)
         request.session['apl'] = None
         request.session['sequence'] = None
-    return render(request, 'wizard/wizard.html', {'wizard': make_wizard(*current), 'edit_mode': edit})
+    wizard = make_wizard(*current)
+    for error_msg in wizard['errors']:
+        messages.add_message(request, messages.ERROR, error_msg)
+    return render(request, 'wizard/wizard.html', {'wizard': wizard, 'edit_mode': edit})
 
 
 @require_http_methods(["POST"])
@@ -176,46 +173,12 @@ def save_data_item(request):
 
 
 @require_http_methods(["POST"])
-def trigger_data_item(request, task_id=None):
-
-    def send_as_task( task_id, args=(), kwargs={}, routing='default', retries=0):
-        with Connection(settings.BROKER_URL) as conn:
-            with Publisher(connection=conn, exchange="scapl", exchange_type="topic",
-                           routing_key=settings.ROUTING_KEYS[routing]) as pub:
-                pub.send({
-                    'task': 'generic',
-                    'id': task_id,
-                    'args': args,
-                    "kwargs": kwargs,
-                    "retries": retries,
-                    "eta": str(now()),
-                })
-
-    # if no task_id provided, trigger the data item
-    args, kwargs = (), {}
-    if task_id is None:
-        apl_id, item_id = int(request.POST['apl']), int(request.POST['item'])
-        apl = Task.objects.get(id=apl_id)
-        di = smodels.DataItem.objects.filter(id=item_id).select_subclasses()[0]
-        if isinstance(di, smodels.SEDataItem):
-            routing = 'search'
-            args = (apl.keywords,di.api,di.keywords,di.max_suggestions )
-            #kwargs = {'keywords': di.keywords, 'suggestions': di.max_suggestions}
-        elif isinstance(di, smodels.ASDataItem):
-            routing = 'automation'
-            args = ( di.call, )
-        else:
-            return JsonResponse({'status': 200, 'result': None})
-        task_id='{}-{}'.format(repr(apl), repr(di))
-        send_as_task(task_id, args, kwargs, routing=routing)
-        return JsonResponse({'status': 200, 'result': task_id})
-    # otherwise, ask for result of the designated task
+def update_data_item(request):
+    result = celery_app.AsyncResult(request.POST['task'])
+    result_value = result.get() if result.status == 'SUCCESS' else None
+    if result_value is None:
+        return JsonResponse({'status': 204, 'warning': _('Celery returned status: ').__unicode__() + result.status})
+    elif 'error' in result_value.keys() and result_value['error'] != u'':
+        return JsonResponse({'status': 400, 'error': result_value['error'].replace('\n', '<br>')})
     else:
-        app = Celery('Scapl', broker='amqp://scapl:scapl@localhost:5672/vScapl', backend='amqp')
-        apl_id, item_id = task_id.split('-')
-        apl = Task.objects.get(id=apl_id)
-        di = smodels.DataItem.objects.filter(id=item_id).select_subclasses()[0]
-        task_id='{}-{}'.format(repr(apl), repr(di))
-        task = app.AsyncResult(task_id)
-        result = task.get() if task.status == 'SUCCESS' else None
-        return JsonResponse({'status': 200, 'task_status': task.status, 'result': result})
+        return JsonResponse({'status': 200, 'result': result_value})

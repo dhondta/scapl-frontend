@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from django.apps import apps
+import re
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
@@ -62,7 +62,7 @@ class Task(models.Model):
         verbose_name_plural = _("Tasks")
 
     def __repr__(self):
-        return u'DL{}'.format(str(self.id).zfill(settings.APL_ID_DIGITS))
+        return u'APL{}'.format(str(self.id).zfill(settings.APL_ID_DIGITS))
 
     def __str__(self):
         return self.reference
@@ -86,8 +86,8 @@ class Task(models.Model):
 
     @property
     def progress(self):
+        m = len([x for x in TaskItem.objects.filter(apl=self) if x.is_valid])
         n = smodels.DataItem.objects.count()
-        m = TaskItem.objects.filter(apl=self).count()
         return int(100 * m / n) if n > 0 else 0
 
     @property
@@ -118,8 +118,8 @@ class TaskHistory(models.Model):
 
 class TaskItem(models.Model):
     apl = models.ForeignKey(Task)
-    item = models.ForeignKey(smodels.DataItem)
-    value = models.TextField()
+    item = models.ForeignKey(smodels.DataItem, related_name="task_items")
+    value = models.TextField(default=None, blank=True, null=True)
     date_filled = models.DateTimeField(auto_now_add=True, editable=False)
     date_updated = models.DateTimeField(auto_now=True, editable=False)
 
@@ -128,5 +128,25 @@ class TaskItem(models.Model):
         verbose_name = _("Item")
         verbose_name_plural = _("Items")
 
+    def __repr__(self):
+        return '{}-{}'.format(repr(self.apl), repr(self.item))
+
     def __str__(self):
-        return "{}/{}".format(self.apl.reference, repr(self.item))
+        return '{}/{}'.format(self.apl.reference, repr(self.item))
+
+    @property
+    def is_valid(self):
+        return self.value is not None and not re.sub(r'^\<p\>', '', re.sub(r'\<\/p\>$', '', str(self.value))) in ['', '<br>']
+
+
+class TaskItemResult(models.Model):
+    task = models.ForeignKey(TaskItem)
+    date_created = models.DateTimeField(auto_now_add=True, editable=False)
+    expires_after = models.IntegerField(default=settings.ASYNC_TASK_EXPIRATION, editable=False)
+
+    class Meta:
+        verbose_name = _("Asynchronous task")
+        verbose_name_plural = _("Asynchronous tasks")
+
+    def __str__(self):
+        return repr(self.task)
