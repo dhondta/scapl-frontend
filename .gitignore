@@ -76,5 +76,6 @@ frontend/frontend/settings/prod.py
 # Static archive files
 static/*.zip
 
-# Unnecessary Django templates
+# Unnecessary Django templates and other files
 frontend/templates/obj
+frontend/*.png
