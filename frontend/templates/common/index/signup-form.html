@@ -104,20 +104,3 @@
         </div>
     </div>
 </form>
-
-<script src="{% static 'base/js/jquery.modal-steps.min.js' %}"></script>
-{% if request.POST.type == 'signup' %}
-<script>
-    $(window).load(function(){ $('#signin-modal').modal('hide'); $('#signup-modal').modal('show'); });
-</script>
-{% endif %}
-<script>
-$('#signup-modal').modalSteps({
-    btnPreviousHtml: '<font size="4"><i class="fa fa-chevron-left"></i></font>',
-    btnNextHtml: '<font size="4"><i class="fa fa-chevron-right"></i></font>',
-    btnLastStepHtml: '<font size="4"><i class="fa fa-check"></i></font>',
-    callBack: {
-        '1': $("#signup-form").validate()
-    }
-});
-</script>

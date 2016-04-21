@@ -39,7 +39,7 @@
                         <li role="separator" class="divider"></li>
                         <h6 class="dropdown-header">{{ label_mytasks }}</h6>
                         {% for task in request.session.recent reversed %}
-                        <li><a href="{% url 'wizard' apl_id=task.apl_id seq_id=task.seq_id %}"><span title="{{ task.sequence }}">{{ task.reference }}</span></a></li>
+                        <li><a href="{% url 'wizard' apl_id=task.id.0 seq_id=task.id.1 %}"><span title="{{ task.sequence }}">{{ task.reference }}</span></a></li>
                         {% endfor %}
                         {% endif %}
                     </ul>

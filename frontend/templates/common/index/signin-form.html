@@ -64,9 +64,3 @@
         </div>
     </div>
 </form>
-
-{% if not request.POST.type == 'signup' %}
-<script>
-    $(window).load(function(){ $('#signin-modal').modal('show'); $('#signup-modal').modal('hide'); });
-</script>
-{% endif %}

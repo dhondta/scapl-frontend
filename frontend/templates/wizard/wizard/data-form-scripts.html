@@ -1,0 +1,20 @@
+<script>
+    $(document).ready(function() {
+        $('di{{ item.id }}-fullscreen').click(function(e) {
+            e.preventDefault();
+            $(this).toggle($(document).fullScreen() != null);
+            return false;
+        });
+        var options = {
+            currentPage: 1,
+            totalPages: 1,
+            alignment: 'center',
+            onPageChanged: function(e, oldPage, newPage){
+                $('#di{{ item.id }}-result').html('<iframe src="' + result[newPage] + '"></iframe>');
+            }
+        };
+        $('#di{{ item.id }}-paginator').bootstrapPaginator(options);
+        $('#di{{ item.id }}-paginator > ul').addClass('pagination');
+        //$('#di{{ item.id }}-paginator').hide();
+    });
+</script>
