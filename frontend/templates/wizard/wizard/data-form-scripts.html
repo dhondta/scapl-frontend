@@ -141,6 +141,37 @@
         return false;
     }
 
+    function item_get(e, di_id, task_id, toast) {
+        if (e != null) { e.preventDefault(); };
+        var id = di_id.substring(3);
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'update_di' %}',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                task: task_id,
+            },
+            success: function(response){
+                if (response.status == 200) {
+                    var tmp = new Array();
+                    for (var key in item_results[id]) { tmp[key] = $.extend(true, {}, item_results[id][key]); }
+                    item_results[id] = $.parseJSON(response.result);
+                    if (tmp.sort().join() != item_results[id].sort().join()) { item_update(di_id); }
+                    tmp = null;
+                } else if (response.status == 204) {
+                    if (toast) {
+                        $().toastmessage('showToast', {text: response.warning, type: 'warning', image: 'warning'});
+                    }
+                } else {
+                    if (toast) {
+                        $().toastmessage('showToast', {text: response.error, type: 'danger', image: 'danger'});
+                    }
+                }
+            },
+        });
+        return false;
+    }
+
     $(document).ready(function() {
     {% for step in wizard.steps %}
         {# Prepare wizard tabs click events #}

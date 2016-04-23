@@ -2,7 +2,7 @@
 {% trans "APL overview for" as legend_overview %}
 {% trans "No result yet" as placeholder_noresult %}
 {% trans "Manual item" as placeholder_manual %}
-<legend>{{ legend_overview }} {{ wizard.reference }}</legend>
+<legend>{{ legend_overview }} {{ wizard.reference }} ({{ wizard.product }})</legend>
 <div class="container" id="apl-overview" style="width: 70%;">
 	<div class="row row-centered">
 		{% for step in wizard.steps %}
@@ -31,7 +31,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h3 class="modal-title" id="wizard-modal-label">{{ wizard.reference }}</h3>
+					<h3 class="modal-title" id="wizard-modal-label">{{ wizard.reference }} ({{ wizard.product }})</h3>
 				</div>
 				<div class="modal-body" id="wizard-modal-body">
 					<div class="navbar">

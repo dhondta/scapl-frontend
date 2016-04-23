@@ -44,8 +44,11 @@ def make_datatable(template_name, objects, exclude_field=None):
                 field_obj = template['fields'][field]
                 value = evaluate(field_obj['value'], obj)
                 # now, other keywords can be handled
+                classes = " ".join([x.strip() for x in field_obj['classes'].split(",")]) if 'classes' in field_obj.keys() else None
                 if 'url' in field_obj.keys():
-                    value = '<a href="{}">{}</a>'.format(evaluate(field_obj['url'], obj), value)
+                    value = '<a href="{}"{}>{}</a>'.format(evaluate(field_obj['url'], obj), ['', ' class="{}"'.format(classes)][classes is not None], value)
+                elif classes is not None:
+                    value = '<span class="{}">{}</span>'.format(classes, value)
                 # finally, save the handled value in the record
                 record[field] = mark_safe(value)
             except:
@@ -86,7 +89,7 @@ def make_wizard(apl_id, seq_id):
     saved_di = TaskItem.objects.filter(apl=apl)
     # now, prepare the wizard, triggering asynchronous tasks for each data item in the background
     ds, seq = scheme.items()[0]
-    wizard = {'reference': apl.reference, 'title': ds.name, 'help': ds.description, 'steps': [], 'errors': []}
+    wizard = {'reference': apl.reference, 'product': apl.product,'title': ds.name, 'help': ds.description, 'steps': [], 'errors': []}
     with Connection(settings.BROKER_URL) as conn:
         for dl, lst in seq.items():
             step = {'title': dl.name, 'help': dl.description, 'items': []}

@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import list_reports, list_tasks, start_wizard, save_data_item, update_data_item
+from .views import list_reports, list_tasks, start_wizard, save_data_item, search, update_data_item
 
 
 urlpatterns = [
@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^update/$', update_data_item, name='update_di'),
     url(r'^tasks/$', list_tasks, name='tasks'),
     url(r'^reports/$', list_reports, name='reports'),
+    url(r'^search/$', search, name='search'),
 ]

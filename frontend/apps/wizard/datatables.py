@@ -47,6 +47,7 @@ tasks_template = {
             'header': _('APL Reference'),
             'value': lambda obj: obj.reference,
             'url': lambda obj: reverse('wizard', kwargs={'apl_id': obj.id}),
+            'classes': 'no-decoration',
         },
         'author': {
             'header': _('Author'),

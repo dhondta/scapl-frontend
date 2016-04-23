@@ -6,11 +6,11 @@ from .models import Task, TaskItem
 
 
 SAMPLE_KEYWORDS = (
-    ('1', 'adobe,acrobat,reader,11', ),
-    ('2', 'ccleaner,5', ),
-    ('3', 'vlc,media,player,2.2.2', ),
-    ('4', 'winrar,5.31', ),
-    ('5', 'skype,7.21', ),
+    ('adobe,acrobat,reader,11', ) * 2,
+    ('ccleaner,5', ) * 2,
+    ('vlc,media,player,2.2.2', ) * 2,
+    ('winrar,5.31', ) * 2,
+    ('skype,7.21', ) * 2,
 )
 
 

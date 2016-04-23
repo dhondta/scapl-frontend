@@ -49,10 +49,12 @@ class Report(models.Model):
 class Task(models.Model):
     author = models.ForeignKey(pmodels.ScaplUser, related_name="created_tasks")
     contributors = models.ManyToManyField(pmodels.ScaplUser, through='TaskContributors', related_name="apl_tasks")
-    keywords = models.CharField(max_length=1024, unique=True)  # TODO: change it to JSONField (Django 1.9+ if used with PostgreSQL)
+    product = models.CharField(max_length=128)
+    keywords = models.CharField(max_length=128, unique=True)  # TODO: change it to JSONField (Django 1.9+ if used with PostgreSQL)
     packages = models.ForeignKey(Package, blank=True, null=True, default=None)
     code = models.CharField(max_length=8, blank=True, null=True, editable=False)
     status = models.ForeignKey(Status, blank=True, null=True, editable=False, default=None, related_name="related_tasks")
+    reference = models.CharField(max_length=40, editable=False)
     date_created = models.DateTimeField(verbose_name=_(u'Creation date'), auto_now_add=True, auto_now=False, editable=False)
     date_modified = models.DateTimeField(verbose_name=_(u'Last modification date'), auto_now_add=False, auto_now=True, editable=False)
     history = HistoricalRecords()
@@ -68,13 +70,15 @@ class Task(models.Model):
         return self.reference
 
     def save(self, *args, **kwargs):
+        self.product = ' '.join([x.capitalize() for x in self.keywords.split(',')])
         if not self.status:
             status = Status.objects.filter(order=1)
             self.status = 'UNDEFINED' if len(status) == 0 else status[0]
         super(Task, self).save(*args, **kwargs)
         if not self.code:
             self.code = "{}_{}".format(now().year, str(self.pk or 'X' * 3).zfill(3))
-        kwargs.update({'update_fields': ['code']})
+        self.reference = "{}_{}".format(self.code, self.status)
+        kwargs.update({'update_fields': ['code', 'reference']})
         super(Task, self).save(*args, **kwargs)
 
     # TODO: this is error-prone due to the field's length ; add a validation
@@ -89,10 +93,6 @@ class Task(models.Model):
         m = len([x for x in TaskItem.objects.filter(apl=self) if x.is_valid])
         n = smodels.DataItem.objects.count()
         return int(100 * m / n) if n > 0 else 0
-
-    @property
-    def reference(self):
-        return "{}_{}".format(self.code, self.status) if self.status else self.code
 
 
 class TaskContributors(models.Model):
