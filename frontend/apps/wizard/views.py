@@ -3,6 +3,7 @@ import json
 import re
 from django.conf import settings
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.html import mark_safe
@@ -10,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from frontend import celery_app
 from importlib import import_module
+from itertools import chain
 from .forms import TaskInitStepForm, TaskSequenceSelectionForm
 from .models import Report, Task, TaskItem
 from .search import get_query
@@ -44,16 +46,25 @@ def search(request):
         found_entries, keywords = [], request.POST.get('q').strip()
         if keywords:
             # first, search on apl tasks
-            #entry_query = get_query(keywords, ['value'])
-            #found_entries.append(Task.objects.filter(entry_query))
+            entry_query = get_query(keywords, ['code', 'status__status', 'reference'])
+            found_entries.append(Task.objects.filter(entry_query))
             # then, search on data items
             entry_query = get_query(keywords, ['value'])
-            found_entries.append(Task.objects.filter(item_set__in=TaskItem.objects.filter(entry_query)))
-            return JsonResponse({'status': 200, 'results': list({e.reference for e in found_entries})})
+            found_entries.append(Task.objects.filter(taskitem__id__in=TaskItem.objects.filter(entry_query)).distinct())
+            # finally, format the results to include links
+            found_entries = sorted(chain(*found_entries), key=lambda o: o.date_created)
+            if len(found_entries) == 0:
+                found_entries = ["<font class='text-muted'>{}</font>".format(_('No result found').__unicode__())]
+            else:
+                found_entries = list({(e.pk, e.reference, ) for e in found_entries})
+                found_entries = ["<a class='no-decoration' href='{}'>{}</a>".format(reverse('wizard', kwargs={'apl_id': x[0]}), x[1]) \
+                                     for x in found_entries][::-1]
+            return JsonResponse({'status': 200, 'results': json.dumps(found_entries)})
         return JsonResponse({'status': 200, 'results': None})
     return JsonResponse({'status': 400})
 
 
+# TODO: In Wizard's template scripts, add text drag-and-drop feature between editor and results
 def start_wizard(request, apl_id=None, seq_id=None):
 
     def allowed_apl(sr, a):

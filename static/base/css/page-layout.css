@@ -1,3 +1,4 @@
+/* generic styles */
 html {
   position: relative;
   min-height: 100%;
@@ -9,33 +10,54 @@ body {
 body.with-nav {
   padding-top: 70px;
 }
-div.jumbotron {
-  display: flex;
-  height: 60%;
-  background-image: url('../images/background.jpg');
+div.navbar-search {
+  position: relative;
+}
+input.navbar-search-input {
+  position: absolute;
+  margin: 0 auto;
+  padding-left: 30px;
+  background-image: url('../images/search.png');
   background-repeat: no-repeat;
-  background-position: center center;
-  justify-content: center;
-  align-items: center;
-  padding-top: 12%;
-  padding-bottom: 12%;
+  background-position: left center;
+  background-size: 24px 24px;
+  border-radius: 14px;
+}
+.navbar-search-results {
+    display: none;
+    position: absolute;
+    top: 33px;
+    left: 30px;
+    z-index: 100;
+    padding: 0;
+    margin: 0;
+    width: 180px;
+}
+.navbar-search-results li {
+  display: block;
+  margin: 1px;
+  padding: 4px;
+}
+.navbar-search-results li:first-child:before, .navbar-search-results li:first-child:after {
+  display: block;
+  content: '';
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px outset transparent;
 }
 div.container {
   width: auto;
   max-width: 100%;
   padding: 0 0;
 }
-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 40px;
-  padding-top: 10px;
-  margin-top: 10px;
-  z-index: 1000;
-}
 .modal {
   text-align: center;
+}
+a.no-decoration {
+  text-decoration: none;
 }
 @media screen and (min-width: 768px) {
   .modal:before {
@@ -50,6 +72,28 @@ footer {
   text-align: left;
   vertical-align: middle;
 }
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+  padding-top: 10px;
+  margin-top: 10px;
+  z-index: 1000;
+}
+/* index-specific style */
+div.jumbotron {
+  display: flex;
+  height: 60%;
+  background-image: url('../images/background.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  justify-content: center;
+  align-items: center;
+  padding-top: 12%;
+  padding-bottom: 12%;
+}
+/* wizard-specific styles */
 .modal-dialog.wizard {
   padding-top: 40px;
   vertical-align: top;
@@ -95,7 +139,6 @@ footer {
 .note-editor .note-dropzone {
   opacity: 0 !important;
 }
-
 .inside-full-height {
   height: 100%;
   margin-top: 0;
@@ -121,7 +164,6 @@ footer {
 .col-bottom {
   vertical-align: bottom;
 }
-
 @media (min-width: 480px) {
   .row-xs-height {
     display: table;
@@ -144,7 +186,6 @@ footer {
     vertical-align: bottom;
   }
 }
-
 @media (min-width: 768px) {
   .row-sm-height {
     display: table;
@@ -167,7 +208,6 @@ footer {
     vertical-align: bottom;
   }
 }
-
 @media (min-width: 992px) {
   .row-md-height {
     display: table;
@@ -190,7 +230,6 @@ footer {
     vertical-align: bottom;
   }
 }
-
 @media (min-width: 1200px) {
   .row-lg-height {
     display: table;
