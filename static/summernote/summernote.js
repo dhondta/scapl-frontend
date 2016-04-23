@@ -4554,14 +4554,18 @@
      * attach Drag and Drop Events
      */
     this.initialize = function () {
-      if (options.disableDragAndDrop) {
-        // prevent default drop event
-        $document.on('drop', function (e) {
-          e.preventDefault();
-        });
-      } else {
+      //e.preventDefault();
+      if (!options.disableDragAndDrop) {
         this.attachDragAndDropEvent();
       }
+    };
+    /**
+     * copy text element Drag and Drop Events
+     */
+    this.copyTextDragAndDropEvent = function() {
+      // 'dragenter': to get textarea cursor's position ???
+      // 'dragleave': to clone the dragged element ???
+      // 'drop':
     };
 
     /**
@@ -4605,9 +4609,8 @@
       // attach dropImage
       $dropzone.on('drop', function (event) {
         var dataTransfer = event.originalEvent.dataTransfer;
-
+        event.preventDefault();
         if (dataTransfer && dataTransfer.files && dataTransfer.files.length) {
-          event.preventDefault();
           $editable.focus();
           context.invoke('editor.insertImagesOrCallback', dataTransfer.files);
         } else {
