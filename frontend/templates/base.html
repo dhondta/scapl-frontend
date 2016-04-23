@@ -22,17 +22,18 @@
     {# jQuery #}
     <link rel="stylesheet" href="{% static 'jquery-ui/jquery-ui.min.css' %}">
     <script src="{% static 'base/js/jquery-2.2.3.min.js' %}"></script>
+    {# Addons #}
+    {% block addon_styles_and_scripts %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'base/css/bootstrap-panel-addon.css' %}">
+    <link rel="stylesheet" href="{% static 'toastmessages/css/jquery.toastmessage.modified.css' %}">
     {# Bootstrap (managed by app 'bootstrap_themes' #}
     {% if request.user.theme %}
     {% bootstrap_styles request.user.theme type='min.css' %}
     {% else %}
     {% bootstrap_styles theme type='min.css' %}
     {% endif %}
-    {# Addons #}
-    <link rel="stylesheet" href="{% static 'base/css/bootstrap-panel-addon.css' %}">
+    {# SCAPL-specific #}
     <link rel="stylesheet" href="{% static 'base/css/page-layout.css' %}">
-    <link rel="stylesheet" href="{% static 'toastmessages/css/jquery.toastmessage.modified.css' %}">
-    {% block addon_styles_and_scripts %}{% endblock %}
 </head>
 <body class="page-fade{% if request.user.is_authenticated %} with-nav{% endif %}" role="document">
     {% if messages %}{% toast_all messages %}{% endif %}

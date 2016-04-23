@@ -1,20 +1,165 @@
+{% load i18n %}
+{% trans "Value successfully updated" as message_success %}
+{% trans "No change" as message_nochange %}
 <script>
-    $(document).ready(function() {
-        $('di{{ item.id }}-fullscreen').click(function(e) {
-            e.preventDefault();
-            $(this).toggle($(document).fullScreen() != null);
-            return false;
-        });
+    var item_results = new Object();
+    var item_raw_results = new Object();
+    var iframe_html = '<iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms" class="iframe-result" src="{0}" frameborder=0></iframe>';
+
+    String.prototype.format = function() {
+        var str = this;
+        for (var i = 0; i < arguments.length; i++) {
+            var reg = new RegExp("\\{" + i + "\\}", "gm");
+            str = str.replace(reg, arguments[i]);
+        }
+        return str;
+    }
+
+    function toggle_wizard(step) {
+        $("ul.nav > li.active").removeClass('active');
+        $("#a-step" + step).parent('li').addClass('active');
+        $("div.tab-content > div.active").removeClass('active').removeClass('in');
+        $("#step" + step).addClass('in').addClass('active');
+        $("#wizard-modal").modal({ show: 'true' });
+    }
+
+    function item_fullscreen(e, di_id) {
+        if (e != null) { e.preventDefault(); };
+        $(di_id + '-result').toggle($(document).fullScreen() != null);
+        return false;
+    }
+
+    function item_save(e, di_id) {
+        if (e != null) { e.preventDefault(); };
+        prettyPrint();
+        var id = parseInt(di_id.substring(3));
+        var new_value = $(di_id).summernote('code').trim();
+        var old_value = $(di_id + '-value').html().trim();
+        if (new_value === old_value) {
+            $(di_id + '-group').removeClass('has-danger').removeClass('has-success').removeClass('has-primary').removeClass('has-info');
+            $(di_id + '-group').addClass('has-warning');
+            $(di_id + '-label').removeClass('text-danger').removeClass('text-success').removeClass('text-primary').removeClass('text-info');
+            $(di_id + '-label').addClass('text-warning');
+            $().toastmessage('showToast', {text: '{{ message_nochange }}', type: 'warning', image: 'warning'})
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'save_di' %}",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    apl: {% with request.session.recent|last as last %}{{ last.id.0 }}{% endwith %},
+                    item: id,
+                    value: new_value,
+                },
+                success: function(response){
+                    if (response.status == 200) {
+                        $(di_id + '-group').removeClass('has-danger').removeClass('has-warning').removeClass('has-primary').removeClass('has-info');
+                        $(di_id + '-group').addClass('has-success');
+                        $(di_id + '-label').removeClass('text-danger').removeClass('text-warning').removeClass('text-primary').removeClass('text-info');
+                        $(di_id + '-label').addClass('text-success');
+                        $(di_id + '-value').html(response.value);
+                        $().toastmessage('showToast', {text: '{{ message_success }}', type: 'success', image: 'success'})
+                    } else {
+                        $(di_id + '-group').removeClass('has-success').removeClass('has-warning').removeClass('has-primary').removeClass('has-info');
+                        $(di_id + '-group').addClass('has-danger');
+                        $(di_id + '-label').removeClass('text-success').removeClass('text-warning').removeClass('text-primary').removeClass('text-info');
+                        $(di_id + '-label').addClass('text-danger');
+                        $().toastmessage('showToast', {text: response.error, type: 'danger', image: 'danger'})
+                        $(di_id).summernote("code", old_value);
+                    }
+                }
+            });
+        }
+        return false;
+    }
+
+    function item_update(di_id) {
+        var id = di_id.substring(3);
         var options = {
             currentPage: 1,
-            totalPages: 1,
+            totalPages: item_results[id].length,
             alignment: 'center',
-            onPageChanged: function(e, oldPage, newPage){
-                $('#di{{ item.id }}-result').html('<iframe src="' + result[newPage] + '"></iframe>');
+            onPageClicked: function(e, f, type, page){
+                $(di_id + '-result > iframe').attr('src', item_results[id][page-1].link);
+            },
+            onPageChanged: function(e, old, page){
+                $(di_id + '-result > iframe').attr('src', item_results[id][page-1].link);
+            },
+            shouldShowPage:function(type, page, current){
+                switch(type) {
+                    case "first":
+                    case "last":
+                        return false;
+                    default:
+                        return true;
+                }
+            },
+            useBootstrapTooltip: true,
+            tooltipTitles: function (type, page, current) {
+                switch (type) {
+                case "page":
+                    return '<h3>' + item_results[id][page-1].title + '</h3><p>' + item_results[id][page-1].text + '</p>';
+                }
+            },
+            bootstrapTooltipOptions: {
+                html: true,
+                placement: 'bottom'
             }
         };
-        $('#di{{ item.id }}-paginator').bootstrapPaginator(options);
-        $('#di{{ item.id }}-paginator > ul').addClass('pagination');
-        //$('#di{{ item.id }}-paginator').hide();
+        $(di_id + '-paginator').bootstrapPaginator(options);
+        $(di_id + '-result').html(iframe_html.format(item_results[id][0].link));
+    }
+
+    function item_get(e, di_id, task_id, toast) {
+        if (e != null) { e.preventDefault(); };
+        var id = di_id.substring(3);
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'update_di' %}',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                task: task_id,
+            },
+            success: function(response){
+                if (response.status == 200) {
+                    var tmp = new Array();
+                    for (var key in item_results[id]) { tmp[key] = $.extend(true, {}, item_results[id][key]); }
+                    item_results[id] = $.parseJSON(response.result);
+                    if (tmp.sort().join() != item_results[id].sort().join()) { item_update(di_id); }
+                    tmp = null;
+                } else if (response.status == 204) {
+                    if (toast) {
+                        $().toastmessage('showToast', {text: response.warning, type: 'warning', image: 'warning'});
+                    }
+                } else {
+                    if (toast) {
+                        $().toastmessage('showToast', {text: response.error, type: 'danger', image: 'danger'});
+                    }
+                }
+            },
+        });
+        return false;
+    }
+
+    $(document).ready(function() {
+    {% for step in wizard.steps %}
+        {# Prepare wizard tabs click events #}
+        $("#overview-step-{{ forloop.counter }}").click(function () { toggle_wizard('{{ forloop.counter }}'); });
+        {# For each item, bind click events on 'save' and 'update' buttons #}
+        {% for item in step.items %}
+        $('#di{{ item.id }}-save').click(function(e) { return item_save(e, '#di{{ item.id }}'); });{% if item.is_auto %}
+        $('#di{{ item.id }}-update').click(function(e) { return item_get(e, '#di{{ item.id }}', '{{ item.task }}', true); });
+        $('#di{{ item.id }}-fullscreen').click(function(e) { return item_fullscreen(e, '#di{{ item.id }}'); });
+        item_results['{{ item.id }}'] = new Array();{% endif %}
+        {% endfor %}
+    {% endfor %}
+        {# When everything else is loaded, wait a second and then start the periodic refresh #}
+        setTimeout("", 1000);
+    {% for step in wizard.steps %}
+        item_get(null, '#di{{ item.id }}', '{{ item.task }}', false);
+        {% for item in step.items %}{% if item.refresh %}
+        setInterval("item_get(null, '#di{{ item.id }}', '{{ item.task }}', false)", {{ RESULT_REFRESH_DELAY }}*1000);
+        {% endif %}{% endfor %}
+    {% endfor %}
     });
 </script>

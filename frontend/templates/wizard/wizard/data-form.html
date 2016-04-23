@@ -1,13 +1,7 @@
 {% load staticfiles i18n %}
-
 {% trans "APL overview for" as legend_overview %}
-{% trans "APL Reference" as legend_reference %}
-{% trans "Value successfully updated" as message_success %}
-{% trans "No change" as message_nochange %}
-{% trans "Task triggered" as message_triggered %}
 {% trans "No result yet" as placeholder_noresult %}
 {% trans "Manual item" as placeholder_manual %}
-
 <legend>{{ legend_overview }} {{ wizard.reference }}</legend>
 <div class="container" id="apl-overview" style="width: 70%;">
 	<div class="row row-centered">
@@ -18,7 +12,7 @@
 				{% for item in step.items %}
 				<label class="col-lg-3 control-label" title="{{ item.help }}">{{ item.label }}</label>
 				<div class="panel panel-default col-lg-9">
-					<div class="panel-body" id="{{ item.id }}-value">
+					<div class="panel-body" id="di{{ item.id }}-value">
 						{{ item.form.instance.value|default_if_none:""|safe }}
 					</div>
 				</div>
@@ -71,7 +65,7 @@
 												</div>
 											</div>
 											<div class="col-md-5">
-												<div class="bs-component" id="di{{ item.id }}-paginator"></div>
+												<div class="bs-component" id="di{{ item.id }}-paginator"><ul></ul></div>
 											</div>
 											<div class="col-md-1">
 												<div class="btn-group" style="float: right">
@@ -96,10 +90,17 @@
 												</div>
 												<div class="col-md-6 col-xs-height col-xs-top">
 													<div class="panel panel-default inside-full-height">
-														<div class="panel-body inside-full-height">
+														<div class="panel-body panel-body-nopadding inside-full-height">
 															<div class="container container-result">
 																<div class="row-fluid row-result">
-																	{% include 'wizard/wizard/data-form-result.html' %}
+																	{% if item.is_auto %}
+																	<div class="row-result iframe-result" id="di{{ item.id }}-result">
+																		<p class="text-muted"><img src="{% static 'base/images/loading.gif' %}" width="20%" alt=""/>
+																		<br><font class="align-middle" size="6">{{ placeholder_noresult }}</font></p>
+																	</div>
+																	{% else %}
+																	<p class="text-muted"><font class="align-middle" size="6">{{ placeholder_manual }}</font></p>
+																	{% endif %}
 																</div>
 															</div>
 														</div>
