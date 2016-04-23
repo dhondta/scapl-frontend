@@ -93,8 +93,8 @@ INSTALLED_APPS = (
     'frontend',
 ) + SCAPL_INSTALLED_APPS
 # Useful list of additional apps: https://github.com/rosarior/awesome-django#admin-interface
-# TODO: convert admin site to django-admin2
-# TODO: use django-wysiwyg for data items
+# TODO: convert admin site to django-admin2 or bootstrap3-django-admin
+# TODO: add model translation using django-modeltranslation or django-rosetta
 # TODO: optimize JS and CSS transfer with django-pipeline
 # TODO: consider using django-feedback for adding a feedback feature where needed
 # TODO: consider using django-analytical
@@ -102,7 +102,7 @@ INSTALLED_APPS = (
 # TODO: consider adding a project dashboard using django-dashing
 # TODO: consider using django-imagekit for managing avatar processing
 # TODO: consider using django-autocomplete-light or django-searchable-select for select's
-# TODO: consider using  for Search field
+# TODO: consider using ? for Search field
 # TODO: optimize security with django-security and django-sslify
 # TODO: consider simplifying settings.py with django-environ or django-split-settings
 # TODO: consider using django-taggit for tagging assets (e.g. APL tasks)
@@ -133,6 +133,7 @@ MIDDLEWARE_CLASSES = (
 #    'django.middleware.cache.FetchFromCacheMiddleware',
 #    'frontend.middleware.RemoteAddrMiddleware',
 #    'frontend.middleware.FilterIPMiddleware',
+    'frontend.middleware.StripWhitespaceMiddleware',
 )
 
 ROOT_URLCONF = 'frontend.urls'
@@ -340,6 +341,7 @@ SUMMERNOTE_CONFIG = {
     'iframe': False,
     'airMode': False,
     'styleWithTags': True,
+    'disableDragAndDrop': True,
     'direction': 'ltr',
     'width': '100%',
     'height': '300',
