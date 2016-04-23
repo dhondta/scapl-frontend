@@ -13,7 +13,7 @@ logger = logging.getLogger('django')
 class Command(NoArgsCommand):
     help = 'Remove expired instances'
 
-    def handle(self, *args, **kwargs):
+    def handle_noargs(self, *args, **kwargs):
         logger.info('Starting expired instances removal...')
         for app in apps.get_app_configs():
             if app.name not in settings.SCAPL_INSTALLED_APPS:

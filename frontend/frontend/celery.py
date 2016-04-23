@@ -17,6 +17,7 @@ CELERYBEAT_SCHEDULE = {
 }
 
 
+# TODO: make the remove_expirables a periodic task
 @app.task(bind=True)
 def remove_expirables(self):
     pass
