@@ -79,3 +79,4 @@ static/*.zip
 # Unnecessary Django templates and other files
 frontend/templates/obj
 frontend/*.png
+/frontend/apps/wizard/models.py
