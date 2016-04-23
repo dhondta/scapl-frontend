@@ -69,7 +69,7 @@ def make_wizard(apl_id, seq_id):
             keywords = [y for x, y in SAMPLE_KEYWORDS][[x for x, y in SAMPLE_KEYWORDS].index(apl.keywords)]
             if di.keywords not in [None, 'None', 'null']:
                 keywords = ','.join([keywords, di.keywords])
-            cmd = di.api.format(keywords=keywords, max_suggestions=di.max_suggestions)
+            cmd = di.api.format(keywords=keywords, suggestions=di.max_suggestions)
             sigresult = wizard_load.send(None, task_id=repr(ti), cmd=cmd, conn=conn, routing='search')
             return sigresult[0][1], True
         elif isinstance(di, smodels.ASDataItem):

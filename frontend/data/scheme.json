@@ -238,7 +238,7 @@
   "fields": {
     "max_suggestions": 10,
     "keywords": "system,requirements",
-    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
+    "api": "google-scraper/run.py --param \"{{'keywords':'{keywords}', 'n':{suggestions}}}\""
   }
 },
 {
@@ -247,7 +247,7 @@
   "fields": {
     "max_suggestions": 1,
     "keywords": "website",
-    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
+    "api": "google-scraper/run.py --param \"{{'keywords':'{keywords}', 'n':{suggestions}}}\""
   }
 },
 {
@@ -265,7 +265,7 @@
   "fields": {
     "max_suggestions": 5,
     "keywords": "update,policy",
-    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
+    "api": "google-scraper/run.py --param \"{{'keywords':'{keywords}', 'n':{suggestions}}}\""
   }
 },
 {
@@ -274,7 +274,7 @@
   "fields": {
     "max_suggestions": 3,
     "keywords": "vendor,support",
-    "api": "google-scraper/run.py --keywords {keywords} -n {max_suggestions}"
+    "api": "google-scraper/run.py --param \"{{'keywords':'{keywords}', 'n':{suggestions}}}\""
   }
 },
 {

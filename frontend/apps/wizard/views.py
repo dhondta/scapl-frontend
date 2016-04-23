@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import json
 import re
 from django.conf import settings
 from django.contrib import messages
@@ -25,6 +26,7 @@ def list_reports(request):
 
 @require_http_methods(["GET"])
 def list_tasks(request):
+    # TODO: adapt datatables' column widths
     table_title, order, headers, tmp_records = make_datatable('tasks', Task.objects.all())
     records = []
     short_name = request.user.get_short_name()
@@ -174,11 +176,24 @@ def save_data_item(request):
 
 @require_http_methods(["POST"])
 def update_data_item(request):
-    result = celery_app.AsyncResult(request.POST['task'])
-    result_value = result.get() if result.status == 'SUCCESS' else None
-    if result_value is None:
-        return JsonResponse({'status': 204, 'warning': _('Celery returned status: ').__unicode__() + result.status})
-    elif 'error' in result_value.keys() and result_value['error'] != u'':
-        return JsonResponse({'status': 400, 'error': result_value['error'].replace('\n', '<br>')})
+    task = celery_app.AsyncResult(request.POST['task'])
+    result = task.get() if task.status == 'SUCCESS' else None
+    if result:
+        if result['output'] != '':
+            return JsonResponse({'status': 200, 'result': result['output']})
+        elif result['error'] != '':
+            return JsonResponse({'status': 400, 'error': result['error'].replace('\n', '<br>')})
+        else:
+            return JsonResponse({'status': 400, 'error': _('Unexpected error, please contact the administrator').__unicode__()})
     else:
-        return JsonResponse({'status': 200, 'result': result_value})
+        # RECEIVED: Task was received by a worker.
+        # RETRY:    Task is waiting for retry.
+        if task.status in ['RECEIVED', 'RETRY']:
+            return JsonResponse({'status': 204, 'warning': _('Task is waiting to be processed.').__unicode__()})
+        # STARTED:  Task was started by a worker.
+        # PENDING:  Task state is unknown (assumed pending since you know the id).
+        elif task.status in ['STARTED', 'PENDING']:
+            return JsonResponse({'status': 204, 'warning': _('Task is still pending...').__unicode__()})
+        # FAILURE, REVOKED
+        else:
+            return JsonResponse({'status': 400, 'error': _('Task failed, please contact the administrator').__unicode__()})
