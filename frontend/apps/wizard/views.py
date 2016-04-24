@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from django_summernote.widgets import SummernoteInplaceWidget
 from frontend import celery_app
 from importlib import import_module
 from itertools import chain
@@ -161,7 +162,8 @@ def start_wizard(request, apl_id=None, seq_id=None):
     wizard = make_wizard(*current)
     for error_msg in wizard['errors']:
         messages.add_message(request, messages.ERROR, error_msg)
-    return render(request, 'wizard/wizard.html', {'wizard': wizard, 'edit_mode': edit})
+    return render(request, 'wizard/wizard.html', {'wizard': wizard, 'edit_mode': edit,
+                                                  'summernote_settings': json.dumps(SummernoteInplaceWidget().template_contexts())})
 
 
 @require_http_methods(["POST"])

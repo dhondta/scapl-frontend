@@ -2,9 +2,12 @@
 {% trans "Value successfully updated" as message_success %}
 {% trans "No change" as message_nochange %}
 <script>
+    var csrftoken = '{{ csrftoken }}';
     var item_results = new Object();
     var item_raw_results = new Object();
     var iframe_html = '<iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms" class="iframe-result" src="{0}" frameborder=0></iframe>';
+    var summernote_settings = {{ summernote_settings|safe }};
+    var summernote_lang_loaded = false;
 
     String.prototype.format = function() {
         var str = this;
@@ -13,14 +16,6 @@
             str = str.replace(reg, arguments[i]);
         }
         return str;
-    }
-
-    function toggle_wizard(step) {
-        $("ul.nav > li.active").removeClass('active');
-        $("#a-step" + step).parent('li').addClass('active');
-        $("div.tab-content > div.active").removeClass('active').removeClass('in');
-        $("#step" + step).addClass('in').addClass('active');
-        $("#wizard-modal").modal({ show: 'true' });
     }
 
     function item_fullscreen(e, di_id) {
@@ -46,7 +41,7 @@
                 type: "POST",
                 url: "{% url 'save_di' %}",
                 data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    csrfmiddlewaretoken: csrftoken,
                     apl: {% with request.session.recent|last as last %}{{ last.id.0 }}{% endwith %},
                     item: id,
                     value: new_value,
@@ -141,35 +136,64 @@
         return false;
     }
 
-    function item_get(e, di_id, task_id, toast) {
-        if (e != null) { e.preventDefault(); };
-        var id = di_id.substring(3);
-        $.ajax({
-            type: 'POST',
-            url: '{% url 'update_di' %}',
-            data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                task: task_id,
-            },
-            success: function(response){
-                if (response.status == 200) {
-                    var tmp = new Array();
-                    for (var key in item_results[id]) { tmp[key] = $.extend(true, {}, item_results[id][key]); }
-                    item_results[id] = $.parseJSON(response.result);
-                    if (tmp.sort().join() != item_results[id].sort().join()) { item_update(di_id); }
-                    tmp = null;
-                } else if (response.status == 204) {
-                    if (toast) {
-                        $().toastmessage('showToast', {text: response.warning, type: 'warning', image: 'warning'});
-                    }
-                } else {
-                    if (toast) {
-                        $().toastmessage('showToast', {text: response.error, type: 'danger', image: 'danger'});
-                    }
+    function item_summernote(di_id) {
+        if(summernote_settings.lang != 'en-US' && !summernote_lang_loaded) {
+            $.ajaxSetup({async:false});
+            $.getScript('{{ STATIC_URL }}django_summernote/lang/summernote-' + summernote_settings.lang + '.min.js');
+            $.ajaxSetup({async:true});
+            summernote_lang_loaded = true;
+        }
+        $(di_id + '-textarea').hide();
+        $(di_id).summernote($.extend({}, summernote_settings, {
+            callbacks: {
+                onInit: function() {
+                    var nEditor = $('.note-editor');
+                    var nToolbar = $('.note-toolbar');
+                    var nEditable = $('.note-editable');
+                    var nStatusbar = $('.note-statusbar');
+                    var setHeight = parseInt(summernote_settings.height)  // default
+                            - nToolbar.outerHeight()  // toolbar height including margin,border,padding
+                            - (nEditable.innerHeight() - nEditable.height())  // editable's padding
+                            - (nEditor.outerHeight() - nEditor.innerHeight())  // editor's border
+                            - nStatusbar.outerHeight();  // status bar height
+                    nEditable.height(setHeight);
+                },
+                onBlur: function() {
+                    $(di_id + '-textarea').value = $(this).summernote('code');
+                },
+                onImageUpload: function(files) {
+                    var imageInput = $('.note-image-input');
+                    var sn = $(this);
+                    // custom attachment data
+                    var attachmentData = $(di_id + '-textarea').dataset;
+                    imageInput.fileupload();
+                    var jqXHR = imageInput.fileupload('send',
+                        {
+                            files: files,
+                            formData: $.extend({csrfmiddlewaretoken: csrftoken}, attachmentData),
+                            url: summernote_settings.url.upload_attachment,
+                        })
+                        .success(function (result, textStatus, jqXHR) {
+                            data = $.parseJSON(result);
+                            $.each(data.files, function (index, file) {
+                                sn.summernote("insertImage", file.url);
+                            });
+                        })
+                        .error(function (jqXHR, textStatus, errorThrown) {
+                            // TODO: Display a detailed error message. It will come from JSON.
+                            alert( 'Got an error while uploading images.' );
+                        });
                 }
-            },
-        });
-        return false;
+            }
+        }));
+    }
+
+    function toggle_wizard(step) {
+        $("ul.nav > li.active").removeClass('active');
+        $("#a-step" + step).parent('li').addClass('active');
+        $("div.tab-content > div.active").removeClass('active').removeClass('in');
+        $("#step" + step).addClass('in').addClass('active');
+        $("#wizard-modal").modal({ show: 'true' });
     }
 
     $(document).ready(function() {
@@ -178,6 +202,7 @@
         $("#overview-step-{{ forloop.counter }}").click(function () { toggle_wizard('{{ forloop.counter }}'); });
         {# For each item, bind click events on 'save' and 'update' buttons #}
         {% for item in step.items %}
+        item_summernote('#di{{ item.id }}');
         $('#di{{ item.id }}-save').click(function(e) { return item_save(e, '#di{{ item.id }}'); });{% if item.is_auto %}
         $('#di{{ item.id }}-update').click(function(e) { return item_get(e, '#di{{ item.id }}', '{{ item.task }}', true); });
         $('#di{{ item.id }}-fullscreen').click(function(e) { return item_fullscreen(e, '#di{{ item.id }}'); });

@@ -1,0 +1,6 @@
+{% load staticfiles %}
+{% comment %}
+no more script here ; in order to avoid repeating summernote editor initialization script for each editor of the wizard,
+this was re-written into 'templates/wizard/wizard/data-form-scripts.html'
+{% endcomment %}
+<div id='{{ id_src }}'>{{ value|safe }}</div>
