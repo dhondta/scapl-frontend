@@ -188,6 +188,14 @@
         }));
     }
 
+    function item_tooltip(di_id, text) {
+        $(di_id + '-help').popover({
+            trigger: 'hover',
+            placement: 'auto left',
+            content: text
+        });
+    }
+
     function toggle_wizard(step) {
         $("ul.nav > li.active").removeClass('active');
         $("#a-step" + step).parent('li').addClass('active');
@@ -202,6 +210,7 @@
         $("#overview-step-{{ forloop.counter }}").click(function () { toggle_wizard('{{ forloop.counter }}'); });
         {# For each item, bind click events on 'save' and 'update' buttons #}
         {% for item in step.items %}
+        item_tooltip('#di{{ item.id }}', "{{ item.help }}");
         item_summernote('#di{{ item.id }}');
         $('#di{{ item.id }}-save').click(function(e) { return item_save(e, '#di{{ item.id }}'); });{% if item.is_auto %}
         $('#di{{ item.id }}-update').click(function(e) { return item_get(e, '#di{{ item.id }}', '{{ item.task }}', true); });

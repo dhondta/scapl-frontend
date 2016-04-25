@@ -206,6 +206,15 @@ class GenericUser(AbstractBaseUser, PermissionsMixin):
         return (self.pk, )
 
 
+class Tooltip(models.Model):
+    base_url = models.CharField(max_length=255, db_index=True)
+    selector = models.CharField(max_length=50, default='', blank=False, null=False, help_text='label:contains("example")')
+    type = models.CharField(max_length=24, default='question-circle', blank=False, null=False)
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)
+
+
 @receiver(pre_delete, sender=GenericUser)
 def delete_user(sender, instance, **kwargs):
     if instance.is_superuser:

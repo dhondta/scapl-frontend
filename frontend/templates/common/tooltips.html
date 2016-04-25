@@ -1,0 +1,14 @@
+{# inspired from: https://github.com/svdgraaf/django-tooltips #}
+{# modified to handle the type of font-awesome icon and HTML body in the tooltip box #}
+<script type='text/javascript'>
+{% for tooltip in tooltips %}
+    $('{{ tooltip.selector|safe }}').after(' ').append(function(){
+        return $('<i>').addClass('help-tooltip fa fa-{{ tooltip.type }}').popover({
+            trigger: 'hover',
+            title: '{{ tooltip.title }}',
+            placement: 'auto top',
+            content: "{{ tooltip.body|safe }}"
+        })
+    });
+{% endfor %}
+</script>
