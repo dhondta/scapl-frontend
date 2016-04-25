@@ -94,7 +94,7 @@
             e.preventDefault();
             $('#search-list').empty();
             var query = $('#search-field').val();
-            if (query.length >= 4) {
+            if (query.length >= 3) {
                 $.ajax({
                     type: 'POST',
                     url: '{% url 'search' %}',

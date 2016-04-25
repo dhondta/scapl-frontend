@@ -44,7 +44,7 @@ def make_datatable(template_name, objects, exclude_field=None):
                 field_obj = template['fields'][field]
                 value = evaluate(field_obj['value'], obj)
                 # now, other keywords can be handled
-                classes = " ".join([x.strip() for x in field_obj['classes'].split(",")]) if 'classes' in field_obj.keys() else None
+                classes = " ".join([x.strip() for x in field_obj['class'].split(",")]) if 'class' in field_obj.keys() else None
                 if 'url' in field_obj.keys():
                     value = '<a href="{}"{}>{}</a>'.format(evaluate(field_obj['url'], obj), ['', ' class="{}"'.format(classes)][classes is not None], value)
                 elif classes is not None:

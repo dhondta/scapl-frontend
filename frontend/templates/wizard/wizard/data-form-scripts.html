@@ -2,7 +2,7 @@
 {% trans "Value successfully updated" as message_success %}
 {% trans "No change" as message_nochange %}
 <script>
-    var csrftoken = '{{ csrftoken }}';
+    var csrftoken = '{{ csrf_token }}';
     var item_results = new Object();
     var item_raw_results = new Object();
     var iframe_html = '<iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms" class="iframe-result" src="{0}" frameborder=0></iframe>';
@@ -112,7 +112,7 @@
             type: 'POST',
             url: '{% url 'update_di' %}',
             data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
+                csrfmiddlewaretoken: csrftoken,
                 task: task_id,
             },
             success: function(response){
@@ -210,9 +210,8 @@
         {% endfor %}
     {% endfor %}
         {# When everything else is loaded, wait a second and then start the periodic refresh #}
-        setTimeout("", 1000);
     {% for step in wizard.steps %}
-        item_get(null, '#di{{ item.id }}', '{{ item.task }}', false);
+        setTimeout("item_get(null, '#di{{ item.id }}', '{{ item.task }}', false);", 1000);
         {% for item in step.items %}{% if item.refresh %}
         setInterval("item_get(null, '#di{{ item.id }}', '{{ item.task }}', false)", {{ RESULT_REFRESH_DELAY }}*1000);
         {% endif %}{% endfor %}
