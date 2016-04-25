@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from .models import GenericUser, Title, Rank, Service
+from .models import GenericUser, Title, Rank, Service, Tooltip
+from .widgets import AdminSummernoteInplaceWidget
 try:
     from bootstrap_themes import list_themes
 except ImportError:
@@ -94,3 +95,21 @@ class GenericUserUpdateForm(GenericUserForm):
 
     def validate_unique(self):
         pass
+
+
+TOOLTIP_TYPE_CHOICES = (
+    ('question-circle', _('Help'), ),
+    ('exclamation-triangle', _('Warning'), ),
+    ('info-circle', _('Information'), ),
+    ('check-circle', _('Check'), ),
+    ('exclamation-circle', _('Check failed'), ),
+)
+
+
+class TooltipForm(forms.ModelForm):
+    type = forms.ChoiceField(choices=TOOLTIP_TYPE_CHOICES)
+    body = forms.CharField(widget=AdminSummernoteInplaceWidget())
+
+    class Meta:
+        model = Tooltip
+        fields = ('base_url', 'selector', 'type', 'title', 'body', )

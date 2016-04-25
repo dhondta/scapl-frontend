@@ -10,7 +10,7 @@
 			<fieldset>
 				<legend title="{{ step.help }}">{{ step.title }}</legend>
 				{% for item in step.items %}
-				<label class="col-lg-3 control-label" title="{{ item.help }}">{{ item.label }}</label>
+				<label class="col-lg-3 control-label">{{ item.label }}</label>
 				<div class="panel panel-default col-lg-9">
 					<div class="panel-body" id="di{{ item.id }}-value">
 						{{ item.form.instance.value|default_if_none:""|safe }}
@@ -57,7 +57,8 @@
 									<div class="container">
 										<div class="row">
 											<div class="col-md-5">
-												<label class="control-label col-sm-12" id="di{{ item.id }}-label" style="z-index: 10;">{{ item.label }}</label>
+												<label class="control-label col-sm-12" id="di{{ item.id }}-label" style="z-index: 10">{{ item.label }}
+												<i class="fa fa-question-circle" id="di{{ item.id }}-help"></i></label>
 											</div>
 											<div class="col-md-1">
 												<div class="btn-group" style="float: right">

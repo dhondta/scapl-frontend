@@ -1,5 +1,10 @@
 # -*- coding: UTF-8 -*-
+import json
 from django import forms
+from django.conf import settings
+from django.template import Context
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 from .models import Task, TaskItem
@@ -59,11 +64,23 @@ class TaskInitStepForm(BootstrapMixin, forms.ModelForm):
         return task
 
 
-class MySummernoteWidget(SummernoteInplaceWidget):
+class WizardSummernoteWidget(SummernoteInplaceWidget):
     def render(self, name, value, attrs=None):
-        # native Summernote widget only takes attrs from its __init__ whereas attrs is set during the wizard creation ;
-        #  this avoids KeyError on 'id' because, in this implementation, attrs is None and self.attrs is to be used
-        return super(MySummernoteWidget, self).render(name, value, attrs or self.attrs)
+        attrs_for_textarea = self.attrs.copy()
+        attrs_for_textarea['hidden'] = 'true'
+        attrs_for_textarea['id'] += '-textarea'
+        html = super(SummernoteInplaceWidget, self).render(name, value, attrs_for_textarea)
+        html += render_to_string(
+            'wizard/wizard/data-form-summernote.html',
+            Context(dict({
+                'id': self.attrs['id'].replace('-', '_'),
+                'id_src': self.attrs['id'],
+                'value': value if value else '',
+                'settings': json.dumps(self.template_contexts()),
+                'STATIC_URL': settings.STATIC_URL,
+            }))
+        )
+        return mark_safe(html)
 
 
 class TaskItemForm(forms.ModelForm):
@@ -71,7 +88,7 @@ class TaskItemForm(forms.ModelForm):
     class Meta:
         model = TaskItem
         fields = ('apl', 'item', 'value', )
-        widgets = {'value': MySummernoteWidget()}
+        widgets = {'value': WizardSummernoteWidget()}
 
 
 class TaskSequenceSelectionForm(BootstrapMixin, forms.Form):

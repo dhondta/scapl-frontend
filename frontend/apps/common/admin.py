@@ -4,8 +4,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
-from .models import GenericUser, Title, Rank, Country, Locality, Address, OrganizationalUnit, Department, Service
-from .forms import GenericUserAdminForm, GenericUserCreationForm
+from django_summernote.admin import SummernoteModelAdmin
+from .models import GenericUser, Title, Rank, Country, Locality, Address, OrganizationalUnit, Department, Service, Tooltip
+from .forms import GenericUserAdminForm, GenericUserCreationForm, TooltipForm
 
 
 class GenericUserAdmin(UserAdmin):
@@ -82,6 +83,13 @@ class GenericUserAdmin(UserAdmin):
         if lookup.startswith('password'):
             return False
         return super(GenericUserAdmin, self).lookup_allowed(lookup, value)
+
+
+@admin.register(Tooltip)
+class TooltipAdmin(admin.ModelAdmin):
+    form = TooltipForm
+    list_display = ('base_url', 'selector', 'type', 'title', )
+    search_fields = ('title', 'base_url', 'body', )
 
 
 admin.site.unregister(Group)

@@ -62,15 +62,6 @@ INSTALLED_APPS = (
     # style applications
     'bootstrap3',
     'bootstrap_themes',
-    # native applications
-    'django_admin_bootstrapped',
-    'django.contrib.auth',
-    'django.contrib.admin',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
     # extra applications (core)
     'admin_reorder',
     'adminsortable2',
@@ -81,6 +72,15 @@ INSTALLED_APPS = (
     'overextends',
     'smuggler',
     'compressor',
+    # native applications
+    'django_admin_bootstrapped',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
     # TODO: Enable 'storages' for production version
     #    'storages',
     #'celery_haystack',
@@ -88,7 +88,6 @@ INSTALLED_APPS = (
     # add-on applications (optional)
     'django_extensions',
     'simple_history',
-    'tooltips',
     'admin_honeypot',
     # SCAPL project,
     'frontend',
@@ -257,7 +256,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'tooltips.processors.tooltips',
+                'apps.common.processors.tooltips',
             ],
             'builtins': [
                 'overextends.templatetags.overextends_tags'
