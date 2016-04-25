@@ -80,6 +80,7 @@ INSTALLED_APPS = (
     'form_utils',
     'overextends',
     'smuggler',
+    'compressor',
     # TODO: Enable 'storages' for production version
     #    'storages',
     #'celery_haystack',
@@ -183,6 +184,12 @@ STATIC_ROOT = STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+    #'compressor.parser.BeautifulSoupParser',
+    #'compressor.parser.LxmlParser',
+    #'compressor.parser.Html5LibParser',
+    #'compressor.filters.jsmin.SlimItFilter',
+    #'compressor.filters.cssmin.CSSCompressorFilter',
 )
 
 # URL prefix for media files (must be different from STATIC_URL).
@@ -357,12 +364,12 @@ SUMMERNOTE_CONFIG = {
         ['style', ['style']],
         ['font', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
         ['font', ['fontname', 'fontsize', 'color']],
+        ['constants', ['constants']],
         ['para', ['ul', 'ol', 'paragraph', 'height']],
         ['insert', ['table', 'link', 'picture', 'hr']],
         ['highlight', ['highlight']],
         ['view', ['fullscreen', 'codeview']],
         ['help', ['help']]
-        # TODO: add a plugin for managing keywords such as 'None', 'Not available', 'Not applicable'
     ],
     'attachment_require_authentication': False,
     'attachment_filesize_limit': 1024 * 1024,
@@ -372,3 +379,18 @@ SUMMERNOTE_CONFIG = {
     'prettifyHtml': False,
 }
 # Note: JS and CSS are manually imported in the relevant templates
+
+# TODO: Enable JS and CSS compression for production version
+# COMPRESS_ENABLED = True
+# COMPRESS_OFFLINE = True
+# COMPRESS_CSS_FILTERS = [
+#     'compressor.filters.cleancss.CleanCSSFilter',
+#     'compressor.filters.css_default.CssAbsoluteFilter',
+#     'compressor.filters.cssmin.CSSCompressorFilter',
+#     'compressor.filters.yui.YUICSSFilter',
+# ]
+# COMPRESS_JS_FILTERS = [
+#     'compressor.filters.jsmin.JSMinFilter',
+#     'compressor.filters.yui.YUIJSFilter',
+# ]
+# COMPRESS_YUI_BINARY = os.path.join(STATICFILES_DIRS[0], 'base', 'yuicompressor.jar').replace('\\', '/')
