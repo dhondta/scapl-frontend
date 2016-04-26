@@ -22,10 +22,25 @@ ADMIN_REORDER = (
     {
         'app': 'common',
         'label': _("2- General Information"),
+        'models': (
+            'common.Country',
+            'common.Locality',
+            'common.Address',
+            'common.OrganizationalUnit',
+            'common.Department',
+            'common.Service',
+            'common.Rank',
+            'common.Title',
+        )
     },
     {
         'app': 'profiles',
         'label': _("3- User Profile Information"),
+        'models': (
+            'profiles.NormalUser',
+            'profiles.SecurityUser',
+            'profiles.ScaplRole',
+        )
     },
     {
         'app': 'wizard',
@@ -37,10 +52,10 @@ ADMIN_REORDER = (
         )
     },
     {
-        'app': 'tooltips',
+        'app': 'common',
         'label': _('5- Add-ons'),
         'models': (
-            {'model': 'tooltips.Tooltip', 'label': 'Tooltips'},
+            {'model': 'common.Tooltip', 'label': 'Tooltips'},
             {'model': 'admin_honeypot.LoginAttempt', 'label': 'Login attempts (Admin Honeypot)'},
         )
     },
