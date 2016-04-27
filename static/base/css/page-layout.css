@@ -93,6 +93,25 @@ div.jumbotron {
   padding-top: 12%;
   padding-bottom: 12%;
 }
+/* admin-specific styles */
+body.dashboard, body.change-list {
+  margin: auto;
+}
+body.dashboard > div.container > div.colMS {
+  width: 40%;
+  margin: auto;
+}
+body.change-list > div.container > div.flex {
+  width: 80%;
+  margin: auto;
+}
+body.change-form > div.container > div.colM {
+  width: 70%;
+  margin: auto;
+}
+.table th a {
+  text-decoration: none;
+}
 /* wizard-specific styles */
 .modal-dialog.wizard {
   padding-top: 40px;

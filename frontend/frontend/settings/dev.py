@@ -62,18 +62,18 @@ INSTALLED_APPS = (
     # style applications
     'bootstrap3',
     'bootstrap_themes',
+    'django_admin_bootstrapped',
     # extra applications (core)
     'admin_reorder',
     'adminsortable2',
+    'compressor',
     'django_libs',
     'django_summernote',
     'expirables',
     'form_utils',
     'overextends',
     'smuggler',
-    'compressor',
     # native applications
-    'django_admin_bootstrapped',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
